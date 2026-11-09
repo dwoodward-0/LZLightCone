@@ -1,0 +1,14 @@
+id: baseline
+description: Default configuration using standard practices
+decisions:
+  statistics: both_with_crosscheck
+  background_components: all_table1
+  efficiency_treatment: input_published_curve
+  response_model: nest_library
+  halo_model: shm_standard
+  nest_parameter_set: ws2024_nest240
+  test_statistic_sidedness: two_sided
+  power_constraint: applied_1sigma
+  median_sensitivity_definition: median_of_toy_limits
+  exposure_structure: combined_single
+  detector_effects: uniform_1d
