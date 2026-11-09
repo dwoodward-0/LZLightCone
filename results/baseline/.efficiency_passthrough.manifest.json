@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "output_id": "efficiency_passthrough",
+  "universe_id": "baseline",
+  "recipe": "python src/plot_efficiency.py --input data/lz_ws2024_efficiency.csv --output results/baseline/efficiency_passthrough.png",
+  "definition_version": "sha256:a01450a2785ec2a66178992a63944e0d07927f0742f1762bf3fc331a96d2a62b",
+  "env_version": "sha256:184e0ac5c3729d2bdd9a9a72f4e54474376bbe7c0706d6fabd08b82546b018e9",
+  "data_version": "sha256:9ad0ba9abbf434ce60efb05c311e5fb612322404b67468c86321501b7b9ca65c",
+  "decisions": {
+    "efficiency_treatment": "input_published_curve"
+  },
+  "input_versions": {
+    "lz_efficiency_curve": "sha256:5f007b20449756e68d2afc4cf3e5c93be1373f7ddd985f50fee873afbd1a2b3e"
+  },
+  "git_sha": "b2d1fbd22a7e029361aff59d000de8f171db5051",
+  "git_remote": "",
+  "lc_version": "0.5.0",
+  "hermeticity": {
+    "mechanism": "seatbelt",
+    "fs": "declared",
+    "network": "allowed",
+    "landlock_abi": null,
+    "exec_allowlist_version": 1
+  },
+  "started_at": "2026-11-09T23:48:41.902+00:00",
+  "finished_at": "2026-11-09T23:48:43.244+00:00",
+  "uv_version": "0.13.7",
+  "image": null
+}
