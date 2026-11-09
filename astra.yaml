@@ -1,0 +1,3026 @@
+# ASTRA Analysis Specification
+
+version: "0.0.14"
+name: "xenon-wimp-sensitivity"
+description: "A from-scratch model of a dual-phase xenon direct-detection experiment, modeled on LUX-ZEPLIN (LZ), that computes the instrument's sensitivity to spin-independent WIMP-nucleon scattering. NEST-style recoil microphysics (yields, recombination, fluctuations) maps a WIMP signal and each LZ background source into corrected observables (S1c, log10 S2c); LZ's published detector parameters, analysis efficiency curve, and background expectations (Table I of the WS2024 result) are declared inputs. Statistical machinery — a 2D binned profile likelihood with nuisance parameters plus a Feldman-Cousins cut-and-count cross-check — turns the expected spectra into a median sensitivity curve, validated against LZ's published median expected limit (5.1e-48 cm2 at 40 GeV/c2). Once validated, background rates become knobs for sensitivity-variation studies under alternative assumptions."
+
+prior_insights:
+  lz_plr_unbinned_2d:
+    id: lz_plr_unbinned_2d
+    label: "LZ WS2022 used unbinned PLR in 2D"
+    claim: "LZ WS2022 performs statistical inference with an extended UNBINNED profile likelihood ratio statistic in the two-dimensional (S1c, log10 S2c) observable space, with a two-sided construction of the 90% confidence bounds — not a binned likelihood."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "Statistical inference of WIMP scattering cross section and mass is performed with an extended unbinned profile likelihood statistic in the log 10S2c-S1c observable space, with a two-sided construction of the 90 % confidence bounds"
+          prefix: "and DEAP-3600 [75] limits. "
+          suffix: " Background and signal component shapes are modeled"
+        location:
+          page: 7
+    scope: "WS2022 analysis construction; a binned 2D likelihood is an approximation to LZ's unbinned PLR."
+  lz_likelihood_constraint_terms:
+    id: lz_likelihood_constraint_terms
+    label: "Background rates are nuisance parameters with constraint terms"
+    claim: "Background component rate uncertainties enter the likelihood as constraint terms in a combined fit; component PDF shapes in (S1c, log10 S2c) come from the Geant4-based package BACCARAT plus a custom LZ detector response simulation using the tuned NEST model."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "The background component uncertainties are included as constraint terms in a combined fit of the background model to the data, the result of which is also shown in Table I."
+          prefix: "using the tuned nest model. "
+          suffix: " Above the smallest tested WIMP mass of 9 GeV"
+        location:
+          page: 7
+  lz_unified_interval_two_sided:
+    id: lz_unified_interval_two_sided
+    label: "LZ uses unified-interval (FC-style) limit construction"
+    claim: "LZ treats its limit construction as a unified-interval (Feldman-Cousins-style, ref [S95]) analysis and explicitly discusses limits fluctuating below the median sensitivity as a feature of that construction."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "In unified interval analyses such as this, statistical fluctuations in the data create statistical fluctuations in the limit, including to values below the median sensitivity of the experiment; a further discussion of this effect is found in Section VI of [S95]."
+          prefix: "the power constraint are shown, as well as the expected sensitivity. "
+          suffix: " We report the median expected limit"
+        location:
+          page: 12
+  lz_power_constraint:
+    id: lz_power_constraint
+    label: "Power-constrained limits between 13 and 36 GeV"
+    claim: "For WIMP masses between 13 and 36 GeV/c2 the reported limit is constrained by a power criterion with power of the alternate hypothesis πcrit = 0.16 (Cowan et al.), restricting fluctuations to 1σ below the median expected limit; this introduces overcoverage (>90%)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "the limit is constrained to a cross section such that the power of the alternate hypothesis is πcrit = 0.16 [78]. This restricts the fluctuation to 1σ below the median expected limit."
+          prefix: "For these masses, "
+          suffix: " The introduction of the power constraint also introduces overcoverage"
+        location:
+          page: 7
+  lz_median_sensitivity_reported:
+    id: lz_median_sensitivity_reported
+    label: "Median expected limit is the headline sensitivity quantity"
+    claim: "LZ reports the median expected limit together with 1σ and 2σ sensitivity bands around it, and recommends using the median expected limit when comparing experiments or interpreting theory compatibility — this is the validation target quantity."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "We report the median expected limit, as well as the 1 and 2 σ bands around the median, as"
+          prefix: "a further discussion of this effect is found in Section VI of [S95]. "
+          suffix: "recommended, to mitigate the cognitive impact of these fluctuations."
+        location:
+          page: 12
+  lz_limit_minima:
+    id: lz_limit_minima
+    label: "WS2022 limit minima for validation"
+    claim: "Key WS2022 validation numbers: minimum of the observed (power-constrained) SI limit is 9.2e-48 cm2 at 36 GeV/c2; minimum of the unconstrained observed limit is 6.2e-48 cm2 at 26 GeV/c2; minimum of the MEDIAN EXPECTED limit is 1.9e-47 cm2 at 43 GeV/c2."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "The minimum of the unconstrained limit curve is 6 .2 × 10−48 cm2 at 26 GeV/c2, and the minimum of the median expected limit is 1 .9 × 10−47 cm2 at 43 GeV/c2."
+          prefix: "at mχ = 36 GeV/c2. "
+          suffix: " The background model and data as a function of reconstructed energy"
+        location:
+          page: 7
+  lz_background_nine_components:
+    id: lz_background_nine_components
+    label: "WS2022 background model has nine components"
+    claim: "The WS2022 background model consists of nine components (β decays + detector ER, solar νER, 127Xe, 124Xe, 136Xe, 8B CEνNS, accidentals, 37Ar, detector neutrons), grouped by their spectra in the ROI or by the uncertainty on their rate."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "The background model in this analysis consists of nine components, grouped according to their spectra in the ROI or the uncertainty on their rate. Table I lists the expected number of events from each component."
+          prefix: "shape that depends on the mass of the WIMP [55]. "
+          suffix: " The dominant ER signal in the search comes from"
+        location:
+          page: 6
+  lz_background_expected_counts:
+    id: lz_background_expected_counts
+    label: "WS2022 expected background counts (Table I)"
+    claim: "Table I (60 d × 5.5 t exposure) gives expected counts used with their uncertainties as fit constraint terms: β decays + detector ER 215±36, νER 27.1±1.6, 127Xe 9.2±0.8, 124Xe 5.0±1.4, 136Xe 15.1±2.4, 8B CEνNS 0.14±0.01, accidentals 1.2±0.3 (subtotal 273±36); 37Ar [0,288] and detector neutrons 0.0+0.2 have non-Gaussian priors."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "β decays + Det. ER 215 ± 36 222 ± 16"
+          prefix: "Source Expected Events Fit Result "
+          suffix: " ν ER 27.1 ± 1.6 27.2 ± 1.6"
+        location:
+          page: 6
+  lz_37ar_neutron_constraints:
+    id: lz_37ar_neutron_constraints
+    label: "Non-Gaussian priors for 37Ar and neutrons"
+    claim: "Two background components get non-Gaussian constraints: 37Ar gets a flat prior from 0 to three times the pre-underground-exposure estimate of 96 events; radiogenic detector neutrons get a data-driven constraint 0.0+0.2 from an OD-tagged single-scatter fit folded with the 89±3% neutron tagging efficiency."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "A flat constraint of 0 to three times the estimate of 96 events is imposed because of large uncertainties on the prediction."
+          prefix: "correcting for the decay time before the search [74]. "
+          suffix: " The NR background has contributions from radiogenic neutrons"
+        location:
+          page: 7
+      - id: ev2
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "The rate of radiogenic neutrons in the ROI is constrained using the distribution of single scatters in the FV tagged by the OD and then applying the measured neutron tagging efficiency from the AmLi calibration sources (89 ± 3 %)."
+          prefix: "is small due to the S2 >600 phd requirement. "
+          suffix: " A likelihood fit of the NR component in the OD-tagged"
+        location:
+          page: 7
+  lz_observed_335_events:
+    id: lz_observed_335_events
+    label: "WS2022: 335 events, best-fit WIMP zero"
+    claim: "335 events pass all WS2022 selections; above 9 GeV/c2 the best-fit WIMP count is zero, so the data are consistent with background-only (p = 0.96 in reconstructed energy)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "Figure 4 shows the distribution in log 10S2c-S1c of the 335 events [53] passing all selections, along with contours representing a 30 GeV/c2 WIMP, a flat NR distribution, and the background model."
+          prefix: "The xenon mass in the FV is estimated to be 5 .5 ± 0.2 t using tritium data and confirmed by geometric calculation. "
+          suffix: " The signal model assumes spin-independent scattering"
+        location:
+          page: 6
+  lz_roi_definition:
+    id: lz_roi_definition
+    label: "WS2022 ROI definition"
+    claim: "The WS2022 ROI is defined in the corrected observables as S1c in [3, 80] phd, uncorrected S2 > 600 phd (>10 extracted electrons), and S2c < 10^5 phd; the S2 thresholds ensure signal efficiencies are well understood and ER backgrounds well calibrated by tritium data."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "The ROI is defined as S1 c in the range 3 − 80 phd, uncorrected S2 greater than 600 phd (>10 extracted electrons), and S2c less than 105 phd, ensuring that signal efficiencies are well understood and background ER sources are well calibrated by the tritium data."
+          prefix: "where a WIMP interaction could be reconstructed. "
+          suffix: " Events classified as multiple scatters in the TPC are removed"
+        location:
+          page: 4
+    scope: "'105 phd' in the PDF text is 10^5 phd (superscript exponent)."
+  lz_efficiency_curve_staged:
+    id: lz_efficiency_curve_staged
+    label: "Signal efficiency is built in stages"
+    claim: "The WS2022 signal efficiency vs NR energy is composed of sequential stages — DAQ trigger, threefold-coincidence and >3 phd S1c threshold, single-scatter reconstruction plus analysis cuts, and the ROI in S1 and S2 — each determined data-driven from DD neutron, AmLi, and tritium calibration data."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "Signal efficiency as a function of NR energy for the trigger (blue), the threefold coincidence and >3 phd threshold on S1c (orange)"
+          prefix: "FIG. 2. "
+          suffix: " (green), and the search ROI in S1 and S2"
+        location:
+          page: 5
+    scope: "Fig. 2 caption; the full caption continues with the SS-reconstruction/cuts and ROI curve descriptions."
+  lz_efficiency_50pct_kev:
+    id: lz_efficiency_50pct_kev
+    label: "Efficiency 50% point at 5.5 keVnr"
+    claim: "The overall WS2022 NR signal efficiency reaches 50% at 5.5 keVnr — a useful cross-check point for a recreated efficiency curve."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "The inset shows the low-energy behavior, with the dotted line at 5 .5 keVnr marking 50 % efficiency."
+          prefix: "The inset shows the low-energy behavior, with the dotted line at "
+          suffix: " The error band (gray) is assessed using AmLi and tritium data"
+        location:
+          page: 5
+  lz_efficiency_uncertainty:
+    id: lz_efficiency_uncertainty
+    label: "Efficiency uncertainty vs energy"
+    claim: "The NR signal efficiency uncertainty (from the AmLi-tritium composite dataset method) is 3% for NR energies above 3.5 keVnr, rising to 15% at 1 keVnr."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "The uncertainty is 3 % for nuclear recoil energies >3.5 keVnr, increasing to 15 % at 1 keVnr."
+          prefix: "and the difference between the AmLi-tritium dataset and a pure AmLi dataset. "
+          suffix: " FIG. 3. Data in reconstructed"
+        location:
+          page: 5
+  lz_data_release_efficiency_curve:
+    id: lz_data_release_efficiency_curve
+    label: "Efficiency curve published in data release"
+    claim: "LZ published a data release (DOI 10.1103/PhysRevLett.131.041002) containing, among other things, the points of the total analysis efficiency curve (Fig. 2) and the WIMP-search data points in S1-S2 space (Fig. 4) — so the published efficiency curve can be taken directly as an input."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "Figure 2: points representing the total efficiency curve for this analysis (black line)."
+          prefix: "Selected data from the following plots from this paper are available at https://doi.org/10.1103/PhysRevLett.131.041002. "
+          suffix: " Figure 4: points in S1-S2 space representing the data"
+        location:
+          page: 13
+  lz_nest_tuned_g1_g2:
+    id: lz_nest_tuned_g1_g2
+    label: "LZ tuned NEST 2.3.7: g1 and g2"
+    claim: "The response model is NEST 2.3.7 with ER parameters tuned to tritium/83mKr/131mXe/129mXe calibration data in log10(S2c)-S1c space, yielding g1 = 0.114 ± 0.002 phd/photon and g2 = 47.1 ± 1.1 phd/electron; the ER parameters were then propagated to the NEST NR model and validated against DD neutron data (band means/widths to better than 1%/4% in log10 S2c)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "The photon detection efficiency g1 is determined to be 0 .114 ± 0.002 phd/photon and the gain of the ionization channel g2 to be 47 .1 ± 1.1 phd/electron [44]."
+          prefix: "(164 keV) peaks. "
+          suffix: " The tritium data are best modeled with the nest recombination"
+        location:
+          page: 4
+      - id: ev2
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "To reproduce the TPC response to ER and NR events, detector and xenon response parameters of the nest 2.3.7 [43] ER model are tuned to match the median and widths of the tritium calibration data in log10S2c-S1c space"
+          prefix: "Corrected parameters are uniform across the TPC to within 3%. "
+          suffix: ", and to match the reconstructed energies of the 83mKr"
+        location:
+          page: 4
+  lz_nest_skewness_disabled:
+    id: lz_nest_skewness_disabled
+    label: "LZ NEST: skewness disabled, band widths reduced"
+    claim: "Two non-default NEST settings were required: the recombination skewness model was disabled (best match to tritium data), and the widths of the predicted ER and NR bands were reduced to match LZ calibration data."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "The tritium data are best modeled with the nest recombination skewness model [45] disabled, and comparisons between the tuned model and tritium data using several statistical tests show consistency throughout the full tritium ER distribution"
+          prefix: "47 .1 ± 1.1 phd/electron [44]. "
+          suffix: " [46–49]. The nest ER model also includes effects"
+        location:
+          page: 4
+      - id: ev2
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "the width of the predicted ER and NR bands had to be reduced to match LZ calibration data and, as mentioned in the main text, the nest recombination skewness model was turned off."
+          prefix: "In addition to the parameters below, "
+          suffix: " There are detailed instructions for implementing these changes"
+        location:
+          page: 12
+  lz_nest_params_table_s2:
+    id: lz_nest_params_table_s2
+    label: "Tuned NEST parameters published (Table S2 + header file)"
+    claim: "Supplemental Table S2 gives the tuned NEST input parameters — ggas1 = 0.0921 phd/photon, g1 = 0.1136 phd/photon, effective gas extraction field 8.42 kV/cm, single electron size 58.5 phd, extraction efficiency 80.5%, g2 = 47.07 phd/electron — and a header file for NEST 2.3.7 reproducing the ER and NR response models is published with the paper."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "The key numerical parameters of the nest model are provided in Table S2. Additionally, a header file for nest 2.3.7 that will reproduce the ER and NR response models used in this analysis is available online at https://doi.org/10.1103/PhysRevLett.131.041002."
+          prefix: "and position-dependence in S1 and S2 areas. "
+          suffix: " Note that the extraction field number is known to be an effective value"
+        location:
+          page: 12
+    scope: "Parameter values are read from Table S2 (PDF page 12); the quoted prose confirms the table exists and the header file is public."
+  lz_detector_fields:
+    id: lz_detector_fields
+    label: "WS2022 drift and extraction fields"
+    claim: "WS2022 operating conditions for the response model: drift field 193 V/cm (varying 4% over the analysis volume), gas extraction field 7.3 kV/cm at r = 0 (8.42 kV/cm effective value in NEST), electron lifetime 5000-8000 µs vs 951 µs maximum drift time."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "The cathode and gate electrodes [35] established a drift field of 193 V /cm, determined by electrostatic simulation to vary by 4 % over the volume considered in this analysis. The gate and anode electrodes established a gas extraction field of 7 .3 kV/cm at radial position r = 0."
+          prefix: "under stable detector conditions. "
+          suffix: " Twelve TPC and two skin PMTs, with no specific position"
+        location:
+          page: 3
+  lz_halo_shm:
+    id: lz_halo_shm
+    label: "WS2022 uses standard halo model with Baxter conventions"
+    claim: "The WS2022 SI WIMP signal model assumes an isotropic Maxwell-Boltzmann velocity distribution parameterized as in Baxter et al. (EPJ C 81, 2021), with astrophysical inputs from refs [55-60] (Lewin & Smith; Smith et al.; McCabe; Schönrich et al.; Bland-Hawthorn & Gerhard; GRAVITY) — i.e. the standard halo model with standard parameter references."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "The signal model assumes spin-independent scattering from WIMPs with an isotropic Maxwell–Boltzmann velocity distribution, parameterized as in Ref. [54], with inputs from Refs. [55–60]."
+          prefix: "a flat NR distribution, and the background model. "
+          suffix: " The WIMP model has an approximately exponentially decreasing energy spectrum"
+        location:
+          page: 6
+  lz_exposure_fv_mass:
+    id: lz_exposure_fv_mass
+    label: "WS2022 exposure 60 d x 5.5 t"
+    claim: "The WS2022 exposure is 60 ± 1 live days in a 5.5 ± 0.2 t fiducial volume (defined radially 4.0 cm from the TPC wall with corner/margin exclusions and drift-time cuts 86-936.5 µs), giving the 60 d × 5.5 t exposure used for all expected counts."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "The xenon mass in the FV is estimated to be 5 .5 ± 0.2 t using tritium data and confirmed by geometric calculation."
+          prefix: "The number of remaining events from the wall entering the FV is estimated to be < 0.01. "
+          suffix: " Figure 4 shows the distribution in log 10S2c-S1c of the"
+        location:
+          page: 6
+      - id: ev2
+        doi: "10.48550/arXiv.2207.03764"
+        version: 4
+        quote:
+          exact: "These omissions result in a final search live time of 60 ± 1 d where a WIMP interaction could be reconstructed."
+          prefix: "and after cosmic-ray muons traversing the TPC. "
+          suffix: " In future searches, the hold-off can be relaxed"
+        location:
+          page: 4
+
+  shm_recommended_parameters:
+    id: shm_recommended_parameters
+    label: "Recommended SHM parameter set (Table 1)"
+    claim: "The paper's Table 1 gives the recommended Standard Halo Model parameter set: local dark matter density 0.3 GeV/cm^3, galactic escape speed 544 km/s, average galactocentric Earth speed 29.8 km/s, solar peculiar velocity (11.1, 12.2, 7.3) km/s, and local standard of rest velocity (0, 238, 0) km/s; the most significant change from past practice is the updated v0."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "The overall recommendation is to use the SHM parameters in Table 1."
+          prefix: "Astrophysical models"
+          suffix: "The most significant is an updated value of"
+        location:
+          page: 16
+      - id: ev2
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Suggested Standard Halo Model parameters. Vectors are given as ( vr, vϕ, vθ) with r pointing radially inward and ϕ in the direction of the Milky Way’s rotation."
+          prefix: "Tab. 1:"
+          suffix: "can approximate"
+        location:
+          page: 11
+    scope: "Applies to spin-independent WIMP sensitivity projections using the standard halo model; adopt these exact values for the LZ-style forward model."
+  shm_rho0_0p3:
+    id: shm_rho0_0p3
+    label: "rho0 = 0.3 GeV/cm^3"
+    claim: "The recommended local dark matter density is 0.3 GeV/cm^3 (the Lewin & Smith value, still the most commonly used); rho0 only normalizes the flux, so changing it linearly rescales exclusion curves, making reinterpretation trivial."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Local dark matter density 0.3 GeV/c2/cm3 [9]"
+          prefix: "Parameter Description Value Reference"
+          suffix: "Galactic escape speed"
+        location:
+          page: 11
+      - id: ev2
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "This parameter normalizes the overall flux, but does not affect the predicted velocity distribution or the resulting WIMP-nucleon recoil spectra"
+          prefix: "typically in the range 0.2 to 0.6 GeV/c2/cm3."
+          suffix: "as such, the total number of WIMP events"
+        location:
+          page: 11
+  shm_vesc_544:
+    id: shm_vesc_544
+    label: "vesc = 544 km/s"
+    claim: "The recommended galactic escape speed is vesc = 544 km/s (RAVE median, kept for consistency with existing WIMP-nucleon cross-section limits), even though some newer measurements trend lower."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "the recommendation put forth in this document is to use vesc = 544 km/s to maintain consistency with assumptions used for existing WIMP-nucleon cross section limits."
+          prefix: "using the Gaia DR2 dataset. As such,"
+          suffix: "Average galactocentric Earth speed"
+        location:
+          page: 11
+  shm_v0_238:
+    id: shm_v0_238
+    label: "v0 = 238 km/s (replaces 220)"
+    claim: "The recommended local standard of rest velocity is v0 = 238 km/s (vector (0, 238, 0) km/s), replacing the 220 km/s (+-20 km/s) used by previous limits (LUX, XENON1T); the smaller uncertainty and new value can materially change projected limits."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "We recommend updating this parameter to 238 km/s; while this new value is within the uncertainty of the old one, the choice of this parameter and its smaller uncertainty can have a material impact on dark matter searches [87]."
+          prefix: "Previous limits on WIMP-nucleon cross sections used a value of 220 km/s"
+          suffix: "Astrophysical Neutrinos"
+        location:
+          page: 12
+      - id: ev2
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Local standard of rest velocity (0, 238, 0) km/s [47, 48]"
+          prefix: "Solar peculiar velocity (11.1, 12.2, 7.3) km/s [46]"
+          suffix: "distinctive substructures"
+        location:
+          page: 11
+  shm_earth_speed_29p8:
+    id: shm_earth_speed_29p8
+    label: "Earth speed 29.8 km/s, March-9 approximation"
+    claim: "The recommended average galactocentric Earth speed is 29.8 km/s with the accompanying time-dependent Earth velocity formulation; for analyses not searching for (annual) modulation, the year-averaged speed distribution may be used, approximately equivalent to evaluating the Earth velocity on March 9, giving v_Earth(March 9) = (29.2, -0.1, 5.9) km/s."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "In this document, we support the use of ⟨|⃗ v|⟩ = 29.8 km/s, (13) as suggested in Ref. [41]"
+          prefix: "Average galactocentric Earth speed:"
+          suffix: "along with the accompanying time-evolving definition"
+        location:
+          page: 11
+      - id: ev2
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "For most analyses not looking for annular modulation effects, it is sufficient to use the distribution averaged over the full year, which comes out to be approximately equivalent to the distribution evaluated at March 9"
+          prefix: "The variation of the lab-frame WIMP speed due to the time evolution of"
+          suffix: "With the exception of"
+        location:
+          page: 10
+      - id: ev3
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Average galactocentric Earth speed 29.8 km/s [41]"
+          prefix: "Galactic escape speed 544 km /s [45]"
+          suffix: "Solar peculiar velocity"
+        location:
+          page: 11
+  shm_vpec_11_12_7:
+    id: shm_vpec_11_12_7
+    label: "Solar peculiar velocity (11.1, 12.2, 7.3) km/s"
+    claim: "The recommended solar peculiar velocity is (11.1, 12.2, 7.3) km/s (from Schoenrich et al. fitted to the Geneva-Copenhagen Survey), with statistical uncertainties (0.75, 0.47, 0.37) km/s and additional systematic uncertainties of (1, 2, 0.5) km/s; this supersedes the older Hipparcos-based value."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Solar peculiar velocity (11.1, 12.2, 7.3) km/s [46]"
+          prefix: "Average galactocentric Earth speed 29.8 km/s [41]"
+          suffix: "Local standard of rest velocity"
+        location:
+          page: 11
+      - id: ev2
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "We support using this value in dark matter searches."
+          prefix: "with additional systematic uncertainties of (1, 2, 0.5)km/s."
+          suffix: "Local standard of rest velocity"
+        location:
+          page: 11
+  shm_fix_params_do_not_profile:
+    id: shm_fix_params_do_not_profile
+    label: "Fix SHM parameters, do not profile"
+    claim: "Because quoted uncertainties on SHM parameters do not reflect halo-model uncertainties (Gaia substructure, LMC effects), the parameters should be fixed to clearly stated values and NOT profiled over as nuisance parameters, so results can be reinterpreted under different halo models."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "it is recommended not to profile over the SHM parameters’ uncertainties. Instead, we recommend that these parameters are fixed to clearly stated values, so they can easily be reinterpreted under different halo models."
+          prefix: "Due to non-parametric uncertainties in the form of the SHM itself,"
+          suffix: "The list of suggested normalization values"
+        location:
+          page: 16
+  report_results_under_nominal_halo:
+    id: report_results_under_nominal_halo
+    label: "Report under nominal halo model"
+    claim: "Results should be reported with respect to the nominal (recommended) halo model as the common point of comparison; halo-model variations are secondary and only matter if new measurements significantly alter the expected spectra."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "We recommend to report results with respect to the nominal halo model, which will give a common point of comparison, while knowledge of the dark matter halo continues to improve, unless new measurements significantly alter the expected spectra, particularly at high masses."
+          prefix: "including Refs. [43, 44] among others."
+          suffix: "Shape variations in the velocity distribution"
+        location:
+          page: 10
+  halo_shape_variation_threshold_effect:
+    id: halo_shape_variation_threshold_effect
+    label: "Halo shape variations matter near threshold"
+    claim: "Velocity-distribution shape variations matter mainly for WIMPs whose signals land near the experiment's energy threshold; normalization-only changes (like rho0) can be handled by linear rescaling of published limits."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Shape variations in the velocity distribution can have an appreciable effect for limits on WIMPs that produce signals near the energy threshold of an experiment, but is otherwise not expected to have a major effect."
+          prefix: "particularly at high masses."
+          suffix: "Changes that affect the signal normalization"
+        location:
+          page: 10
+  plr_recommended_test_statistic:
+    id: plr_recommended_test_statistic
+    label: "PLR is the recommended test statistic"
+    claim: "The Profile Likelihood Ratio is the recommended test statistic for both discovery significance and confidence-interval construction; alternate methods are acceptable only if they fulfill similar statistical properties, especially coverage."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "We recommend PLR as the test statistic to use to assess discovery significance and to construct confidence intervals. Alternate methods should fulfill similar statistical properties, in particular of coverage."
+          prefix: "should be pointed out when reporting results."
+          suffix: "For standard WIMP searches we advocate"
+        location:
+          page: 15
+  raster_scan_per_mass:
+    id: raster_scan_per_mass
+    label: "Raster scan per WIMP mass"
+    claim: "Standard WIMP searches should use the raster-scan approach: test a single parameter of interest (signal strength/cross section) at each fixed WIMP mass separately, rather than a simultaneous 2D fit of sigma and M; a 2D contour is reserved for excesses approaching discovery."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "For the reasons laid out in Ref. [17] and in keeping with convention to date, we advocate following the raster scan approach in most of what follows, but we return to this question in Sec. 2.4."
+          prefix: "An alternative 2D approach would be to constrain σ and M at the same time."
+          suffix: "Given λ(µ), one can define"
+        location:
+          page: 3
+      - id: ev2
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "For standard WIMP searches we advocate performing these assessments on a per-mass basis, as in a raster scan."
+          prefix: "Alternate methods should fulfill similar statistical properties, in particular of coverage."
+          suffix: "Discovery significance should be assessed"
+        location:
+          page: 15
+  two_sided_ts_recommended:
+    id: two_sided_ts_recommended
+    label: "Two-sided test statistic for limits"
+    claim: "For limit setting, the two-sided test statistic t-tilde_mu (Eq. 4) is recommended over the one-sided q_mu, so the same statistic serves discovery and exclusion and the interval naturally lifts off from zero if an excess is seen; the cost is a marginally weaker (up to ~20%) upper limit."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Here, we recommend the two-sided construction of Eq. 4. This decision is motivated by the desire to use the same test statistic for limit setting as for discovery"
+          prefix: "test statistic in their science papers (see, for instance, Refs. [21, 25, 26])."
+          suffix: "(recall that q0 of Eq. 5 is a limiting case of Eq. 4)"
+        location:
+          page: 5
+  fc_profile_construction_equivalence:
+    id: fc_profile_construction_equivalence
+    label: "Eq. 4 = profile construction = FC without nuisances"
+    claim: "The recommended two-sided construction is the Neyman 'unified' ordering: the log-likelihood-ratio ordering gives Feldman-Cousins intervals, or the profile construction when nuisance parameters are profiled; Eq. 4 equals Feldman-Cousins exactly in the absence of nuisance parameters. This grounds the FC cut-and-count cross-check in the same ordering principle."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Equation 4 corresponds to the profile construction described by the Particle Data Group [16], and, in the absence of nuisance parameters, is equivalent to that of Feldman&Cousins [15, 23]."
+          prefix: "avoids the potential of an experiment flip-flopping between several constructions"
+          suffix: "The cost of choosing the two-sided construction"
+        location:
+          page: 5
+  cl_90_primary:
+    id: cl_90_primary
+    label: "90% CL primary"
+    claim: "The primary limit should be quoted at 90% confidence level (alpha = 0.1), consistent with past field convention; 95% CL appears occasionally but 90% is standard."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "For direct detection of dark matter, α is most often 0.1, leading to 90% confidence levels, although a value of 0.05 (95% CL) is sometimes used."
+          prefix: "said to have coverage"
+          suffix: "The two-sided test statistic most often used"
+        location:
+          page: 5
+  mu_strictly_positive:
+    id: mu_strictly_positive
+    label: "mu strictly positive"
+    claim: "For dark matter the signal strength mu is defined strictly positive since signal can only add counts; the test statistic must respect this physical boundary."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "In the case of dark matter, the sought-after signal can only increase the data count (i.e. µ is defined strictly positive)."
+          prefix: "is the probability density function for"
+          suffix: "One can modify Eq. 2 to become"
+        location:
+          page: 3
+  mu_effective_estimator:
+    id: mu_effective_estimator
+    label: "mu-hat may go negative (Cowan)"
+    claim: "When implementing t-tilde_mu, the global-best-fit mu-hat is treated as an effective estimator allowed to go negative (following Cowan et al.); if mu-hat < 0 the denominator is evaluated at mu = 0 with theta conditioned there."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Note that here we follow the prescription in Ref. [15], which treats ˆµ as an effective estimator that can take negative values even if the condition µ ≥ 0 is required by the physical model."
+          prefix: "the maximum likelihood estimator will always be µ = 0."
+          suffix: "Discovery"
+        location:
+          page: 3
+  median_brazil_band:
+    id: median_brazil_band
+    label: "Publish median + Brazil band"
+    claim: "Expected/median sensitivity should be published as the median expected limit with an uncertainty band (the 'Brazil band'), computed from background-only pseudo-data; underfluctuation handling then references the band quantiles."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "We recommend collaborations publish the expected sensitivity of a result by showing a median expected limit with an uncertainty band (often called the ”Brazil band”)."
+          prefix: "the primary limit should use α = 0.1 (i.e. 90% CL)."
+          suffix: "The two-sided confidence interval will"
+        location:
+          page: 15
+  ts_distributions_from_mc:
+    id: ts_distributions_from_mc
+    label: "TS distributions from toy MC"
+    claim: "Test-statistic distributions should be built with toy MC (or approximations validated by toy MC), not assumed asymptotic; sensitivity should be computed directly from adequate simulation, cross-checked against nuisance-parameter variations."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "We recommend the use of MC techniques to construct the test-statistic distributions (see Sec. 2.3), as opposed to assuming that these distributions follow an asymptotic approximation."
+          prefix: "such assessments should always be undertaken with caution."
+          suffix: "We also recommend performing coverage checks"
+        location:
+          page: 6
+      - id: ev2
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "We recommend that the distribution of test statistics be estimated using either toy simulations or approximations (asymptotic or otherwise) verified using toy simulations."
+          prefix: "the per-mass confidence limit should still be included when reporting the result."
+          suffix: "Whenever possible, models should be validated"
+        location:
+          page: 15
+  coverage_checks_recommended:
+    id: coverage_checks_recommended
+    label: "Coverage checks recommended"
+    claim: "Coverage checks via MC are recommended to show the actual coverage matches nominal CL, including when true nuisance-parameter values differ from those assumed in the interval construction; with nuisance parameters coverage is not guaranteed but in practice is generally correct."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "We also recommend performing coverage checks to show that the actual coverage of the hypothesis test is similar to the nominal confidence, including if the true values of nuisance parameters differ from those assumed in the construction of the confidence interval"
+          prefix: "follow an asymptotic approximation."
+          suffix: "in the presence of nuisance parameters, coverage is not guaranteed"
+        location:
+          page: 6
+  sensitivity_via_simulation:
+    id: sensitivity_via_simulation
+    label: "Sensitivity via simulation, not asymptotics"
+    claim: "Sensitivity (expected limits/bands) should be calculated directly using adequate simulation, with MC studies cross-checked against uncertainty in the simulated nuisance-parameter values, rather than relying on asymptotic formulae."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "In general, we recommend that sensitivity be calculated directly using adequate simulation, with the MC studies cross checked against uncertainty in the simulated values of the nuisance parameters."
+          prefix: "asymptotic approximation be supported by MC studies to show its validity."
+          suffix: "If a set procedure for this computation is in place"
+        location:
+          page: 8
+  asymptotic_xenon1t_caution:
+    id: asymptotic_xenon1t_caution
+    label: "Asymptotic approximation can fail (~50% bias)"
+    claim: "Asymptotic (Wilks/chi-square) approximations can fail badly in direct detection because backgrounds are so strongly discriminated that the post-discrimination expectation in the signal region is O(1) or less; XENON1T's first result using the asymptotic approximation was incorrectly about 50% more sensitive than it should have been."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "the XENON1T collaboration presented a first result by approximating their likelihood ratio with an asymptotic distribution [6], an approximation that led incorrectly to a ∼50% more sensitive result."
+          prefix: "Similarly,"
+          suffix: "For their second science run, XENON1T corrected this treatment"
+        location:
+          page: 2
+  pcl_minus_1sigma:
+    id: pcl_minus_1sigma
+    label: "Power-constrained limits, pi_crit = 0.159"
+    claim: "Power-constrained limits are recommended to prevent underfluctuations: apply PCL with rejection power pi_crit = 0.159, i.e. clamp limits to the -1 sigma quantile of background-only upper limits (the lower Brazil-band edge), and make the unconstrained limit available; PCL is preferred over CLs."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "we advocate the use of a power-constrained limit (PCL) on the confidence intervals obtained using the test statistic of Eq. 4, with a power of at least πcrit = 0.159. This corresponds to restricting limits to the -1σ quantile of background-only upper limits."
+          prefix: "To avoid large underfluctuations that would exclude parameter space to which the experiment has little sensitivity,"
+          suffix: "We recommend that collaborations make available the unconstrained limit"
+        location:
+          page: 15
+  evidence_3sigma_global:
+    id: evidence_3sigma_global
+    label: "Evidence threshold: 3 sigma global"
+    claim: "A claim of 'evidence' requires at least a 3 sigma global discrepancy with the background-only hypothesis (global p-value < 1.4e-3); no recommendation is made for the 'discovery' threshold."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Claims of evidence should require at least a 3σ global discrepancy with the background-only hypothesis."
+          prefix: "significance that approaches or exceeds 3 σ."
+          suffix: "We do not make a recommendation regarding discovery significance."
+        location:
+          page: 15
+  lee_only_if_local_3sigma:
+    id: lee_only_if_local_3sigma
+    label: "LEE only if local excess >= 3 sigma"
+    claim: "The look-elsewhere effect across WIMP masses should be computed (via toy MC distribution of the minimum local p-value) only when a local excess approaches or exceeds 3 sigma, due to the computational cost; for SI searches above ~40-50 GeV the trial factor is negligible because spectra are degenerate."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "we propose that it be accounted for only if a local excess approaching or exceeding 3 σ is observed."
+          prefix: "Given the large computational cost associated with calculating the LEE,"
+          suffix: "If the computation needed to reach the relevant significance is unfeasible"
+        location:
+          page: 4
+  lower_limit_reporting_threshold:
+    id: lower_limit_reporting_threshold
+    label: "Decide lower-limit reporting threshold in advance"
+    claim: "With two-sided 90% CL intervals, background-only data can produce a non-zero lower limit in 10% of cases; collaborations should decide in advance on a significance threshold (e.g. XENON1T's rule: no lower limit shown if below 3 sigma) for reporting a lifted-off lower limit."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "we recommend that collaborations should decide in advance on a significance threshold for reporting of a lower limit; for example, in the recent XENON1T publication [7], if a result was less than 3σ significant, no lower limit would be shown."
+          prefix: "For a case like this,"
+          suffix: "As stated previously, we recommend publication of the smallest observed p-value"
+        location:
+          page: 6
+  report_smallest_p0:
+    id: report_smallest_p0
+    label: "Always report smallest p0"
+    claim: "The smallest observed p0 (background-only p-value) should always be reported alongside the upper limit, regardless of significance, and a p0-vs-mass plot made available in supplementary material or on request."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "We recommend always reporting the smallest observed p0 regardless of the presence or absence of any claim."
+          prefix: "which is computed only with reference to a fixed signal model."
+          suffix: "a plot of p0 as a function of particle mass"
+        location:
+          page: 4
+  neutrino_flux_convention:
+    id: neutrino_flux_convention
+    label: "Recommended neutrino flux normalizations (Table 4)"
+    claim: "For neutrino backgrounds, use the theoretical (B16 high-Z solar model) predictions for all solar sources except 7Be and 8B, where the latest experimental values should be used because they have low uncertainty and are uncorrelated with other neutrino signals; Table 4 gives the recommended normalizations (pp 5.98e10 +/- 0.6%, pep 1.44e8 +/- 1%, 7Be 4.99e9 +/- 3%, 8B 5.25e6 +/- 4%, hep 7.98e3 +/- 30%, CNO per Table 3, atmospheric 10.5 +/- 2.1, DSNB 86 +/- 43 cm^-2 s^-1)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "We recommend using the theoretical prediction for all the neutrino sources, except for 7Be and 8B, for which the most recent experimental values have a low uncertainty and are completely uncorrelated to other neutrino signals."
+          prefix: "The list of suggested normalization values for the relevant neutrino fluxes is shown in Table 4."
+          suffix: "We leave at the discretion of each collaboration"
+        location:
+          page: 16
+      - id: ev2
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Recommended normalization values of all relevant neutrino fluxes for direct dark matter searches. This is a subset of the values shown in Table 3."
+          prefix: "Tab. 4:"
+          suffix: "pp 5.98"
+        location:
+          page: 15
+    scope: "Irreducible neutrino background normalization for the xenon TPC forward model; flux-to-recoil-rate conversion choices (oscillations, form factor, electron binding, electroweak) are left to each collaboration."
+  atmospheric_flux_fluka_20pct:
+    id: atmospheric_flux_fluka_20pct
+    label: "Atmospheric flux: FLUKA, 20% uncertainty"
+    claim: "For atmospheric neutrinos in the sub-GeV region (the relevant regime), use the 2005 FLUKA simulations; the flux uncertainty below 100 MeV is approximately 20%, driven by cosmic-ray-air cross sections and the location-dependent geomagnetic cut-off (larger flux nearer the poles)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Currently, the best predictions on the atmospheric neutrino flux in the sub-GeV regime are based on the 2005 FLUKA simulations [115]."
+          prefix: "which is the most relevant for dark matter searches."
+          suffix: "The sum of the predicted electron, anti-electron"
+        location:
+          page: 14
+      - id: ev2
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Taking into account these two effects, the uncertainty on the atmospheric neutrino flux below 100 MeV is approximately 20% [117, 118]."
+          prefix: "which introduces a cut-off in the low end of the energy spectrum."
+          suffix: "It should be highligthed that the cut-off"
+        location:
+          page: 14
+  dsnb_50pct_uncertainty:
+    id: dsnb_50pct_uncertainty
+    label: "DSNB 86 +/- 43, 50% uncertainty"
+    claim: "A 50% uncertainty should be assigned to the diffuse supernova neutrino background flux (recommended value 86 +/- 43 cm^-2 s^-1 in Table 4), following existing DSNB recommendations."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "we recommend assigning an uncertainty of 50% on the DSNB flux."
+          prefix: "following the recommendations from Refs. [121, 122],"
+          suffix: "Overall Recommendations"
+        location:
+          page: 14
+  neutrino_wimp_mimic_masses:
+    id: neutrino_wimp_mimic_masses
+    label: "Neutrino floors: 6 GeV (8B/hep), >10 GeV (atm/DSNB)"
+    claim: "In xenon, 8B and hep solar neutrinos (coherent neutrino-nucleus scattering, nuclear-recoil-like) mimic a WIMP of about 6 GeV/c^2, while atmospheric neutrinos and the DSNB mimic WIMPs above about 10 GeV/c^2; pp-chain neutrinos instead give electronic recoils at low energy."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "in a xenon target 8B and hep solar neutrinos can mimic a WIMP signal with a mass of approximately 6 GeV /c2, while atmospheric neutrinos and neutrinos from the diffuse supernova neutrino background (DSNB) will mimic a WIMP signal for masses above 10 GeV /c2."
+          prefix: "experimentally by COHERENT [89]. For example,"
+          suffix: "Next, we describe each of these neutrino sources separately."
+        location:
+          page: 12
+  background_gof_required:
+    id: background_gof_required
+    label: "Goodness-of-fit required for PLR validity"
+    claim: "PLR results are only valid if the background and detector-response models are demonstrated correct: goodness-of-fit criteria must be set before the analysis (e.g. XENON required background-model p >= 0.05 in a validation region), models validated on calibration data/side-bands, and the GoF power to detect impactful deviations investigated."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "However, we believe it is essential for experiments to satisfactorily demonstrate goodness-of-fit for their background and detector models in order to properly utilize the methods presented here."
+          prefix: "the model of detector response and backgrounds is correct."
+          suffix: "This includes setting criteria for background model acceptance"
+        location:
+          page: 8
+  nuisance_params_in_likelihood:
+    id: nuisance_params_in_likelihood
+    label: "Background uncertainties as nuisance parameters"
+    claim: "Quantifiable background-model uncertainties should be incorporated directly into the likelihood function as nuisance parameters and acknowledged as such in publications (this is a key advantage of the PLR approach)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Uncertainties in the background model, when quantifiable, should be incorporated directly into the likelihood function as nuisance parameters and acknowledged as such in any publications."
+          prefix: "deviations from the assumed model should ideally be investigated."
+          suffix: "Experimenter Bias Mitigation"
+        location:
+          page: 9
+  detector_response_out_of_scope:
+    id: detector_response_out_of_scope
+    label: "Response modeling left to the collaboration"
+    claim: "The paper deliberately does not prescribe how to model detector response or backgrounds — that modeling and its validation is highly detector-specific — it only requires that experiments demonstrate goodness-of-fit; the NEST-style microphysics/detector-response implementation choice is left to the collaboration."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2105.00599"
+        version: 3
+        quote:
+          exact: "Modelling these, and the validation thereof, is highly detector-specific and outside the scope of this paper."
+          prefix: "One of the requirements of the PLR method is that the model of detector response and backgrounds is correct."
+          suffix: "However, we believe it is essential for experiments"
+        location:
+          page: 8
+  nest_version_default:
+    id: nest_version_default
+    label: "NEST version pinning required"
+    claim: "As of this review (December 2024), NEST v2.4 is the default version of the toolkit, and several model parameters elsewhere in the paper are explicitly version-pinned (e.g. 'as of v2.3.11'), so a reimplementation must pick and record a specific NEST version for its parameter values to be meaningful."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "NEST v2.4 is its default; different versions are specified as needed."
+          prefix: "the fundamental scintillation light and ionization charge yields for LXe, the focus of this work. "
+          suffix: " This manuscript is a technical overview of updates to NEST, including new models"
+        location:
+          page: 2
+  er_recomb_from_qy:
+    id: er_recomb_from_qy
+    label: "ER recombination derived after Qy fit"
+    claim: "In current NEST versions the ER recombination probability r is not predicted from first principles but found retroactively: Qy is fit directly (via the sigmoid equation) and r is derived afterwards, with the Nex/Ni ratio used as a constraint to avoid degeneracy between r and Nex/Ni."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "The recombination fraction or probability, r, is found retroactively in recent NEST versions after fitting to Qy per Equation 5, chosen for matching both the box and Birks models."
+          prefix: "NEST using a typical LXe operating condition of ρ = 2.89 g/cm3 (T = 173 K, P = 1.57 bar). "
+          suffix: " Using Equation 2 as a constraint"
+        location:
+          page: 5
+  er_qy_first_subtraction:
+    id: er_qy_first_subtraction
+    label: "ER model: Qy primary, Ly by subtraction"
+    claim: "The current ER model treats charge yield as primary: Qy(E, field) is modeled directly as a sum of two sigmoids (Eq. 5) with parameters m1-m10, and the light yield is obtained by subtracting the ionization electrons from the total quanta Nq = E/Wq, leveraging the greater reliability of S2-based Qy measurements at low energy."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "This procedure leverages the greater reliability of S2 measurements cf. S1 for lower E, as explained in [24, 15]. Qy in the ER model is a sum of two sigmoids:"
+          prefix: "where Nq is the total quanta. "
+          suffix: " with m1 serving as the minimum field-dependent charge yield"
+        location:
+          page: 4
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "with m1 serving as the minimum field-dependent charge yield. m2 determines the low-E behavior, and m7 controls the field dependence at high energies."
+          prefix: "Qy in the ER model is a sum of two sigmoids:"
+          suffix: " The individual mi are summarized within Appendix B"
+        location:
+          page: 4
+  er_qy_sigmoid_params:
+    id: er_qy_sigmoid_params
+    label: "ER Qy sigmoid parameters (m2, m3)"
+    claim: "Key current beta-ER charge-yield parameters (Table 1): the low-energy asymptote m2 is approximately 77.3 electrons/keV, and the low-energy (Thomas-Imel regime) shape parameter is the field-dependent function m3 = log10(E)*0.14 + 0.53 keV (about 0.8-1.5 keV at O(100 V/cm) fields)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "m2 Low-energy asymptote of the β ER charge yield equation. Default value is approximately 77.3 keV−1. m3 Controls the energy-dependent shape of the β charge yields in the low-energy (Thomas-Imel) regime:"
+          prefix: "Takes valuesO(10 keV−1) for O(100 V/cm) fields. "
+          suffix: " m3 = log10(E) · 0.14 + 0.53."
+        location:
+          page: 27
+  er_box_birks_split:
+    id: er_box_birks_split
+    label: "Two sigmoids = box model + Birks"
+    claim: "The two sigmoids of the ER Qy model respectively mimic two first-principles recombination pictures: the Thomas-Imel box model at low energies (below roughly 15-50 keV, where recombination and light yield rise with energy) and Doke-modified Birks' Law at higher energies; Birks' Law alone cannot capture ER behavior below about 50 keV."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "While empirical, the first (left, m1+...) and second (right, +m5...) sigmoids of Equation 5 capture the qualitative behavior of two first-principles options, respectively: the Thomas-Imel box model at low energies [35], and Doke-modified Birks' Law at higher energies [36]."
+          prefix: "with [27] providing more details). "
+          suffix: " Between ∼15 keV and the energy of a MIP"
+        location:
+          page: 4
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Despite Birks' great success in explaining data at high E, that model cannot capture the behavior of ER at E ≲ 50 keV ."
+          prefix: "which covers many alternative approaches to NEST. "
+          suffix: " While lower-E extensions are possible, such as addition of higher-order terms"
+        location:
+          page: 13
+  er_work_function:
+    id: er_work_function
+    label: "Wq = 21.94 - 2.93*rho eV"
+    claim: "Current NEST uses a single density-dependent work function for total quanta, Wq = 21.94 - 2.93*rho eV (rho in g/cm3), giving Wq of 13-14 eV at typical LXe operating conditions (T = 165-180 K, P = 1.5-2 bar, rho ~ 2.9 g/cm3)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "The work function, Wq, for production of quanta depends only upon the density, using a linear fit based on data collected in [31], across phases (see also Appendix A):"
+          prefix: "dark matter experiments at least. "
+          suffix: " ρ is the mass density in units of g/cm3."
+        location:
+          page: 3
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "LXe TPCs typically operate at temperatures of 165–180 K, and pressures of 1.5–2 bar(a), leading toρ ≈ 2.9 g/cm3 and resulting in aWq of between 13–14 eV (Eqn. 1, with discrepant values discussed in [32])."
+          prefix: "ρ is the mass density in units of g/cm3. "
+          suffix: " The exciton-ion ratio or Nex/Ni relates Wq"
+        location:
+          page: 4
+  er_nex_ni_ratio:
+    id: er_nex_ni_ratio
+    label: "ER Nex/Ni formula"
+    claim: "The ER exciton-to-ion ratio is Nex/Ni = (0.0674 + 0.0397*rho) * erf(0.05*E), with the energy dependence chosen so light yield approaches zero as energy decreases, since lower-E datasets favor both less recombination and smaller Nex/Ni."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Nex/Ni = (0.0674 + 0.0397ρ) × erf(0.05E)"
+          prefix: "into light and charge (see Appendix A, where the ρ dependence is explained): "
+          suffix: "where E is deposited energy in keV , for aβ interaction or Compton scatter"
+        location:
+          page: 4
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Here, the ρ dependence is based again on [31] while the E dependence comes from reconciling [18, 33, 34], given evidence that light yield approaches zero as energy E decreases, with lower-E data sets favoring both less recombination and smaller Nex/Ni."
+          prefix: "where E is deposited energy in keV , for aβ interaction or Compton scatter, and 'erf' refers to the error function. "
+          suffix: " Ionization electrons can recombine with Xe atoms"
+        location:
+          page: 4
+  er_fano_factor:
+    id: er_fano_factor
+    label: "ER Fano-like factor formula"
+    claim: "The ER total-quanta Fano-like factor (Eq. 7) is Fq = 0.13 - 0.030*rho - 0.0057*rho^2 + 0.0016*rho^3 + deltaF*sqrt(<Nq>)/sqrt(E), with deltaF = 0.0015 for LXe (identically 0 for gaseous Xe); 0.13 is the theoretical Xe Fano factor and the sqrt(<Nq>) term is data-driven to match MeV-scale combined-energy resolutions."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "The constant 0.13 represents the theoretical value of the Xe Fano factor following the traditional definition (Fq < 1). O(0.1) matches NEXT gas data on Ne− [48] and Biagi's Degrad work."
+          prefix: "The first part of Equation 7 is a spline of data [31] from gas, liquid, and solid. "
+          suffix: " The second part of Eqn. 7 is only for liquid and is data-driven"
+        location:
+          page: 6
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "The second part of Eqn. 7 is only for liquid and is data-driven, where δF = 0.0015 for LXe but is identically 0 for gaseous Xe."
+          prefix: "and Biagi's Degrad work. "
+          suffix: " term is included in order to match the data at MeV scales"
+        location:
+          page: 6
+  er_recomb_fluct_nonbinomial:
+    id: er_recomb_fluct_nonbinomial
+    label: "Non-binomial ER recombination fluctuations"
+    claim: "ER recombination fluctuations are explicitly non-binomial: the variance has a binomial part plus a term sigma_p^2 * Ni^2, where sigma_p is a skewed Gaussian in electron-fraction space with field-dependent amplitude A = 0.05-0.1, centroid xi = 0.45, width omega = 0.205 (0.2 in the main text) and skew alpha_p = -0.2; this non-binomial treatment replaced the constant sigma_p used in NEST versions below 2.1, which was found inadequate."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Moreover, they are not binomial, despite recombination (or, escape) appearing to be a binary decision."
+          prefix: "constitute one of the key factors for characterization of ER discrimination [ 54]. "
+          suffix: " Potential explanations for this phenomenon include other energy loss mechanisms"
+        location:
+          page: 6
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "σp is a skewed Gaussian (on the second line) with field-dependent amplitude, A, varying from 0.05–0.1, as needed to simulate the spectral broadening of ER with higher drift electric field [27, 59]."
+          prefix: "The σp term leads to σr ∝ Ni, as proposed in [54]. "
+          suffix: " In NEST versions < 2.1, σp was simulated as a constant"
+        location:
+          page: 7
+      - id: ev3
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "In NEST versions < 2.1, σp was simulated as a constant, similar in value to A, but this was found to be inadequate for capturing the full behavior of recombination fluctuations [41]."
+          prefix: "drift electric field [27, 59]. "
+          suffix: " σp's dependent variable was chosen to be the mean electron fraction"
+        location:
+          page: 7
+      - id: ev4
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Default NEST values determining respectively the width and skewness ofσp are ω = 0.2 and αp = −0.2."
+          prefix: "ξ, ω, and αp are the centroid, width, and skew of σp, respectively. "
+          suffix: " (Future work may recast all of σr entirely in terms of y, not just σp.)"
+        location:
+          page: 7
+      - id: ev5
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "A skew centroid ξ ≈ 0.4–0.5 was found based on β and γ data."
+          prefix: "(Future work may recast all of σr entirely in terms of y, not just σp.) "
+          suffix: " The types of data included continuous spectra and monoenergetic-peak energy resolutions"
+        location:
+          page: 7
+      - id: ev6
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "ξ Centroid-location parameter of the non-binomial recombination skew Gaussian. Default value for ERs is an electron fraction of 0.45, but 0.5 for NRs."
+          prefix: "where 0.05 was 0.055 in 2.3.10 "
+          suffix: " ω Width parameter for the non-binomial recombination skew Gaussian."
+        location:
+          page: 28
+      - id: ev7
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "ω Width parameter for the non-binomial recombination skew Gaussian. Takes value of 0.205 for ERs and 0.19 for NRs."
+          prefix: "Default value for ERs is an electron fraction of 0.45, but 0.5 for NRs. "
+          suffix: " αp Skewness parameters for the non-binomial recombination skew Gaussian."
+        location:
+          page: 28
+  er_gamma_separate_model:
+    id: er_gamma_separate_model
+    label: "Gamma ERs have separate mi parameters"
+    claim: "Gamma/X-ray absorption ER events are modeled with the same functional form as beta ER but with their own distinct set of mi parameters (Table 2); the gamma and beta models are kept independent rather than merged through dE/dx."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Absorption of any high-energy photon, a γ or x-ray, is modeled like β interactions and Compton scatters, but with unique mi (Figure 2), to capture sub-position-resolution multiple scatters and distinct dE/dx."
+          prefix: "inherent fields of Xe atoms [45]. "
+          suffix: " Ly is mostly lower and Qy higher for βs"
+        location:
+          page: 5
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "While it might be possible to merge the γ and β models by relying on differences in dE/dx, γs are treated independently at present."
+          prefix: "to capture sub-position-resolution multiple scatters and distinct dE/dx. Ly is mostly lower and Qy higher for βs, as explained within the Figure 2 caption. "
+          suffix: " Appendix B lists the β and γ model parameters"
+        location:
+          page: 5
+  nr_total_quanta_powerlaw:
+    id: nr_total_quanta_powerlaw
+    label: "NR total quanta power law: a=11, b=1.1"
+    claim: "Current NR total quanta follow a simple power law N'q = a*E^b with a = 11 (+2.0/-0.5) and b = 1.1 +/- 0.05 - a deliberate simplification of the Lindhard rational-function approach that also permits departures from Lindhard at higher energies; the quoted uncertainties include S1/S2 systematic effects and are more than 10x the statistical-only errors of the earlier NEST review."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "This is a simplification of the Lindhard approach to modeling the reduced quanta compared with ER, but also allows for departures from Lindhard at higher Es, lowering N ′q(E)'s rate of change with respect to Lindhard."
+          prefix: "NR N ′q (differentiated in this section from ER with a prime) is well fit by a power law across >3 orders of magnitude in E (Fig. 5 within [15]). "
+          suffix: " Fewer equations and parameters are involved compared to Lindhard"
+        location:
+          page: 9
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "a Scaling on NR total quanta. Default value is 11+2.0−0.5 keV−b. b Power-law exponent for the NR total quanta. Default value is 1.1 ± 0.05."
+          prefix: "as shown in Equations (9), (12), and (13). "
+          suffix: " ς Field dependence in NR light and charge yields, with mass-density-dependent scaling"
+        location:
+          page: 28
+      - id: ev3
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "The uncertainties here are > 10× those reported recently for the same fit, as only statistical error was included in Eqn. 6 of [15]."
+          prefix: "NEST uses that simpler formula, repeated here: N ′q = aEb, where a = 11+2.0−0.5 and b = 1.1 ± 0.05. (9) "
+          suffix: " Here, systematic uncertainties in S1 detection efficiency and S2 gain"
+        location:
+          page: 9
+  nr_qy_model:
+    id: nr_qy_model
+    label: "NR charge yield model parameters"
+    claim: "The NR charge yield is Q'y = (1/sigma)*(E+epsilon)^p * [1 - 1/(1+(E/zeta)^eta)] with field/density dependence sigma = gamma*Field^delta*(rho/rho0)^upsilon, using gamma = 0.0480 +/- 0.0021, delta = -0.0533 +/- 0.0068, upsilon = 0.3, rho0 = 2.90 g/cm3, epsilon = 12.6 (+3.4/-2.9) keV, p = 0.5 (reproducing Q'y proportional to 1/sqrt(E) at high E), and sub-keV roll-off sigmoid parameters zeta = 0.3 +/- 0.1 keV and eta = 2 +/- 1."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "ζ and η are the two sigmoid parameters that control the Q′y roll-off at sub-keV energies."
+          prefix: "(Note ς has adaptable units of keV1−p.) "
+          suffix: " They permit a better match to not only the most recent calibrations"
+        location:
+          page: 10
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "At high E, p = 0.5 reproduces Q′y ∝ 1/√E (Figure 3, bottom row)."
+          prefix: "while ζ represents a characteristic scale for NR to ionize one e− [15, 85]. "
+          suffix: " Similar to ER, Nph is derived from N ′q − Ne−"
+        location:
+          page: 10
+      - id: ev3
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "ϵ Reshaping parameter for NR charge yields, controlling the effective energy scale at which the charge yield behavior changes. The default value is 12.6+3.4−2.9 keV ."
+          prefix: "δ Power-law exponent in the field dependence in ς; default value is -0.0533 ± 0.0068. "
+          suffix: " p Exponent which controls the shape of the energy dependence of the NR charge yields"
+        location:
+          page: 28
+      - id: ev4
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "γ Power-law base for the field dependence in ς. Default value is 0.0480 ± 0.0021. δ Power-law exponent in the field dependence in ς; default value is -0.0533 ± 0.0068."
+          prefix: "the default value is 0.3. "
+          suffix: " ϵ Reshaping parameter for NR charge yields"
+        location:
+          page: 28
+      - id: ev5
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "ζ Controls the energy dependence of the NR charge yields roll-off at low energies. Default value is 0.3 ± 0.1 keV . η Controls energy-dependent shape of the NR charge yields roll-off at low energies. Default value is 2 ± 1."
+          prefix: "at energies greater than O(ϵ). Default value is 0.5. "
+          suffix: " θ Controls the energy dependence of the NR light yields roll-off."
+        location:
+          page: 28
+      - id: ev6
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "The reference density ρ0 ≡ 2.90 g/cm3."
+          prefix: "υ = 0.3. (11) "
+          suffix: " (The 2.89 value earlier was a very specific example, using LUX;"
+        location:
+          page: 10
+  nr_ly_model:
+    id: nr_ly_model
+    label: "NR light yield roll-off (theta, iota)"
+    claim: "The NR light yield has its own sigmoid roll-off multiplier [1 - 1/(1+(E/theta)^iota)] with theta = 0.30 +/- 0.05 keV and iota = 2.0 +/- 0.5; theta of about 300 eV is a physically motivated characteristic energy for release of a single VUV photon, in agreement with Sorensen and NEST pre-v2.0.0."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "θ is a physically-motivated characteristic energy for release of a single (VUV) photon. Like ζ, its value is 300 eV , in agreement with Sorensen [85], and NEST pre-v2.0.0 [45]."
+          prefix: "it will be challenging to achieve any with low uncertainty. "
+          suffix: " Fundamental physics models for the L governing total quanta"
+        location:
+          page: 11
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "θ Controls the energy dependence of the NR light yields roll-off. Default value is 0.30 ± 0.05 keV . ι Controls the shape of the energy dependence of the NR light yields roll-off. Default value is 2.0 ± 0.5."
+          prefix: "Default value is 2 ± 1. "
+          suffix: " Table 4. Table of NEST model parameters for different types of fluctuations"
+        location:
+          page: 28
+  nr_hard_cutoff:
+    id: nr_hard_cutoff
+    label: "NR hard cutoff ~200 eV"
+    claim: "NEST implements a hard cut-off below which no quanta are generated for NRs: energies E < Wq*(Nq/N'q) of approximately 200 eV."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "A hard cut-off for any quanta was implemented in NEST for E < Wq (Nq / N′q) ≈ 200 eV ."
+          prefix: "The same is true for η and ζ in the Q′y formulation. "
+          suffix: " Nq represents the quanta which would have been generated for same-E ER."
+        location:
+          page: 11
+  nr_fano_separate:
+    id: nr_fano_separate
+    label: "NR: separate Fano factors, 0.4 each (v2.3.11)"
+    claim: "NR fluctuations do not use a single common Fano factor on total quanta: Nex and Ni are each smeared with separate (nominally independent) Fano factors, both set to 0.4 as of NEST v2.3.11 (the value was 1.0 in previous versions), even though some data imply Fex much greater than 1."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "In contrast to ER, for which the data suggest strict anti-correlation, simulated ⟨N ′q⟩ is not varied with a common Fano factor shared by both types of quanta for simplicity."
+          prefix: "Below this, no quanta are generated. Sub-keV recoils have been observed at 200–400 V/cm (Figure 3). "
+          suffix: " For NR, there are (nominally) separate Fano factors for the excitation and ionization"
+        location:
+          page: 11
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Based upon the sparse existing reports of NR E resolution [72, 77, 90] both Fex and Fi are set to 0.4 in NEST (as of v2.3.11; 1 earlier) though some data imply Fex ≫ 1 [72, 90]."
+          prefix: "as is standard practice for Fano factors [89]. "
+          suffix: " Nex = G[⟨Nex⟩, σex] and Ni = G[⟨Ni⟩, σi] (G=Gauss)."
+        location:
+          page: 11
+      - id: ev3
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "For NRs, this is separated into fluctuations for Nex and Ni; the default value is 0.4 for both in NEST v2.3.11, while the values were 1.0 in previous NEST versions. (Fex was underestimated to be conservative for low-mass WIMPs.)"
+          prefix: "For ERs, this is proportional to √ E · E; see Equation (7). "
+          suffix: " σp Non-binomial contribution to recombination fluctuations"
+        location:
+          page: 28
+    scope: "Parameter values version-pinned to NEST v2.3.11"
+  nr_recomb_fluct:
+    id: nr_recomb_fluct
+    label: "NR recombination fluctuation parameters"
+    claim: "NR recombination fluctuations use the same functional form as ER but with NR-specific parameters: A' = 0.04 (fixed for all fields as of v2.3.11; 0.1 in v2.3.10), xi' = 0.50, omega' = 0.19, alpha'_p = 0, plus an additional NR recombination asymmetry skew alpha'_r = 2.25 applied to the final electron and photon distributions, with evidence for higher values."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Parameter values are similar but not identical to those from ER: A′ = 0.04 (as of v2.3.11 and fixed for all fields), ξ′ = 0.50, and ω′ = 0.19 (α′p = 0)."
+          prefix: "The new parameters are distinguished using a prime symbol superscript again for NR (′). "
+          suffix: " Over time, these do appear to have been converging upon values similar to ER's."
+        location:
+          page: 11
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Ne− and Nph distributions have that width but are skewed due to NR recombination asymmetry (α′r = 2.25)."
+          prefix: "These set a final recombination widthσ′r. "
+          suffix: " α′r may be higher, but it is difficult to disambiguate NR skew"
+        location:
+          page: 11
+      - id: ev3
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "while this is fixed at 2.25 for NRs, with evidence of higher values in [59]."
+          prefix: "Field- and energy- dependent equations can be found in Ref. [59] for ERs, "
+          suffix: " Frontiers 28"
+        location:
+          page: 28
+  nr_lindhard_k_and_nex_ni:
+    id: nr_lindhard_k_and_nex_ni
+    label: "Lindhard k = 0.166; NR Nex/Ni = 1.0"
+    claim: "In the paper's first-principles cross-check of the NR model, the Lindhard parameter is k = 0.166 (the decades-old default for xenon, with N'q/Nq approximately equal to k when averaged over energy), consistent with LUX D-D data, Lenardo's meta-analysis, and NEST v2.3+; Nex/Ni = 1.0 is the standard NR assumption, with best fits to data and theory ranging from 0.7-1.1."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "We set the crucial Lindhard parameter kL = 0.166, the decades-old default for Xe [84]. Averaging over E, N ′q/Nq ≈ kL. 0.166 is consistent with actual data [72], Lenardo's meta-analysis [102], and NEST v2.3+."
+          prefix: "out in multiple other works [84, 80, 72, 15], not Equation 9. "
+          suffix: " We identify ς of Equation 12 with TIB value"
+        location:
+          page: 14
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Nex/Ni = 1.0 is assumed. While higher than for ER, it is the most common assumption for NR, and best fits to data and theory vary from 0.7–1.1 [80]."
+          prefix: "and comparable to a best-fit TIB for ER. "
+          suffix: " An additional quenching is applied to just L′y [69]."
+        location:
+          page: 14
+  box_model_tib_values:
+    id: box_model_tib_values
+    label: "Thomas-Imel box parameter TIB ~0.03-0.04"
+    claim: "Thomas-Imel box-model parameter values: the box size is interpreted as a 4.6 micron (energy-independent) electron-ion thermalization distance (Mozumder), giving TI_B = 0.0376; Dahl's best fits span 0.03-0.04 for ER and NR data at 60-522 V/cm, this review's contemporary fits use 0.0300, and varying the drift velocity covers the full range 0.02-0.05."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "We interpret aT I, the size of the \"box\" surrounding ionized atoms, as corresponding to a (E-independent) e−-ion thermalization distance of 4.6 µm, as calculated by Mozumder [105]."
+          prefix: "(please see Section 6.2 of [20] for the details). "
+          suffix: " This value was used before as a border in NEST for track length, to switch from T-I to Birks."
+        location:
+          page: 13
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Dahl found best-fit values of TIB ranging from 0.03–0.04 for both ER and NR data at 60–522 V/cm [20]. Our contemporary fits (for NEST and for data), the blue lines at low energies in the first two panels at top in Figure 4, used 0.0300."
+          prefix: "for that case is 0.0376. "
+          suffix: " If vd changes with drift field (it is typically O(2 mm/µs) [106])"
+        location:
+          page: 13
+      - id: ev3
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "then the entire ranges of Dahl, and of Sorensen and Dahl, are covered: 0.02–0.05 [80]."
+          prefix: "(it is typically O(2 mm/µs) [106]), "
+          suffix: " Frontiers 13"
+        location:
+          page: 13
+  birks_k_values:
+    id: birks_k_values
+    label: "Birks kB = 0.28 at 180 V/cm"
+    claim: "Current Doke/Birks recombination parameters for ER: kB = 0.28 at 180 V/cm (fit to the high-energy portion of the NEST beta model and supported by LUX/XENON tritium, 14C, and 220Rn data), with the additional constant kC non-zero only at 0 V/cm; the value in NEST v0.9x and the 2011 NEST paper was kB = 0.257, within 10% of the current value."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "A best fit to ER (γ) data has a non-zero kC only at 0 V/cm; at non-zero E, Equation 14 contains only one Birks' constant, kA = kB. kB's best-fit value (for 180 V/cm) is 0.28, from a fit to only the high-E portion of the NEST β ER model."
+          prefix: "with an additional constantkC that accounts for parent-ion recombination [18]. "
+          suffix: " That is in turn supported by 3H, 14C, and 220Rn data from LUX and XENON."
+        location:
+          page: 13
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Notably, kB in NEST v0.9x and the first NEST paper 13 years ago for this E was 0.257, within 10% of the value in Figure 4 (upper right plot pane), which covers many alternative approaches to NEST."
+          prefix: "That is in turn supported by 3H, 14C, and 220Rn data from LUX and XENON. "
+          suffix: " Despite Birks' great success in explaining data at high E"
+        location:
+          page: 13
+  counting_fluctuation_implementation:
+    id: counting_fluctuation_implementation
+    label: "Binomial sampling chain + 1-10% detector smear"
+    claim: "Photon and electron counting fluctuations are generated by binomial sampling at each stage of the chain (the Nex/Ni split, photon detection with probability g1, electron survival and gas extraction), and residual unknown detector effects are added as Gaussian smearing proportional to pulse areas at the 1-10% level across experiments (effectively 0% for spike-counted S1)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "S1.1 A binomial distribution with probability g1 (3-D spatially varying) determines the fraction of Nph successfully detected by photo-sensors; g1 represents the product of geometric × quantum efficiencies."
+          prefix: "closely following Appendix C of [62]. First, S1: "
+          suffix: " S1.2 Single photo-electrons in sensors are modeled by 0-truncated Gaussians"
+        location:
+          page: 8
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "ER quanta are differentiated (Nex and Ni) using a binomial distribution (Eq. A2 [62]), approximated as normal for computational speed, using the same Box-M¨uller algorithm as in the first bullet above."
+          prefix: "(Eq. A1 [62]). Two distinct F s exist for NR Nex and Ni, breaking that correlation (Section 2.3). "
+          suffix: " Any non-binomial / non-Gaussian fluctuation at this stage is essentially degenerate with the next step."
+        location:
+          page: 8
+      - id: ev3
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "The scale of the unknown detector effects across experiments is 1–10% [ 32, 15, 61] (for S2s, and for non-integer forms of S1s, but effectively 0% for a spike count of S1 photons)."
+          prefix: "or both in [7, 32], supplementing validation of means in our Figures 1, 2, and 3 with their vetting of fluctuations. "
+          suffix: " See again Appendix A."
+        location:
+          page: 7
+  validation_ranges:
+    id: validation_ranges
+    label: "Model validity: <1 keV to >1 MeV, 0-4 kV/cm"
+    claim: "The current models are tuned on calibration data spanning less than 1 keV to more than 1 MeV in energy and 0 to roughly 4 kV/cm drift field, drawing on beta, gamma, and NR datasets from XENON, LUX, PandaX, ZEPLIN, neriX, and LLNL; newer XENON1T and PandaX NR datasets that were not included in the fits still agree at the 1-2 sigma level."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Combining calibration data ranging from < 1 keV to > 1 MeV energy, NEST has predictive shapes for the primary scintillation and ionization yields as functions of energy, E, and drift electric field, E, for different particle interaction types [29]."
+          prefix: "known as g1 and g2 for those respective yields. "
+          suffix: " The status of the NEST modeling of these shapes is shown in Figure 1."
+        location:
+          page: 3
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "Newer works from XENON1T and PandaX were not included in fits (yet agree at the 1–2σ level)."
+          prefix: "exist at right [19, 20, 64, 65, 66, 67, 68, 69, 70, 71, 8, 72, 73, 74, 75, 76, 77, 78, 79]. "
+          suffix: " NEST lines are blue and black, at similar Es."
+        location:
+          page: 9
+  nest_fully_empirical:
+    id: nest_fully_empirical
+    label: "NEST is fully empirical"
+    claim: "Current NEST is fully empirical - built by smoothly interpolating datasets with sigmoids and power laws rather than derived from first principles - which introduces extrapolation uncertainty into uncalibrated regimes but reproduces NR and ER data with a comparable number of free parameters and much greater flexibility than semi-empirical approaches."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "By smoothly interpolating data sets taken at individual energies and/or electric fields NEST is now fully empirical, built upon sigmoids and power laws as needed for a continuous model."
+          prefix: "3 COMP ARISONS TO FIRST -PRINCIPLES APPROACHES "
+          suffix: " But inherent uncertainty is introduced by extrapolating into new energy and/or field regimes."
+        location:
+          page: 13
+      - id: ev2
+        doi: "10.48550/arXiv.2211.10726"
+        version: 4
+        quote:
+          exact: "In the case of NR, the fully empirical approach reproduces all data better using a comparable number of free parameters, but much greater flexibility compared to semi-empirical approaches."
+          prefix: "shown here shows that NEST can accurately simulate potential dark matter signals and backgrounds, respectively. "
+          suffix: " For fluctuations, the number of NEST free parameters increased to two Fano factors"
+        location:
+          page: 14
+  er_energy_partition_equations:
+    id: er_energy_partition_equations
+    label: "Original NEST: Platzman partition equations"
+    claim: "NEST computes ER yields from a simplified Platzman energy partition: Edep = Nex*Wex + Ni*Wi = Ni*(alpha*Wex + Wi), so Ni = Edep/(alpha*Wex+Wi) and Nex = alpha*Ni; these quanta then split via the recombination probability r into Nph = Nex + r*Ni scintillation photons and Ne = Ni*(1-r) ionization electrons."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "Edep = NexWex + NiWi = Ni(αWex +Wi), α≡ Nex/Ni (2.1)"
+          prefix: "For the energy partition we use a simplified Platzman equation [2, 7]"
+          suffix: "where Edep is energy deposited by a particle in a single interaction"
+        location:
+          page: 4
+      - id: ev2
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "Nph = Nex + rNi and (2.4) Ne = Ni(1− r) (2.5) where r is the recombination probability."
+          prefix: "which in turn lead to Nph photons and Ne ionization electrons:"
+          suffix: "For long particle tracks we use [3, 18]"
+        location:
+          page: 4
+    scope: "electron recoils in liquid xenon; a single mean work function W = (alpha*Wex+Wi)/(1+alpha) may replace the two separate work functions with no loss of generality"
+  exciton_ion_ratio_alpha_006:
+    id: exciton_ion_ratio_alpha_006
+    label: "Original NEST: alpha = 0.06 fixed"
+    claim: "The exciton-to-ion ratio alpha = Nex/Ni is taken as the theoretical value 0.06 for liquid xenon, held fixed at all fields in this work; it may differ for NR versus ER and may change with field, but is treated as independent of energy, with some measurements as high as 0.20."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "The theoretical value of this dimensionless ratio α is a constant 0.06 for liquid xenon [14, 15], used successfully to ﬁt experimental data [16]."
+          prefix: "may differ for NR versus ER, and may change with ﬁeld, but it is likely not a function of energy [10]."
+          suffix: "Some measurements of α in liquid xenon have been as high as 0.20"
+        location:
+          page: 4
+  recombination_doke_birks_long_tracks:
+    id: recombination_doke_birks_long_tracks
+    label: "Doke/Birks recombination for long tracks"
+    claim: "For long particle tracks the recombination probability follows a Doke/Birks-law form r = A*(dE/dx)/(1 + B*(dE/dx)) + C with C = 1 - A/B, so that r approaches unity as dE/dx approaches infinity; A, B, C are free parameters constrained by light-yield data, with the first term describing volume recombination and C geminate (Onsager) recombination."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "r = A dE dx 1 + B dE dx +C, C = 1− A/B, (2.6) derived from Birks’ Law [19]."
+          prefix: "where r is the recombination probability. For long particle tracks we use [3, 18]"
+          suffix: "Doke et al. [ 18] derived a scintillation yield for LNEs from Birks’ Law"
+        location:
+          page: 4
+  recombination_thomas_imel_short_tracks:
+    id: recombination_thomas_imel_short_tracks
+    label: "Thomas-Imel box model for short tracks"
+    claim: "For short particle tracks (shorter than the 4.6 um mean ionization electron-ion thermalization distance in LXe) the Thomas-Imel box model is used instead: r = 1 - ln(1+xi)/xi with xi = Ni*(xi/Ni); an analytic estimate from eps = 1.96, T = 165 K, a = 4.6 um gives xi/Ni = 0.14 at zero field, and low-energy ER below ~15 keV lie strictly in this regime where r depends on energy (via Ni), not on dE/dx."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "For short particle tracks the Thomas-Imel box model is better suited [13], where the recombination probability is instead [10, 13, 20]"
+          prefix: "which ensures complete recombination at inﬁnite LET, or dE /dx."
+          suffix: "where α′ is a constant dependent on ionization electron and hole mobilities"
+        location:
+          page: 5
+      - id: ev2
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "r = 1− ln(1 + ξ ) ξ , ξ≡ Niα′ 4a2v (2.7)"
+          prefix: "the recombination probability is instead [10, 13, 20]"
+          suffix: "where α′ is a constant dependent on ionization electron and hole mobilities"
+        location:
+          page: 5
+      - id: ev3
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "We deﬁne “short tracks” to be those that are shorter than the mean ionization electron-ion thermalization distance, 4.6 µm in liquid xenon [ 24]."
+          prefix: "This is false at high electric ﬁeld, which increases electron energy [10]."
+          suffix: "If an incident gamma or electron produces secondary gammas or scatters multiple times"
+        location:
+          page: 5
+      - id: ev4
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "Using ε = 1.96, T = 165 K [ 23], and a = 4.6 µm [24], we estimate a value of 0.14 for zero electric ﬁeld."
+          prefix: "where e is the electron charge, ε is the dielectric constant, k is Boltzmann’s constant, and T is the electron temperature."
+          suffix: "We assume here that most electrons will thermalize prior to recombination"
+        location:
+          page: 5
+    scope: "short tracks / low-energy recoils (ER below ~15 keV, NR below ~100 keV) where the track is shorter than the electron-ion thermalization distance"
+  zero_field_fitted_parameters:
+    id: zero_field_fitted_parameters
+    label: "Original NEST zero-field parameters"
+    claim: "Best-fit zero-field model parameters from matching the compiled gamma data: xi/Ni = 0.19 (fit on points below 15 keV and then held fixed), and Doke/Birks parameters A = 0.18, B = 0.42, C = 0.57; held-fixed parameters are W = 13.7 eV (error-weighted average of Doke 13.8 +/- 0.9 eV and Dahl 13.7 +/- 0.2 eV; its inverse corresponds to 73 photons/keV), alpha = 0.06, and the 4.6 um thermalization length used to set the Doke/Thomas-Imel cross-over energy."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "low energy points alone (<15 keV) ξ /Ni = 0.19 high energy points treated independently A = 0.18,B = 0.42,C = 0.57 averaging points (raw) at same energy A = 0.18,B = 0.42,C = 0.57"
+          prefix: "Note that the value ofξ /Ni is comparable to our earlier estimate of 0.14."
+          suffix: "We minimize the mean-squared of the residuals in order to optimize the parameters of our model, which is founded on Equations 2.6 and 2.7."
+        location:
+          page: 10
+      - id: ev2
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "In addition to the list in Table 1, other parameters which we employed, but that we held ﬁxed, included W = 13.7 eV ,α = 0.06, and 4.6 µm as the electron-ion thermalization length scale, which we pragmatically selected to determine the cross-over energy where the Doke model would begin to dominate"
+          prefix: "entered into the simulation to reproduce some measured yields and predict others."
+          suffix: "because of how well it predicts the approximate location of the major change in slope"
+        location:
+          page: 10
+      - id: ev3
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "The inverse of our W = 13.7 eV corresponds to 73 photons/keV"
+          prefix: "Equality implies excitation alone, with no ionization."
+          suffix: "The clear dip in light yield at ∼30-35 keV is present"
+        location:
+          page: 11
+    scope: "zero electric field; at non-zero field these parameters are refit (see field-dependence insight)"
+  field_dependence_of_parameters:
+    id: field_dependence_of_parameters
+    label: "Field-dependence power laws (original NEST)"
+    claim: "At non-zero electric field the Thomas-Imel parameter follows the power law xi/Ni = 0.057*E^-0.12 (field E in V/cm; e.g. 0.034 at 60 V/cm down to 0.021 at 4060 V/cm), consistent with Dahl's expectation xi/Ni ~ E^-0.1; the Doke parameters A and B vary with field via power-law interpolation and C is set to 0 (volume recombination dominates over Onsager at field), with zero field a discontinuity at A = 0.18, B = 0.42, C = 0.57; the Thomas-Imel/Doke cross-over distance becomes 69/sqrt(E) um (E in V/cm)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "After having found values for ξ /Ni at ﬁve different ﬁelds, we ﬁt a power law to it: ξ /Ni = 0.057E−0.12 (ﬁeld in V/cm). This is consistent with Dahl’s expectation of ξ /Ni ∝ E−0.1 [10]."
+          prefix: "causes the Thomas-Imel model to break down in Geant4 at high energy, but we take advantage of the regime where it does work."
+          suffix: "The next step was to ﬁnd the Doke parameters as a function of electric ﬁeld magnitude."
+        location:
+          page: 15
+      - id: ev2
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "the distance in µm is 69 / √ E, where the electric ﬁeld magnitude is in units of V/cm"
+          prefix: "We offer a power law ﬁt as a function of electric ﬁeld as a ﬁrst effort without optimization:"
+          suffix: "Monotonic variation emerged naturally in our model"
+        location:
+          page: 16
+      - id: ev3
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "Monotonic variation emerged naturally in our model (Figure 6) for A and B, and a negligible value for C, so we set C = 0. These parameters have physical meaning as discussed earlier."
+          prefix: "As electric ﬁeld increases a need arises to change this cross-over distance in order to avoid creating a discontinuity."
+          suffix: "We interpret a near-zero value forC as demonstrating that volume recombination dominates over Onsager recombination."
+        location:
+          page: 16
+      - id: ev4
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "The case of zero ﬁeld is a discontinuity whereA = 0.18, B = 0.42 (both zero for high-energy electrons), andC = 0.57 (Figure 2 and Section 3)."
+          prefix: "We use a power law ﬁt to interpolate A and C between discrete ﬁelds. The ﬁnal outcome is a decreasing recombination with increasing ﬁeld, as expected."
+          suffix: "(right) Variations in recombination probability, as a function of applied electric ﬁeld, used in our simulation."
+        location:
+          page: 16
+    scope: "electron recoils at non-zero electric field; for 1 MeV electrons the extreme assumption A = 0 is propagated"
+  recombination_fluctuation_model:
+    id: recombination_fluctuation_model
+    label: "Fluctuations from stochastic recombination, not Fano"
+    claim: "NEST's intrinsic (non-delta) fluctuations arise from event-by-event stochastic recombination — variation in detailed track history and in dE/dx of individual secondary electrons — rather than from an imposed Fano factor; this alone produces non-Gaussian photon-yield distributions, and these recombination fluctuations swamp Fano-factor and alpha effects."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "The reason for observing spread in ﬁnal light yield, sans Fano factor and detector effects, lies in the dependence of the recombination probability on a detailed track history and stochastic variations in dE /dx values."
+          prefix: "Compare with the asymmetry of our simulated peak."
+          suffix: "Because of∼10% photon detection efﬁciency"
+        location:
+          page: 6
+      - id: ev2
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "Monte Carlo ﬂuctuations in tracks result in a variation in the number of scintillation photons ultimately produced, even before ﬂuctuation in the ratio of excitons to ions, or their sum (Fano factor), is taken into consideration."
+          prefix: "Doing so preserves macroscopic characteristics of the energy-dependent light yield (Figure5) while remaining stochastic. As demonstrated in Figure 3,"
+          suffix: "For simplicity, our model deﬁnes a mean work function"
+        location:
+          page: 6
+      - id: ev3
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "The scatter in the simulation is a result of recombination ﬂuctuations discussed in the text: particle history variation and dE /dx ﬂuctuations, which swamp Fano factor andα effects."
+          prefix: "To approximate the Xed result we look at the energy deposition in a ﬁnite volume of xenon of comparable dimensions to Xed but without walls."
+          suffix: "The experimental data have additional scatter, either due to a low-yield tail in S2"
+        location:
+          page: 18
+  s1_s2_anticorrelation:
+    id: s1_s2_anticorrelation
+    label: "S1-S2 anti-correlation by construction"
+    claim: "Each ionization electron either recombines (contributing to S1) or escapes (forming S2), so S1 and S2 yields are anti-correlated by construction; recombination is decided for individual recoils by explicitly tracking energies and recoil ranges of secondary electrons, which preserves the stochastic, energy-dependent light yield."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "Since an ionization electron lost to recombination cannot escape and one which escapes cannot recombine, S1 and S2 light yields are anti-correlated."
+          prefix: "The direct excitation contribution to S1, which depends on the small ratio of excitons to ions, is consequently small ([10] and ref. therein)."
+          suffix: "Furthermore, scintillation yield, and hence recombination probability, is known to be a function"
+        location:
+          page: 3
+      - id: ev2
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "Our model determines recombination for individual recoils in a Geant4 simulation [ 5] by explicitly tracking energies and recoil ranges for secondary electrons produced by an incident gamma. Doing so preserves macroscopic characteristics of the energy-dependent light yield (Figure5) while remaining stochastic."
+          prefix: "uniﬁed picture of scintillation yield, which is continuous versus energy and consistent with data."
+          suffix: "As demonstrated in Figure 3"
+        location:
+          page: 6
+  nr_lindhard_model:
+    id: nr_lindhard_model
+    label: "NR: Lindhard factor multiplies energy partition"
+    claim: "Nuclear recoils use the same framework with one modification: the energy partition is multiplied by a Lindhard factor L, Edep*L(Edep) = (Nex+Ni)*W = (1+alpha)*Ni*W, where L is the fraction of NR energy available for excitation and ionization (NR lose ~80% of energy to heat); NR tracks below ~100 keV are always in the Thomas-Imel regime and the same free parameter xi/Ni = 0.19 as for ER is used; two Lindhard scenarios are treated — pure Lindhard and the Hitachi correction — and L underlies the keVnr vs keVee energy scales."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "Edep L(Edep ) = (Nex + Ni)W = (1 + α)NiW (6.1)"
+          prefix: "We make only one modiﬁcation to the mathematical framework for NR, such that Equation 2.1 is modiﬁed [10, 13] as follows:"
+          suffix: "where L is the Lindhard factor (or, effective Lindhard factor for modiﬁcation to the Lindhard theory made to better explain data)."
+        location:
+          page: 19
+      - id: ev2
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "Tracks of NR below O(100 keV) are always within the Thomas-Imel regime [ 10]. We again use the single free parameter from the Thomas-Imel model (ξ /Ni) that successfully explained the low-energy yield of ER."
+          prefix: "uses parameters from a model motivated by gamma-induced ER and applies them to NR directly."
+          suffix: "We make only one modiﬁcation to the mathematical framework for NR"
+        location:
+          page: 19
+      - id: ev3
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "We use the same value of ξ /Ni (= 0.19) as for ER to evaluate the model against empirical data."
+          prefix: "one can not a priori deﬁne the NR energy scale in terms of the “electron equivalent” energy in “keVee.”"
+          suffix: "A choice remains in the application of the Lindhard factor with respect to proposed corrections."
+        location:
+          page: 20
+      - id: ev4
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "We elect to investigate two scenarios in order to treat this intricate subject with due diligence: pure Lindhard, and the Hitachi correction to the Lindhard factor [13]."
+          prefix: "A choice remains in the application of the Lindhard factor with respect to proposed corrections."
+          suffix: "Lindhard theory is more appropriate for solid crystal scintillators"
+        location:
+          page: 20
+      - id: ev5
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "most of its energy (∼80%) to heat, which in this case implies interactions with other nuclei instead of electrons."
+          prefix: ""
+          suffix: "Nuclear interactions with electrons excite or ionize atoms and thus produce usable signals"
+        location:
+          page: 20
+      - id: ev6
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "The fractional factor L is the reason why two energy scales are often deﬁned: keV ee and keVnr (or keVr) [2, 10]."
+          prefix: "Nuclear interactions with electrons excite or ionize atoms and thus produce usable signals for a detector [7, 13]."
+          suffix: "The former is for ER and the latter for NR."
+        location:
+          page: 20
+    scope: "nuclear recoils at zero electric field (NR field dependence treated separately)"
+  nr_field_dependence:
+    id: nr_field_dependence
+    label: "Original NEST: NR field dependence not modeled"
+    claim: "NR yields change only weakly with electric field, and this paper did not model NR field dependence; to reproduce it, the authors suggest a field-dependent xi/Ni for NR that changes differently with field than the ER one, rather than changing alpha (Dahl instead suggests alpha ~ 1 for NR at non-zero field)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "Because NR yields change very weakly with ﬁeld [22, 54], we did not initially investigate ﬁeld dependence."
+          prefix: "but in direct conﬂict with the older claims of Sorensen et al. [61] and Aprile et al. [58]."
+          suffix: "Dahl’s study suggests an explanation for this weak dependence:α∼ 1 for NR at non-zero ﬁeld"
+        location:
+          page: 20
+      - id: ev2
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "To reproduce ﬁeld dependence, which is of greater importance now as S2 is used to lower the threshold of xenon detectors [ 65], we suggest employing a ξ /Ni that changes differently with electric ﬁeld than it does for ER, rather than attempting a change in α."
+          prefix: "For zero ﬁeld we saw no need to change the α or ξ /Ni used successfully earlier."
+          suffix: "Though this is in apparent contradiction with Dahl’s work, we offer it as another means to the same end."
+        location:
+          page: 20
+    scope: "nuclear recoils; the paper's quantitative NR predictions are for zero field only"
+  nr_predictions_vs_data:
+    id: nr_predictions_vs_data
+    label: "NR Leff: prediction, pure Lindhard best"
+    claim: "The zero-field NR light yield (Leff) curves are predictions, not fits, obtained by applying ER-motivated parameters to NR; unmodified Lindhard theory agrees best with the latest measurements — good agreement with Plante et al. and mostly within 1 sigma of Manzur et al. (which favors the Hitachi correction) — in conflict with older Sorensen and Aprile results."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "Surprisingly, given the expected inapplicability of the Lindhard theory to liquid xenon, unmodiﬁed it appears to agree the best with the latest measurements. It is in good agreement with Plante et al. [60] and mostly resides within 1σ of Manzur et al. [8], which seems better described with the Hitachi correction."
+          prefix: "Note that our curves are not ﬁts but predictions."
+          suffix: "(Note: we do not include works that are primarily commentary on older data"
+        location:
+          page: 21
+    scope: "zero-field nuclear recoil scintillation efficiency (Leff) down to ~few-keV recoils"
+  validity_range_and_datasets:
+    id: validity_range_and_datasets
+    label: "Original validity: 1 keV-1 MeV, 0-10 kV/cm"
+    claim: "The model spans incident gamma/ER energies O(1 keV) to O(1 MeV) and electric fields 0 to O(10 kV/cm), with few enough free parameters to port to any simulation package; zero-field ER yields were tuned to a compilation of essentially all published gamma data (511 keV primary and 122 keV benchmark lines), with most data reproduced within +/-4%, and the field dependence was matched primarily to Dahl's dataset spanning 2-200 keV and 60-4060 V/cm; yields at low energy are predicted, not directly fitted or extrapolated."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "An incident gamma energy range of O(1 keV) to O(1 MeV) and electric ﬁelds between 0 and O(10 kV/cm) are incorporated into this heuristic model."
+          prefix: "facilitates an improved description of nuclear recoil."
+          suffix: "We show results from a Geant4 implementation, but because the model"
+        location:
+          page: 1
+      - id: ev2
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "We show results from a Geant4 implementation, but because the model has a few free parameters, implementation in any simulation package should be simple."
+          prefix: "are incorporated into this heuristic model."
+          suffix: "We use a quasi-empirical approach, with an objective of improving detector calibrations"
+        location:
+          page: 1
+      - id: ev3
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "most data do not differ by more than±4% from a simulation with the parameters which best reproduce the data"
+          prefix: "Given our assumptions for relative-absolute translation,"
+          suffix: "These are listed in Table 1, above."
+        location:
+          page: 10
+      - id: ev4
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "We began our data-matching with one data set that is the most comprehensive in terms of simultaneous span in energy (2-200 keV) and electric ﬁeld (60-4060 V/cm) [ 10]."
+          prefix: "Thus, our hybrid model of Thomas-Imel plus Doke covers a large range in both electric ﬁeld and energy."
+          suffix: "By starting with one very complete data set, we initially sidestepped the issue related to collecting data sets"
+        location:
+          page: 15
+      - id: ev5
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "Unlike some other previous works [ 3, 4], we do not utilize a direct ﬁt to the energy dependence of total scintillation yield. We thus predict, not extrapolate, the response to an energy regime that is lower than what has been studied experimentally."
+          prefix: "utilized for predicting charge yields (Section 5) and the NR quenching factor (Section 6)."
+          suffix: "In earlier work, similar models have been applied to materials other than LNE"
+        location:
+          page: 13
+  geant4_low_energy_limitation:
+    id: geant4_low_energy_limitation
+    label: "Original: Geant4 <250 eV limitation caveat"
+    claim: "The original implementation is approximate at very low energy because Geant4 does not simulate electron production below 250 eV, so the Thomas-Imel model is applied approximately at low energy (this also shifts the best-fit xi/Ni away from Dahl's values); the authors argue the default Geant4 regime is nonetheless sufficient for practical purposes, matching data mostly to better than 5%."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1106.1613"
+        version: 1
+        quote:
+          exact: "Our model is ultimately an approximation because Geant4 does not accurately simulate electron production (tertiary, quaternary generations, etc.) below 250 eV [ 5], unlike other software packages with more precise low-energy electron physics, such as PENELOPE [10, 32]."
+          prefix: "which should exclusively produce ER [10, 12]."
+          suffix: "However, we demonstrate that working within the default Geant4 energy regime is sufﬁcient"
+        location:
+          page: 14
+    scope: "caveat for reimplementations that, like the original NEST, drive the yield model from an externally generated electron-cascade history"
+  lz_exposure_4p2ty:
+    id: lz_exposure_4p2ty
+    label: "WS2024 combined exposure 4.2 tonne-years"
+    claim: "The combined LZ WS2024+WS2022 WIMP search uses a total exposure of 4.2 +/- 0.1 tonne-years over 280 live days, of which 3.3 +/- 0.1 tonne-years and 220 live days are new WS2024 exposure."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "This analysis uses a total exposure of 4 .2 ± 0.1 tonne-years from 280 live days of LZ operation, of which 3.3 ± 0.1 tonne-years and 220 live days are new."
+          prefix: "time projection chamber. "
+          suffix: "A technique to actively tag background electronic"
+        location:
+          page: 2
+  lz_headline_limits:
+    id: lz_headline_limits
+    label: "WS2024 headline limit and sensitivity"
+    claim: "LZ places its strongest SI WIMP exclusion at 2.2e-48 cm2 (90% CL) and achieves a best median sensitivity of 5.1e-48 cm2, both at 40 GeV/c2, for WIMP masses above 9 GeV/c2."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The strongest SI exclusion set is 2 .2 × 10−48 cm2 at the 90% confidence level and the best SI median sensitivity achieved is 5 .1 × 10−48 cm2, both for a mass of 40 GeV/ c2."
+          prefix: "spin-dependent WIMP-nucleon cross sections for masses ≥9 GeV/c2. "
+          suffix: "Astrophysical observations provide strong evidence for"
+        location:
+          page: 2
+  lz_fiducial_mass_5p5t:
+    id: lz_fiducial_mass_5p5t
+    label: "Fiducial mass 5.5 tonnes from tritium calibration"
+    claim: "LZ's fiducial mass for the WIMP search is 5.5 +/- 0.2 tonnes, determined from the fraction of tritium calibration events in the full active volume that fall inside the fiducial volume."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The fiducial mass, determined using the fraction of tritium events in the full active volume found within the FV, is 5 .5 ± 0.2 tonnes."
+          prefix: "of both depth and azimuthal angle. "
+          suffix: "Veto coincidence cuts reject events that are accompa"
+        location:
+          page: 4
+  lz_drift_field_97vcm:
+    id: lz_drift_field_97vcm
+    label: "WS2024 fields: 97 V/cm drift, 3.4 kV/cm extraction"
+    claim: "WS2024 ran with a TPC drift field of 97 V/cm and a liquid-gas extraction field of 3.4 kV/cm (at radial center, below the liquid surface), both lower than in WS2022."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Cathode, gate, and anode electrodes establish the TPC drift field at 97 V/cm and the liquid-gas extraction field at 3.4 kV/cm (at the radial center, below the liquid surface) for the WS2024 data-taking campaign."
+          prefix: "that in Ref. [12]), discussed later. "
+          suffix: "With respect to WS2022, the extraction field was decreased"
+        location:
+          page: 3
+  lz_live_time_220days:
+    id: lz_live_time_220days
+    label: "81.5% live-time retention, 220.0 live days"
+    claim: "After all live-time losses and exclusions (including a 10% cumulative S2 hold-off removal), 81.5% of the WS2024 collected live time remains for analysis, totaling 220.0 live days."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Accounting for all live-time losses and exclusions, 81.5% of the collected live time of WS2024 remains for analysis, totaling 220.0 live days."
+          prefix: "30% in WS2022. "
+          suffix: "The cumulative effect of the data selection"
+        location:
+          page: 5
+  lz_fv_boundaries:
+    id: lz_fv_boundaries
+    label: "Fiducial volume drift-time boundaries"
+    claim: "The LZ fiducial volume is bounded in drift time at 71 us and 1034 (1030) us in the low (high) mixing state, i.e. 9.9 cm below the gate and 2.2 cm above the cathode; events within 6.0 cm of the field cage resistors are also excluded."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Drift time limits are placed at 71 µs and 1034 (1030) µs in the low(high)-mixing state, corresponding to distances of 9.9 cm below the gate and 2.2 cm above the cathode, respectively."
+          prefix: "external backgrounds. "
+          suffix: "Events within 6.0 cm of the TPC field cage resistors"
+        location:
+          page: 4
+  lz_fv_radial_wall:
+    id: lz_fv_radial_wall
+    label: "Radial FV boundary from wall-background contour"
+    claim: "The radial fiducial boundary follows a contour of measured wall background rate (function of depth and azimuth) chosen so that TPC-wall backgrounds misreconstructed inwards have expectation < 0.01 events in WS2024."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The radial fiducial boundary is defined such that backgrounds originating from the TPC wall, which can be misreconstructed radially inwards due to finite position resolution, have a negligible expectation of < 0.01 events for WS2024."
+          prefix: "excluded, as these resistors have elevated radioactivity. "
+          suffix: "This radial boundary follows a contour of measured wall background event rate"
+        location:
+          page: 4
+  lz_ws2024_roi_definition:
+    id: lz_ws2024_roi_definition
+    label: "WS2024 ROI definition"
+    claim: "The WIMP search ROI is 3 < S1c < 80 phd and log10(S2c) < 4.5, plus a lower bound of 645 phd (14.5 extracted electrons) on uncorrected S2, which renders the analysis largely insensitive to 8B CEvNS."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The ROI is defined such that the corrected S1 and S2 pulse sizes are in the range of 3< S1c <80 phd and log 10(S2c) < 4.5. A lower bound on uncorrected S2 pulse size of 645 phd, equivalent to 14.5 extracted electrons, is also applied."
+          prefix: "(ROI). "
+          suffix: "This S2 threshold renders the analysis largely insensitive"
+        location:
+          page: 4
+  lz_s1_ss_efficiency:
+    id: lz_s1_ss_efficiency
+    label: "Single-scatter S1 identification efficiency"
+    claim: "The single-scatter S1 identification efficiency is >90% for all S1 sizes in the analysis, rising to 100% for S1 > 35 phd (8 keV), assessed by comparing automated to manual event classification on tritium and DD calibration data."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The SS S1 identification efficiency is found to be >90% for all S1 pulse sizes in this analysis, rising to 100% for S1s >35 phd (8 keV)."
+          prefix: "differences in photon transit times can lead to missed S1 pulses. "
+          suffix: "This efficiency is assessed by comparing the event classification"
+        location:
+          page: 3
+  lz_nr_efficiency_fig2:
+    id: lz_nr_efficiency_fig2
+    label: "Published cumulative NR efficiency curve (Fig. 2)"
+    claim: "LZ publishes the cumulative NR signal efficiency (Fig. 2) as a function of NR energy, built up sequentially from the S2 trigger (95% at 3.5 extracted electrons), SS reconstruction and analysis cuts, the S2 ROI, and the S1 ROI, with acceptances assessed on tritium and neutron calibration data."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The cumulative effect of the data selection, event detection, and reconstruction efficiencies on the NR signal efficiency can be seen in Fig. 2, where the cut acceptances are assessed on a combination of tritium and neutron calibration data sets."
+          prefix: "remains for analysis, totaling 220.0 live days. "
+          suffix: "Uncertainties arise from the combined statistical error"
+        location:
+          page: 5
+  lz_nr_efficiency_50pct:
+    id: lz_nr_efficiency_50pct
+    label: "NR efficiency 50% at 5.4 keV"
+    claim: "The WS2024 NR signal efficiency reaches 50% at 5.4 keV nuclear recoil energy."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The inset shows the low-energy behavior, with the dotted line at 5.4 keV marking 50% efficiency."
+          prefix: "followed by the S1 ROI (black). "
+          suffix: "The uncertainty band (gray) is assessed using"
+        location:
+          page: 5
+  lz_nest_g1_g2:
+    id: lz_nest_g1_g2
+    label: "WS2024 NEST tuning: g1 = 0.112, g2 = 34.0"
+    claim: "LZ tunes NEST 2.4.0 for detector response; a scan over g1 and g2 using tritium data in {S1c, log10(S2c)} space, constrained by 131mXe and 83mKr energy reconstruction, gives g1 = 0.112 +/- 0.002 phd/photon and g2 = 34.0 +/- 0.9 phd/electron."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "A scan over viable values for g1 and g2, performed using tritium data in {S1c, log10(S2c)} space and constrained by the energy reconstruction of 131mXe and 83mKr peaks, yields g1 = 0 .112 ± 0.002 phd/photon and g2 = 34 .0 ± 0.9 phd/electron."
+          prefix: "are key parameters. "
+          suffix: "A further tuning to more accurately capture the"
+        location:
+          page: 4
+  lz_nest_er_band_tuning:
+    id: lz_nest_er_band_tuning
+    label: "ER/NR band tuning precision"
+    claim: "A further NEST tuning to the observed tritium ER band reproduces the band median and width to better than 0.2% and 5% in log10(S2c); the DD data define the NR band, tuned to similar precision via small adjustments to NR yield parameters."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "enables nest to reproduce the band median and width to better than 0.2% and 5% in log 10(S2c), respectively."
+          prefix: "the shape of the observed distribution of tritium data, "
+          suffix: "The DD data define an analogous"
+        location:
+          page: 4
+  lz_signal_background_models_nest:
+    id: lz_signal_background_models_nest
+    label: "All signal/background models from NEST except accidentals"
+    claim: "LZ generates signal and background model distributions in {S1c, log10(S2c)} with NEST plus event simulations; the accidental coincidence background is the sole exception, using a data-driven method identical to WS2022."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Signal and background model distributions are generated using nest and event simulations [16], with the exception of the accidental coincidence background model, which follows a data-driven method identical to that used for the WS2022 result [23]."
+          prefix: "in the {S1c, log10(S2c)} observables. "
+          suffix: "The primary backgrounds and their treatment are similar to those of the WS2022 analysis"
+        location:
+          page: 5
+  lz_nest_application_sim:
+    id: lz_nest_application_sim
+    label: "NEST-based application with detector effects"
+    claim: "LZ implements its detector and xenon response in a NEST-based simulation application that additionally models curved electron drift paths from field non-uniformities, finite (x,y,z) position reconstruction resolution, and position-dependence of S1 and S2 sizes."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The LZ detector and xenon response models are implemented in a nest-based application that includes effects such as curved electron drift paths from field non-uniformities, finite position reconstruction resolution in the transverse (x, y) and longitudinal z directions, and position-dependence of the S1 and S2 signal sizes."
+          prefix: "Details of the Detector Response Model "
+          suffix: "The key detector parameters of the model are provided in Table S2."
+        location:
+          page: 12
+  lz_nest_header_hepdata:
+    id: lz_nest_header_hepdata
+    label: "NEST v2.4.0 header on HEPData"
+    claim: "LZ publishes a NEST v2.4.0 header file reproducing the ER and NR response models used in this analysis, available on HEPData (record 155182)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "A header file for nest v2.4.0 that reproduce the ER and NR response models used in this analysis is available online at https://www.hepdata.net/record/155182."
+          prefix: "of the model are provided in Table S2. "
+          suffix: "TABLE S2. Relevant nest detector parameters."
+        location:
+          page: 12
+  lz_nest_single_electron_size:
+    id: lz_nest_single_electron_size
+    label: "Table S2 detector parameters, WS2024 vs WS2022"
+    claim: "Table S2 gives the WS2024 NEST detector parameters: g1 = 0.112 phd/photon, ggas1 = 0.076 phd/photon, effective GXe extraction field 8.3 kV/cm, single electron size 46.9 phd, extraction efficiency 72.5%, and g2 = 34.0 phd/electron (WS2022 values: 0.114, 0.092, 8.4 kV/cm, 58.5 phd, 80.5%, 47.1 phd/electron)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Single Electron Size [phd] 46.9 58.5"
+          prefix: "Effective GXe Extraction Field [kV/cm] 8.3 8.4 "
+          suffix: "Extraction Efficiency [%] 72.5 80.5"
+        location:
+          page: 12
+  lz_nest_extraction_efficiency:
+    id: lz_nest_extraction_efficiency
+    label: "Extraction efficiency 72.5% (WS2024)"
+    claim: "The LZ electron extraction efficiency is measured as the ratio of the best-fit electroluminescence gain g2 to the observed single electron signal size, giving 72.5% in WS2024 versus 80.5% in WS2022; the effective GXe field in Table S2 is a NEST-model knob, not a physical field in the TPC."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Extraction Efficiency [%] 72.5 80.5"
+          prefix: "Single Electron Size [phd] 46.9 58.5 "
+          suffix: "g2 [phd/electron] 34.0 47.1"
+        location:
+          page: 12
+  lz_ec_charge_yield:
+    id: lz_ec_charge_yield
+    label: "EC recombination enhancement: Qy ratio 0.87"
+    claim: "Electron-capture decays show enhanced recombination relative to beta decays of the same energy; LZ measures a charge-yield ratio Qy^L/Qy^beta = 0.87 +/- 0.03 for 5.2 keV L-shell EC decays, using Skin-tagged and multiple-scatter sidebands of 127Xe and 125Xe."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "These yield a charge-yield ratio of QL y /Qβ y = 0 .87 ± 0.03 for 5.2 keV L-shell EC decays relative to β decays of the same energy [25]."
+          prefix: "situ via neutron activation. "
+          suffix: "Two-neutrino DEC decays of 124Xe"
+        location:
+          page: 6
+  lz_xe124_dec_model:
+    id: lz_xe124_dec_model
+    label: "124Xe DEC model: abundance, branches, Qy bounds"
+    claim: "The 124Xe two-neutrino double-electron-capture background in the ROI is estimated from natural abundance 9.52e-4 with LL (10.00 keV) and LM (5.98 keV) branching ratios of 1.4% and 0.8%, with LM charge suppression modeled by the same 0.87 ratio and the LL-shell charge yield treated as a free parameter bounded between 0.65 and 0.87 via the Thomas-Imel box model."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The expected number of 124Xe counts in the ROI is estimated assuming an abundance of 9 .52 × 10−4 [28] and branching ratios for the LL (10.00 keV) and LM (5.98 keV) decay modes of 1.4% and 0.8%, respectively."
+          prefix: "consistent with that in Ref. [27]. "
+          suffix: "The LM charge suppression is modeled with the same ratio"
+        location:
+          page: 6
+  lz_neutron_sideband_insitu:
+    id: lz_neutron_sideband_insitu
+    label: "Detector neutrons constrained in situ via sideband"
+    claim: "LZ constrains the detector-neutron background in situ: veto-tagged events form a sideband that is included directly in the final likelihood; a sideband-only fit returns an expectation of 0 (+0.2) SS neutron counts (secondary estimates: 0.05 +/- 0.01 from simulations, 0.3 +/- 0.2 from MS neutron tags)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "As discussed later, the sideband is incorporated directly into the final statistical analysis; a sideband-only fit returns an expectation of 0 +0.2 SS counts, as shown in Table I."
+          prefix: "the number of neutron events in the WIMP search data. "
+          suffix: "Secondary estimates from simulations based on"
+        location:
+          page: 5
+  lz_six_samples_unbinned_ml:
+    id: lz_six_samples_unbinned_ml
+    label: "Six samples, unbinned extended ML (LZ's actual method)"
+    claim: "LZ's statistical analysis divides the data into six mutually exclusive samples analyzed simultaneously with an unbinned extended maximum likelihood in {S1c, log10(S2c)} — note: unbinned, not binned — so a binned 2D profile likelihood would be a deliberate variation of the published approach."
+    created_at: "2026-11-09T12:00:00Z"
+    scope: "Applies to the published LZ WS2024 inference; a binned 2D likelihood is our forward-model variation, not LZ's method."
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The data are divided into six mutually exclusive samples, which are simultaneously analyzed using an unbinned, extended maximum likelihood."
+          prefix: "as described in the text. "
+          suffix: "Five of these apply to the new 220 live-day exposure"
+        location:
+          page: 6
+  lz_ws2022_sixth_sample:
+    id: lz_ws2022_sixth_sample
+    label: "Sixth likelihood sample is full WS2022"
+    claim: "The sixth likelihood sample is the full WS2022 result (60 live days), with its data and models included so the limit comes from a combined WS2024+WS2022 fit; the five WS2024 samples are the four radon/flow-state samples plus a Skin/OD-veto-tagged sample."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The sixth sample in the likelihood represents WS2022, containing the data and models from the first, 60 live- day WIMP search result [8]."
+          prefix: "low-mixing state exposures. "
+          suffix: "The full WS2024 data set is shown"
+        location:
+          page: 7
+  lz_likelihood_nuisances:
+    id: lz_likelihood_nuisances
+    label: "Nuisance parameters of the WS2024 likelihood"
+    claim: "The likelihood nuisance parameters are the expected event counts of each background source (Table I), the radon tagging efficiency, the neutron veto tagging efficiency, and the 124Xe LL-shell charge-yield ratio bounded between 0.65 and 0.87 — all floating within their uncertainties."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The nuisance parameters, which float within their uncertainties, are the expected number of events for each background source, listed in Table I; the radon tagging efficiency; the neutron veto tagging efficiency; and the 124Xe QLL y /Qβ y , bounded between 0.65 and 0.87."
+          prefix: "events tagged by the Skin or OD. "
+          suffix: "Parameters characterizing 222Rn and 220Rn daughter backgrounds"
+        location:
+          page: 7
+  lz_mixing_state_params:
+    id: lz_mixing_state_params
+    label: "Some nuisances independent between flow states"
+    claim: "Nuisance parameters for 222Rn/220Rn daughter backgrounds and for tritium and 14C are kept independent between the high-mixing and low-mixing state exposures."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Parameters characterizing 222Rn and 220Rn daughter backgrounds, tritium and 14C are independent in the high- and low-mixing state exposures."
+          prefix: "bounded between 0.65 and 0.87. "
+          suffix: "The sixth sample in the likelihood represents WS2022"
+        location:
+          page: 7
+  lz_best_fit_wimps_zero:
+    id: lz_best_fit_wimps_zero
+    label: "Best-fit WIMP number zero at all masses"
+    claim: "The best-fit WIMP number is zero at every mass tested, spanning 9 GeV/c2 to 100 TeV/c2, for the combined WS2024+WS2022 analysis."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The best-fit number of WIMPs at all masses tested (between 9 GeV/ c2 and 100 TeV/ c2) for the combined WS2024+WS2022 analysis is zero."
+          prefix: "we also report their exposures. "
+          suffix: "The goodness of fit of the background-only model"
+        location:
+          page: 7
+  lz_gof_binned_projections:
+    id: lz_gof_binned_projections
+    label: "Binned projections used only for goodness of fit"
+    claim: "LZ assesses goodness of fit of the background-only model using binned 1D projections in S1c, log10(S2c), reconstructed energy, and distance from the ER band median, plus the full 2D {S1c, log10(S2c)} space, passing a Holm-Bonferroni test at significance level 0.05 — binned 2D treatment appears as model validation, not as the primary statistic."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The goodness of fit of the background-only model is assessed in binned 1D projections of the data and model into S1 c, log 10(S2c), reconstructed energy, distance from the ER band median, as well as the 2D space of {S1c, log10(S2c)}."
+          prefix: "WS2024+WS2022 analysis is zero. "
+          suffix: "All samples show excellent model-data agreement"
+        location:
+          page: 7
+  lz_plr_test_statistic:
+    id: lz_plr_test_statistic
+    label: "Two-sided unbinned PLR test statistic"
+    claim: "LZ's 90% CL SI upper limits come from a two-sided, unbinned profile likelihood ratio test statistic (Cowan et al. construction), not a one-sided or FC construction."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Figure 5 shows the 90% confidence level upper limit on the spin-independent WIMP-nucleon cross section as a function of mass following inference performed with a two-sided, unbinned profile likelihood ratio test statistic [31]."
+          prefix: "in agreement with the pre-fit expectations. "
+          suffix: "The limit is power constrained at all WIMP masses"
+        location:
+          page: 8
+  lz_ws2024_power_constraint:
+    id: lz_ws2024_power_constraint
+    label: "Power constraint 1 sigma below median, all masses"
+    claim: "LZ applies a power constraint at all WIMP masses, limiting the fluctuation to 1 sigma below the median expectation; the constraint uses the expected sensitivity assuming no signal is present (per their Ref. [32] footnote)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The limit is power constrained at all WIMP masses to 1σ below the median expectation following the recommendation in Ref. [32]."
+          prefix: "likelihood ratio test statistic [31]. "
+          suffix: "The fluctuation, and therefore the size of the constraint, is largest"
+        location:
+          page: 8
+  lz_min_limit_and_median:
+    id: lz_min_limit_and_median
+    label: "Minimum observed limit and median sensitivity"
+    claim: "The minimum of the combined-analysis observed SI limit curve is 2.2e-48 cm2 at 40 GeV/c2, while the minimum of the median expected limit is 5.1e-48 cm2 at 40 GeV/c2 — the latter is the sensitivity target for our forward-model validation."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The minimum of the limit curve is 2 .2 × 10−48 cm2 at 40 GeV/c2 while that of the median expected limit is 5.1×10−48 cm2 at 40 GeV/c2."
+          prefix: "overlap with expected WIMP distributions. "
+          suffix: "The best median 3 σ observation potential"
+        location:
+          page: 8
+  lz_median_3sigma_discovery:
+    id: lz_median_3sigma_discovery
+    label: "Best median 3-sigma discovery potential"
+    claim: "The best median 3-sigma discovery (observation) potential of the combined analysis is 1.1e-47 cm2 at 40 GeV/c2."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The best median 3 σ observation potential is 1 .1 × 10−47 cm2 at 40 GeV/c 2."
+          prefix: "5.1×10−48 cm2 at 40 GeV/c2. "
+          suffix: "Results of searching for evidence of spin-dependent WIMP-nucleon couplings"
+        location:
+          page: 8
+  lz_fig5_median_postfit:
+    id: lz_fig5_median_postfit
+    label: "Median expected limit uses post-fit background estimates"
+    claim: "In Fig. 5 the green and yellow bands show the range of expected upper limits from 68% and 95% of background-only pseudo-experiments, and the median expected limit (dashed) is obtained with post-fit background estimates — i.e. the published median sensitivity uses the fitted background rates, not the pre-fit (Table I pre-fit column) expectations."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The gray dot-dash line shows the limits without the power constraint; green and yellow regions show the range of expected upper limits from 68% and 95% of background-only experiments, while the dashed black line indicates the median expectation, obtained with post-fit background estimates."
+          prefix: "constraint applied. "
+          suffix: "The median 3 σ observation potential from the post-fit model"
+        location:
+          page: 8
+  lz_sensitivity_bands:
+    id: lz_sensitivity_bands
+    label: "1- and 2-sigma sensitivity bands (Fig. S3)"
+    claim: "The Supplemental Material Fig. S3 shows the 1-sigma and 2-sigma sensitivity bands around the median expected limit in number of WIMP events versus mass, for both the combined and WS2024-only analyses."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The green and yellow bands are the 1 σ and 2σ sensitivity bands."
+          prefix: "discovery sensitivity. "
+          suffix: "Parameters of the Salting Model"
+        location:
+          page: 14
+  lz_fig4_projection:
+    id: lz_fig4_projection
+    label: "Fig. 4 is a 1D projection, not a stacked 2D spectrum"
+    claim: "Figure 4 compares WS2024 data to the best-fit model (values from Table I, background plus a 40 GeV/c2 WIMP shown at its power-constrained 90% CL upper limit) in a 1D projection along the ER band median normalized to the 1-sigma band width, i.e. it is a data/model agreement plot, not a stacked spectrum in (S1c, log10 S2c)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "FIG. 4. Comparison between data and the best-fit model for WS2024 corresponding to the values shown in Table I for a background plus a 40 GeV/ c2 WIMP signal fit in a projection along the ER band median, normalized to the 1σ band width."
+          prefix: "40 < S1c < 80 phd "
+          suffix: "The 40 GeV/ c2 WIMP component is shown with an amplitude"
+        location:
+          page: 7
+  lz_fig4_panels:
+    id: lz_fig4_panels
+    label: "Fig. 4 panels: S1c 3-40 and 40-80 phd"
+    claim: "Figure 4's upper and lower panels select S1c ranges 3-40 phd and 40-80 phd, with background-plus-WIMP fit p-values of 0.55 and 0.59 respectively; shaded bands show the central 68% interval of combined systematic and statistical model uncertainties."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The upper and lower panels select the S1 c ranges 3–40 phd and 40–80 phd with p values of 0.55 and 0.59, respectively."
+          prefix: "equal to its power-constrained 90% C.L. upper limit. "
+          suffix: "Shaded bands depict the central interval containing 68%"
+        location:
+          page: 7
+  lz_table1_scope:
+    id: lz_table1_scope
+    label: "Table I scope: WS2024 3.3 t-y exposure only"
+    claim: "Table I lists expected (pre-fit) and best-fit counts per background source for the 3.3 tonne-year WS2024 exposure alone (not the combined 4.2 t-y), including a 40 GeV/c2 WIMP signal row; flat beta components are split by flow state / radon tag and neutron counts are derived in situ."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "TABLE I. The expected and best-fit counts for different sources in the 3.3 tonne-year exposure of WS2024, including a 40 GeV/ c2 WIMP signal."
+          prefix: "124Xe in particular. "
+          suffix: "Flat β-decay components have been separated based on"
+        location:
+          page: 6
+  lz_bkg_214pb:
+    id: lz_bkg_214pb
+    label: "Background: 214Pb betas, dominant"
+    claim: "The dominant WIMP-search background is 214Pb betas from the 222Rn chain: 743 +/- 88 events expected pre-fit (733 +/- 34 best fit) in the WS2024 ROI, from a measured FV activity of 3.9 +/- 0.4 uBq/kg."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "214Pb βs 743 ± 88 733 ± 34"
+          prefix: "Source Pre-fit Expectation Fit Result "
+          suffix: "85Kr + 39Ar βs + det. γs 162 ± 22 161 ± 21"
+        location:
+          page: 6
+  lz_bkg_85kr_39ar_detgammas:
+    id: lz_bkg_85kr_39ar_detgammas
+    label: "Background: 85Kr + 39Ar + detector gammas"
+    claim: "The combined 85Kr + 39Ar + detector-gamma flat beta/gamma background contributes 162 +/- 22 expected events (161 +/- 21 fit), based on measured xenon contamination of 1.10 +/- 0.18 ppb natAr and 186 +/- 26 ppq natKr."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "85Kr + 39Ar βs + det. γs 162 ± 22 161 ± 21"
+          prefix: "214Pb βs 743 ± 88 733 ± 34 "
+          suffix: "Solar ν ER 102 ± 6 102 ± 6"
+        location:
+          page: 6
+  lz_bkg_solar_nu_er:
+    id: lz_bkg_solar_nu_er
+    label: "Background: solar neutrino ER"
+    claim: "Solar neutrino electronic-recoil scattering (pp/7Be etc.) contributes 102 +/- 6 expected events in the WS2024 ROI."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Solar ν ER 102 ± 6 102 ± 6"
+          prefix: "162 ± 22 161 ± 21 "
+          suffix: "212Pb + 218Po βs 62.7 ± 7.5 63.7 ± 7.4"
+        location:
+          page: 6
+  lz_bkg_212pb_218po:
+    id: lz_bkg_212pb_218po
+    label: "Background: 212Pb + 218Po betas"
+    claim: "The 212Pb + 218Po beta background (radon chains other than 222Rn->214Pb) contributes 62.7 +/- 7.5 expected events (63.7 +/- 7.4 fit)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "212Pb + 218Po βs 62.7 ± 7.5 63.7 ± 7.4"
+          prefix: "Solar ν ER 102 ± 6 102 ± 6 "
+          suffix: "Tritium+ 14C βs 58.3 ± 3.3 59.7 ± 3.3"
+        location:
+          page: 6
+  lz_bkg_tritium_c14:
+    id: lz_bkg_tritium_c14
+    label: "Background: tritium + 14C (calibration residuals)"
+    claim: "Residual tritium + 14C betas from ER calibration injections contribute 58.3 +/- 3.3 expected events (59.7 +/- 3.3 fit), included only for the high-mixing-state exposure."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Tritium+ 14C βs 58.3 ± 3.3 59.7 ± 3.3"
+          prefix: "62.7 ± 7.5 63.7 ± 7.4 "
+          suffix: "136Xe 2νββ 55.6 ± 8.3 55.9 ± 8.2"
+        location:
+          page: 6
+  lz_bkg_xe136_2nubb:
+    id: lz_bkg_xe136_2nubb
+    label: "Background: 136Xe 2-neutrino double beta"
+    claim: "136Xe two-neutrino double beta decay contributes 55.6 +/- 8.3 expected events (55.9 +/- 8.2 fit) in the WS2024 ROI."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "136Xe 2νββ 55.6 ± 8.3 55.9 ± 8.2"
+          prefix: "58.3 ± 3.3 59.7 ± 3.3 "
+          suffix: "124Xe DEC 19.4 ± 2.5 20.4 ± 2.4"
+        location:
+          page: 6
+  lz_bkg_xe124_dec:
+    id: lz_bkg_xe124_dec
+    label: "Background: 124Xe DEC, off ER band"
+    claim: "124Xe two-neutrino double electron capture contributes 19.4 +/- 2.5 expected events (20.4 +/- 2.4 fit) in the WS2024 ROI; it is a new background in this analysis, sitting off the ER band due to enhanced recombination."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "124Xe DEC 19.4 ± 2.5 20.4 ± 2.4"
+          prefix: "55.6 ± 8.3 55.9 ± 8.2 "
+          suffix: "127Xe + 125Xe EC 3.2 ± 0.6 2.7 ± 0.6"
+        location:
+          page: 6
+  lz_bkg_127xe_125xe_ec:
+    id: lz_bkg_127xe_125xe_ec
+    label: "Background: 127Xe + 125Xe electron capture"
+    claim: "The 127Xe + 125Xe electron-capture background (from in-situ neutron activation) contributes only 3.2 +/- 0.6 expected events (2.7 +/- 0.6 fit)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "127Xe + 125Xe EC 3.2 ± 0.6 2.7 ± 0.6"
+          prefix: "19.4 ± 2.5 20.4 ± 2.4 "
+          suffix: "Accidental coincidences 2.8 ± 0.6 2.6 ± 0.6"
+        location:
+          page: 6
+  lz_bkg_accidentals:
+    id: lz_bkg_accidentals
+    label: "Background: accidental coincidences (data-driven)"
+    claim: "Accidental coincidence events (random S1-S2 pairings, rejected 99.5% by pulse-shape cuts evaluated on an unphysical-drift-time sideband) contribute 2.8 +/- 0.6 expected events (2.6 +/- 0.6 fit)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Accidental coincidences 2.8 ± 0.6 2.6 ± 0.6"
+          prefix: "3.2 ± 0.6 2.7 ± 0.6 "
+          suffix: "Atm. νNR 0.12 ± 0.02 0.12 ± 0.02"
+        location:
+          page: 6
+  lz_bkg_atm_nu_nr:
+    id: lz_bkg_atm_nu_nr
+    label: "Background: atmospheric neutrino CEvNS"
+    claim: "Atmospheric-neutrino coherent elastic neutrino-nucleus scattering contributes 0.12 +/- 0.02 expected NR events in the WS2024 ROI."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Atm. νNR 0.12 ± 0.02 0.12 ± 0.02"
+          prefix: "2.8 ± 0.6 2.6 ± 0.6 "
+          suffix: "8B+hep νNR 0.06 ± 0.01 0.06 ± 0.01"
+        location:
+          page: 6
+  lz_bkg_b8_hep_nu_nr:
+    id: lz_bkg_b8_hep_nu_nr
+    label: "Background: 8B + hep neutrino CEvNS"
+    claim: "8B + hep solar neutrino CEvNS contributes 0.06 +/- 0.01 expected NR events in the WS2024 ROI."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "8B+hep νNR 0.06 ± 0.01 0.06 ± 0.01"
+          prefix: "0.12 ± 0.02 0.12 ± 0.02 "
+          suffix: "Detector neutrons a0.0+0.2 0.0+0.2"
+        location:
+          page: 6
+  lz_bkg_detector_neutrons:
+    id: lz_bkg_detector_neutrons
+    label: "Background: detector neutrons, in situ only"
+    claim: "Detector (radiogenic) neutrons have a pre-fit expectation of 0 (+0.2) single-scatter counts in the ROI, derived in situ from the veto-tagged sideband fit rather than from radioassay simulation."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Detector neutrons a0.0+0.2 0.0+0.2"
+          prefix: "8B+hep νNR 0.06 ± 0.01 0.06 ± 0.01 "
+          suffix: "40 GeV/c2 WIMP – 0 .0+0.6"
+        location:
+          page: 6
+  lz_bkg_total:
+    id: lz_bkg_total
+    label: "Total expected background 1210 events"
+    claim: "The total expected background in the WS2024 ROI is 1210 +/- 91 events pre-fit (1202 +/- 41 best fit), consistent with the 1220 events observed after all selections and salt removal."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Total 1210 ± 91 1202 ± 41"
+          prefix: "40 GeV/c2 WIMP – 0 .0+0.6 "
+          suffix: "a The expected number of neutron events results from a fit"
+        location:
+          page: 6
+  lz_table_s1_sample_exposures:
+    id: lz_table_s1_sample_exposures
+    label: "Six-sample exposures (Table S1)"
+    claim: "The six likelihood samples have exposures (tonne-years) of 0.6 (high-mixing), 0.6 (radon-tag inactive), 0.3 (radon-tagged), 1.8 (radon-untagged), n/a (veto-tagged), and 0.9 (WS2022 only)."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "TABLE S1. Exposures of the six samples used in the likelihood given in tonne-years."
+          prefix: "of the distribution of tagged neutron backgrounds. "
+          suffix: "High-Mixing Radon Tag Radon Radon Veto WS2022"
+        location:
+          page: 12
+  lz_radon_tag_fractions:
+    id: lz_radon_tag_fractions
+    label: "Radon tag captures 60% of 214Pb"
+    claim: "In WS2024, 15% of the low-mixing tag-active exposure is radon-tagged and captures on average 60 +/- 4% of the total 214Pb, leaving an effective 214Pb activity of 1.8 +/- 0.3 uBq/kg in the untagged remainder — the tag separation helps constrain other backgrounds, especially 124Xe."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "For WS2024, 15% of the low-mixing, tag-active exposure is identified as radon-tagged, containing on average 60 ± 4% of the total 214Pb as estimated directly by measurements of its excited-state decays."
+          prefix: "with a lower probability to contain 214Pb decays. "
+          suffix: "The radon-tagged data set can be seen in the bottom panel of Fig. 3."
+        location:
+          page: 6
+  lz_four_exposure_categories:
+    id: lz_four_exposure_categories
+    label: "Four WS2024 exposure categories"
+    claim: "WS2024 exposure is split into four categories by flow/tag state — (1) high-mixing (no radon tag), (2) low-mixing with tag inactive, (3) low-mixing tag-active and radon-tagged, (4) low-mixing tag-active and radon-untagged — each entering the likelihood as a separate sample."
+    created_at: "2026-11-09T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "To summarize, we have four categories of WS2024 exposure: (1) high-mixing, where a radon tag is not possible; (2) low-mixing, but with the radon tag inactive due to interruptions; (3) low-mixing, active radon tag and radon-tagged, with a high probability to contain 214Pb decays; and (4) low-mixing, active radon tag and radon-untagged, with a lower probability to contain 214Pb decays."
+          prefix: "induced by power outages, are labeled as radon-tag-inactive. "
+          suffix: "For WS2024, 15% of the low-mixing, tag-active exposure"
+        location:
+          page: 6
+decisions:
+  statistics:
+    id: statistics
+    label: "Statistical inference machinery"
+    rationale: "How the limit/sensitivity is computed from the expected spectra. The plan: 2D binned profile likelihood (primary) plus a cut-and-count with Feldman-Cousins as a transparent cross-check. Note LZ itself used an unbinned PLR — the binned 2D likelihood is a documented approximation to it."
+    default: both_with_crosscheck
+    options:
+      both_with_crosscheck:
+        label: "2D binned profile likelihood + FC cut-and-count cross-check"
+        description: "Binned Poisson profile likelihood in (S1c, log10 S2c) with background-rate nuisance parameters, plus a cut-and-count in the ROI with Feldman-Cousins 90% CL; compare the two sensitivity curves as an internal validation."
+        insights: [lz_plr_unbinned_2d, lz_unified_interval_two_sided, plr_recommended_test_statistic, raster_scan_per_mass, two_sided_ts_recommended, fc_profile_construction_equivalence, cl_90_primary, mu_strictly_positive, mu_effective_estimator, median_brazil_band, ts_distributions_from_mc, coverage_checks_recommended, sensitivity_via_simulation, asymptotic_xenon1t_caution, pcl_minus_1sigma, evidence_3sigma_global, lee_only_if_local_3sigma, lower_limit_reporting_threshold, report_smallest_p0, background_gof_required, nuisance_params_in_likelihood, lz_six_samples_unbinned_ml, lz_ws2022_sixth_sample, lz_plr_test_statistic, lz_ws2024_power_constraint, lz_headline_limits, lz_min_limit_and_median, lz_median_3sigma_discovery, lz_fig5_median_postfit, lz_sensitivity_bands, lz_best_fit_wimps_zero, lz_likelihood_nuisances, lz_neutron_sideband_insitu, lz_table_s1_sample_exposures]
+      profile_likelihood_2d:
+        label: "2D binned profile likelihood only"
+        description: "Poisson likelihood per (S1c, log10 S2c) bin, profile likelihood ratio test statistic, median expected limit."
+        insights: [lz_plr_unbinned_2d, lz_likelihood_constraint_terms, lz_power_constraint, lz_median_sensitivity_reported, lz_limit_minima, lz_exposure_fv_mass, plr_recommended_test_statistic, raster_scan_per_mass, two_sided_ts_recommended, cl_90_primary, mu_strictly_positive, mu_effective_estimator, median_brazil_band, nuisance_params_in_likelihood, lz_ws2024_roi_definition, lz_six_samples_unbinned_ml, lz_gof_binned_projections, lz_plr_test_statistic, lz_likelihood_nuisances]
+      cut_and_count_fc:
+        label: "Cut-and-count with Feldman-Cousins only"
+        description: "Define ROI in (S1c, log10 S2c), count expected events, FC confidence belt on signal counts, convert to cross-section limit via efficiency and exposure."
+        insights: [lz_unified_interval_two_sided, lz_power_constraint, fc_profile_construction_equivalence, cl_90_primary, ts_distributions_from_mc, asymptotic_xenon1t_caution, pcl_minus_1sigma]
+  background_components:
+    id: background_components
+    label: "Background components simulated"
+    rationale: "Which background sources enter the expectation model as independently simulated, rate-tunable components. WS2022 used nine components; WS2024's Table 1 is the fuller list to extract."
+    default: all_table1
+    options:
+      all_table1:
+        label: "Every component in LZ's background table"
+        description: "Simulate each component listed in the LZ background table (e.g. WS2022's nine; WS2024 Table 1) through the response model, each with its own source spectrum and rate, validated against the published distributions."
+        insights: [lz_background_nine_components, lz_background_expected_counts, lz_37ar_neutron_constraints, lz_observed_335_events, neutrino_flux_convention, atmospheric_flux_fluka_20pct, dsnb_50pct_uncertainty, neutrino_wimp_mimic_masses, lz_exposure_4p2ty, lz_fiducial_mass_5p5t, lz_live_time_220days, lz_fv_boundaries, lz_fv_radial_wall, lz_signal_background_models_nest, lz_xe124_dec_model, lz_neutron_sideband_insitu, lz_mixing_state_params, lz_likelihood_nuisances, lz_fig4_projection, lz_fig4_panels, lz_table1_scope, lz_bkg_214pb, lz_bkg_85kr_39ar_detgammas, lz_bkg_solar_nu_er, lz_bkg_212pb_218po, lz_bkg_tritium_c14, lz_bkg_xe136_2nubb, lz_bkg_xe124_dec, lz_bkg_127xe_125xe_ec, lz_bkg_accidentals, lz_bkg_atm_nu_nr, lz_bkg_b8_hep_nu_nr, lz_bkg_detector_neutrons, lz_bkg_total, lz_table_s1_sample_exposures, lz_radon_tag_fractions, lz_four_exposure_categories]
+      four_classes:
+        label: "Four microphysics classes only"
+        description: "Group backgrounds into ER, NR, surface, accidental classes with one tunable rate per class."
+        insights: [lz_background_nine_components, lz_bkg_xe124_dec, lz_bkg_127xe_125xe_ec, lz_bkg_accidentals, lz_bkg_atm_nu_nr, lz_bkg_b8_hep_nu_nr, lz_bkg_detector_neutrons]
+      er_nr_only:
+        label: "ER + NR only"
+        description: "Minimal two-component model; fastest, but omits surface/accidental shapes."
+        insights: [neutrino_wimp_mimic_masses]
+  efficiency_treatment:
+    id: efficiency_treatment
+    label: "Signal analysis efficiency"
+    rationale: "The published analysis efficiency folds in event-level cuts whose details are not public; recreating it would couple validation to unmodelable details. Decision: take the published curve as an input."
+    default: input_published_curve
+    options:
+      input_published_curve:
+        label: "Published efficiency curve as input"
+        description: "Take LZ's published total analysis efficiency (from the data release) as a declared input, applied identically to signal and background components."
+        insights: [lz_data_release_efficiency_curve, lz_roi_definition, lz_efficiency_50pct_kev, lz_nr_efficiency_fig2, lz_nr_efficiency_50pct, lz_s1_ss_efficiency, lz_nest_header_hepdata]
+      recreate_from_cuts:
+        label: "Recreate efficiency from modeled cuts"
+        description: "Model trigger, S1 threshold, single-scatter and ROI efficiencies from published stage descriptions; risks mismatch on event-level cut details."
+        insights: [lz_efficiency_curve_staged, lz_efficiency_uncertainty, lz_roi_definition, lz_fv_boundaries, lz_fv_radial_wall, lz_ws2024_roi_definition, lz_s1_ss_efficiency]
+  response_model:
+    id: response_model
+    label: "Detector response / microphysics model"
+    rationale: "How recoil energy becomes (S1, S2). User decision: use the NEST library itself via the nestpy Python bindings rather than reimplementing the microphysics — LZ's published WS2024 header should work with NEST directly, and the released nestpy wheel ships the LZ_WS2024 detector as a built-in. The HEPData header input (lz_nest_header_hepdata) cross-checks that the packaged detector parameters match LZ's published ones; if they ever disagree, the documented fallback is a source build of nestpy with the header copied into lib/nest. Which parameter set to pin is its own decision (nest_parameter_set)."
+    default: nest_library
+    options:
+      nest_library:
+        label: "NEST library via nestpy bindings"
+        description: "Run NEST itself through its official Python bindings (nestpy on PyPI), with the LZ_WS2024 built-in detector cross-checked against the published HEPData header. No microphysics code of our own; validation still against LZ's published band figures."
+        insights: [lz_nest_header_hepdata, lz_signal_background_models_nest, lz_nest_application_sim, nest_version_default]
+      nest_implementation:
+        label: "Own NEST-style microphysics implementation"
+        description: "Implement the NEST yield/recombination/fluctuation models ourselves, using LZ's published tuned parameters as inputs where available."
+        insights: [lz_nest_tuned_g1_g2, lz_nest_skewness_disabled, lz_nest_params_table_s2, lz_detector_fields, detector_response_out_of_scope, background_gof_required, nest_version_default, er_recomb_from_qy, er_qy_first_subtraction, er_qy_sigmoid_params, er_box_birks_split, er_work_function, er_nex_ni_ratio, er_fano_factor, er_recomb_fluct_nonbinomial, er_gamma_separate_model, nr_total_quanta_powerlaw, nr_qy_model, nr_ly_model, nr_hard_cutoff, nr_fano_separate, nr_recomb_fluct, nr_lindhard_k_and_nex_ni, box_model_tib_values, birks_k_values, counting_fluctuation_implementation, validation_ranges, nest_fully_empirical, er_energy_partition_equations, exciton_ion_ratio_alpha_006, recombination_doke_birks_long_tracks, recombination_thomas_imel_short_tracks, zero_field_fitted_parameters, field_dependence_of_parameters, recombination_fluctuation_model, s1_s2_anticorrelation, nr_lindhard_model, nr_field_dependence, nr_predictions_vs_data, validity_range_and_datasets, geant4_low_energy_limitation, lz_drift_field_97vcm, lz_nest_g1_g2, lz_nest_er_band_tuning, lz_signal_background_models_nest, lz_nest_application_sim, lz_nest_header_hepdata, lz_nest_single_electron_size, lz_nest_extraction_efficiency, lz_ec_charge_yield]
+      physics_parametrized:
+        label: "Physics-parametrized yields"
+        description: "Lindhard quenching + published yield fits + Poisson/Gaussian resolution; simpler but less faithful band shapes."
+        insights: [lz_nest_params_table_s2, detector_response_out_of_scope, background_gof_required, er_box_birks_split, nr_total_quanta_powerlaw, box_model_tib_values, birks_k_values, nest_fully_empirical, zero_field_fitted_parameters, field_dependence_of_parameters, validity_range_and_datasets, nr_predictions_vs_data, lz_nest_er_band_tuning, lz_ec_charge_yield]
+  halo_model:
+    id: halo_model
+    label: "Astrophysical (halo) model"
+    rationale: "Velocity distribution and parameters for the WIMP recoil spectrum. LZ uses the standard halo model parameterized per the community conventions paper (Baxter et al. 2021)."
+    default: shm_standard
+    options:
+      shm_standard:
+        label: "Standard halo model, canonical parameters"
+        description: "Isotropic Maxwell-Boltzmann with truncated escape velocity; parameters per the recommended conventions (Baxter et al. 2021)."
+        insights: [lz_halo_shm, shm_recommended_parameters, shm_rho0_0p3, shm_vesc_544, shm_v0_238, shm_earth_speed_29p8, shm_vpec_11_12_7, shm_fix_params_do_not_profile, report_results_under_nominal_halo]
+      shm_with_variations:
+        label: "SHM with parameter variations"
+        description: "Explore halo-parameter uncertainty impact on sensitivity as an additional study axis."
+        insights: [report_results_under_nominal_halo, halo_shape_variation_threshold_effect, shm_fix_params_do_not_profile]
+  nest_parameter_set:
+    id: nest_parameter_set
+    label: "NEST version / detector parameter pinning"
+    rationale: "LZ's two campaigns used different NEST versions and detector parameter sets: WS2022 tuned NEST 2.3.7 (g1 = 0.114 phd/photon, g2 = 47.1 phd/electron, SES 58.5 phd, extraction 80.5%); WS2024 tuned NEST 2.4.0 (g1 = 0.112 +/- 0.002, g2 = 34.0 +/- 0.9, SES 46.9 phd, extraction 72.5%), with a reproducing header file on HEPData. The validation target is the WS2024 median sensitivity, so the WS2024 set is the natural default."
+    default: ws2024_nest240
+    options:
+      ws2024_nest240:
+        label: "WS2024 parameter set (NEST 2.4.0)"
+        description: "Use the WS2024 tuning: NEST 2.4.0 with g1 = 0.112, g2 = 34.0 phd/electron, single electron size 46.9 phd, extraction efficiency 72.5%, drift field 97 V/cm; HEPData header as the declared input."
+        insights: [lz_nest_g1_g2, lz_nest_header_hepdata, lz_nest_single_electron_size, lz_nest_extraction_efficiency, lz_drift_field_97vcm]
+      ws2022_nest237:
+        label: "WS2022 parameter set (NEST 2.3.7)"
+        description: "Use the WS2022 tuning: NEST 2.3.7 with g1 = 0.114, g2 = 47.1 phd/electron, skewness disabled, reduced band widths."
+        insights: [lz_nest_tuned_g1_g2, lz_nest_params_table_s2, lz_nest_skewness_disabled, lz_detector_fields]
+      both_compare:
+        label: "Both parameter sets, compared"
+        description: "Implement parameter-pinning as a switch and produce the sensitivity curve under both sets, quantifying how much the tuning change moves the median limit."
+        insights: [lz_nest_header_hepdata, lz_nest_tuned_g1_g2, nest_version_default]
+  test_statistic_sidedness:
+    id: test_statistic_sidedness
+    label: "Two-sided vs one-sided test statistic"
+    rationale: "LZ uses a two-sided profile likelihood ratio test statistic, and the community conventions recommend the two-sided PLR (their Eq. 4), noting it equals the Feldman-Cousins construction when nuisance parameters are absent. A one-sided (CLs-style) variant is a common alternative worth having on the decision space."
+    default: two_sided
+    options:
+      two_sided:
+        label: "Two-sided PLR (LZ / conventions)"
+        description: "Use the two-sided profile likelihood ratio test statistic for both the binned 2D likelihood and the FC cross-check."
+        insights: [two_sided_ts_recommended, lz_plr_test_statistic, fc_profile_construction_equivalence]
+      one_sided:
+        label: "One-sided PLR"
+        description: "Use a one-sided variant of the profile likelihood ratio; upper limits only."
+        insights: [plr_recommended_test_statistic]
+  power_constraint:
+    id: power_constraint
+    label: "Power constraint on the limit"
+    rationale: "LZ power-constrains the limit at all masses to 1 sigma below the median expectation (WS2022 used pi_crit = 0.16 between 13 and 36 GeV/c2), which prevents downward fluctuations from producing overly strong limits at the cost of overcoverage. Whether to apply it changes the reported curve and is a standard methodological fork."
+    default: applied_1sigma
+    options:
+      applied_1sigma:
+        label: "Power constraint applied (LZ)"
+        description: "Constrain the limit to 1 sigma below the median expected limit at all WIMP masses, following LZ."
+        insights: [lz_ws2024_power_constraint, lz_power_constraint, pcl_minus_1sigma]
+      none:
+        label: "No power constraint"
+        description: "Report the raw limit without a power constraint; LZ publishes this variant as the gray dot-dash line in Fig. 5."
+        insights: [lz_fig5_median_postfit]
+  median_sensitivity_definition:
+    id: median_sensitivity_definition
+    label: "Definition of the median sensitivity"
+    rationale: "The validation target is LZ's median expected limit. LZ obtains it as the median of expected limits from background-only pseudo-experiments with post-fit background estimates (green/yellow bands in Fig. 5), consistent with the conventions paper's recommendation of toy Monte Carlo over asymptotic formulae. A single Asimov-dataset limit is the cheaper alternative and coincides with the median up to construction details."
+    default: median_of_toy_limits
+    options:
+      median_of_toy_limits:
+        label: "Median of toy-MC expected limits (LZ)"
+        description: "Generate background-only pseudo-experiments under the expected model, compute the limit for each, take the median; 1/2-sigma bands from the 68%/95% quantiles."
+        insights: [lz_fig5_median_postfit, lz_median_sensitivity_reported, ts_distributions_from_mc, sensitivity_via_simulation]
+      asimov_limit:
+        label: "Asimov-dataset limit"
+        description: "Compute the limit on the single expected (background-only Asimov) dataset; cheaper, no MC spread, and the input to LZ-style power constraints."
+        insights: [sensitivity_via_simulation, pcl_minus_1sigma]
+      both_report:
+        label: "Both, reported side by side"
+        description: "Compute the Asimov limit and the median of toy limits; their agreement is itself a validation of the statistical machinery."
+        insights: [lz_median_sensitivity_reported, sensitivity_via_simulation]
+  exposure_structure:
+    id: exposure_structure
+    label: "Exposure / likelihood sample structure"
+    rationale: "LZ splits the data into six likelihood samples (four WS2024 flow-state/radon-tag categories plus a veto-tagged sample plus the full WS2022 sample) with some nuisance parameters independent between flow states. For a forward model with no observed data, pooling the combined 4.2 tonne-year exposure into a single sample reproduces the expected total counts exactly and only neglects the nuisance-decoupling benefit of the split."
+    default: combined_single
+    options:
+      combined_single:
+        label: "Single combined exposure (simplified)"
+        description: "Pool the combined 4.2 tonne-year exposure into one likelihood sample using the total expected counts of each background source."
+        insights: [lz_exposure_4p2ty, lz_bkg_total, lz_table1_scope]
+      six_samples_full:
+        label: "Six-sample structure (LZ-faithful)"
+        description: "Reproduce the six-sample split (four WS2024 flow/tag categories, veto-tagged sample, WS2022) with per-sample exposures and independent nuisances where LZ has them."
+        insights: [lz_six_samples_unbinned_ml, lz_table_s1_sample_exposures, lz_mixing_state_params, lz_four_exposure_categories]
+  detector_effects:
+    id: detector_effects
+    label: "Position-dependent detector effects in the response"
+    rationale: "LZ's NEST-based application additionally models curved electron drift paths from field non-uniformities, finite position reconstruction resolution, and position-dependence of S1/S2 sizes. These widen the S1/S2 bands beyond pure microphysics fluctuations; LZ's NEST tuning compensates with reduced band widths (and skewness disabled in WS2022). A uniform 1D response with LZ's tuned band widths is the simplest model that can still reproduce the published band shapes."
+    default: uniform_1d
+    options:
+      uniform_1d:
+        label: "Uniform 1D response (no position effects)"
+        description: "Model a single (position-averaged) response chain. All outputs, the ROI, and the likelihood are expressed in the corrected observables (S1c, log10 S2c) throughout; with no position dependence the LZ-style corrections are the identity, so the generated response is already the corrected-space distribution. Electron-lifetime and field-variation effects are absorbed into the effective g1/g2 and LZ's tuned (reduced) band widths."
+        insights: [lz_nest_skewness_disabled, detector_response_out_of_scope, lz_nest_er_band_tuning]
+      simplified_position:
+        label: "Simplified position-dependent effects"
+        description: "Generate raw position-dependent signals (drift-time-dependent S2 size from electron lifetime, field-dependent light/charge yields, x-y light-collection variation), then apply LZ-style corrections to obtain (S1c, log10 S2c); costs a 3D event generation model."
+        insights: [lz_nest_application_sim]
+
+inputs:
+  - id: lz_nest_header_ws2024
+    type: data
+    label: "LZ WS2024 NEST header"
+    source: data/lz_ws2024_nest_header.hh
+    description: "NEST v2.4.0 header file (LZ_Result2024.hh) reproducing the ER and NR response models used in LZ's WS2024 analysis. Published on HEPData, DOI 10.17182/hepdata.155182.v2/r1 (insight lz_nest_header_hepdata). Carries the detector parameter values behind decision nest_parameter_set.ws2024_nest240 (g1 = 0.112, g2 = 34.0, SES 46.9 phd, extraction 72.5%)."
+  - id: lz_efficiency_curve
+    type: data
+    label: "LZ WS2024 NR efficiency curve"
+    source: data/lz_ws2024_efficiency.csv
+    description: "Cumulative NR data-selection efficiency vs nuclear recoil energy, from the HEPData Efficiency table of the LZ WS2024 record (ins2841863, table DOI 10.17182/hepdata.155182.v2/t4). This is the published analysis efficiency taken as an input per decision efficiency_treatment.input_published_curve; reaches 50% at ~5.4 keVnr (insight lz_nr_efficiency_50pct)."
+  - id: lz_si_sensitivity_reference
+    type: data
+    label: "LZ WS2024 SI limit + sensitivity reference"
+    source: data/lz_ws2024_si_sensitivity.csv
+    description: "90% CL spin-independent WIMP-nucleon cross-section curves vs WIMP mass from the HEPData SI cross section table (ins2841863): observed limit, limit without power constraint, median expected limit, +/-1 and +/-2 sigma bands, and 3-sigma discovery potential. The median column is the validation target (5.1e-48 cm2 minimum at 40 GeV/c2, insight lz_min_limit_and_median); the 1/2-sigma columns are the reference for the sensitivity bands."
+  - id: lz_table1_counts_reference
+    type: data
+    label: "LZ WS2024 Table I background counts"
+    source: data/lz_ws2024_table1_counts.csv
+    description: "Expected (pre-fit) and best-fit background counts per source in the WS2024 ROI, transcribed from Table I of arXiv:2410.17036v3 (insights lz_bkg_*); every value backed by a verified quote. Serves both as the rate input for background_components.all_table1 and as the acceptance reference for the background-counts validation."
+outputs:
+  - id: response_model_calibration
+    type: data
+    format: hdf5
+    label: "Calibrated microphysics response"
+    description: "Calibrated NEST-style response engine outputs, consumed by every later stage: ER and NR light/charge yields vs recoil energy at the LZ drift field, and the ER/NR band medians and widths in (S1c, log10 S2c) space, written as lookup tables. Uses the NEST header input for detector parameters."
+    inputs: [lz_nest_header_ws2024]
+    decisions: [response_model, nest_parameter_set, detector_effects]
+  - id: er_band_validation
+    type: figure
+    format: png
+    label: "Validation 1: ER band vs LZ"
+    description: "Validation of the microphysics stage: our ER band (median and +/-1 sigma width) in (S1c, log10 S2c) over energy, overlaid on the LZ tritium ER band reference. ACCEPTANCE: band median and width agree to better than ~5% in log10(S2c), LZ's own tuning bar (insight lz_nest_er_band_tuning). The digitized LZ band reference input is added when this output is wired."
+    inputs: [response_model_calibration]
+    decisions: [response_model, nest_parameter_set, detector_effects]
+  - id: nr_band_validation
+    type: figure
+    format: png
+    label: "Validation 2: NR band vs LZ"
+    description: "Validation of the microphysics stage, NR analogue of er_band_validation: our NR band vs the DD-neutron-defined LZ NR band reference. ACCEPTANCE: same style as Validation 1 — median and width agreement at the ~5% level in log10(S2c)."
+    inputs: [response_model_calibration]
+    decisions: [response_model, nest_parameter_set, detector_effects]
+  - id: efficiency_passthrough
+    type: figure
+    format: png
+    label: "Validation 3: efficiency curve passthrough"
+    description: "Sanity check that the published efficiency input is ingested faithfully: the declared lz_efficiency_curve plotted against LZ's Fig. 2 presentation (50% at 5.4 keVnr). ACCEPTANCE: plotted curve identical to the input file; 50% point at 5.4 +/- 0.1 keVnr. No analysis content — it guards the input path."
+    inputs: [lz_efficiency_curve]
+    decisions: [efficiency_treatment]
+  - id: background_models
+    type: data
+    format: hdf5
+    label: "Per-component background models"
+    description: "Every Table I background source (decision background_components.all_table1) propagated through the calibrated response into a 2D distribution in (S1c, log10 S2c), normalized to its Table I pre-fit count for the combined single exposure (decision exposure_structure.combined_single). The accidentals and detector-neutron sources are modeled from their published descriptions (data-driven in LZ)."
+    inputs: [response_model_calibration, lz_table1_counts_reference]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects]
+  - id: background_projection_validation
+    type: figure
+    format: png
+    label: "Validation 4: background spectra vs LZ"
+    description: "Validation of the background stage: our combined background model projected along the ER-band median (LZ Fig. 4's projection — a 1D view, not a stacked 2D spectrum), split per component, with the total checked against the Table I pre-fit counts. ACCEPTANCE: total ROI counts consistent with 1210 +/- 91; per-component totals within their Table I uncertainties; projection shape qualitatively consistent with the digitized Fig. 4 reference."
+    inputs: [background_models, lz_table1_counts_reference]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects]
+  - id: wimp_signal_models
+    type: data
+    format: hdf5
+    label: "WIMP signal models per mass"
+    description: "SI WIMP recoil spectra for the mass grid, drawn from the standard halo model (decision halo_model.shm_standard, parameters fixed not profiled), propagated through the response and folded with the published efficiency input. One (S1c, log10 S2c) distribution per mass, normalized to unit cross section (per-event expectation at the analysis exposure)."
+    inputs: [response_model_calibration, lz_efficiency_curve]
+    decisions: [halo_model, efficiency_treatment, exposure_structure, nest_parameter_set, detector_effects]
+  - id: plr_sensitivity_curve
+    type: table
+    format: csv
+    label: "2D PLR median sensitivity curve"
+    description: "Primary sensitivity result: the binned 2D profile likelihood in (S1c, log10 S2c) with background-rate nuisance parameters, raster-scanned over WIMP mass. Columns: WIMP mass, median expected limit from background-only toys (decision median_sensitivity_definition.median_of_toy_limits), +/-1 and +/-2 sigma band edges, with the power constraint applied (decision power_constraint.applied_1sigma) and two-sided test statistic (decision test_statistic_sidedness.two_sided). ACCEPTANCE: compared against the LZ reference in sensitivity_vs_lz_validation."
+    inputs: [background_models, wimp_signal_models]
+    decisions: [statistics, background_components, exposure_structure, median_sensitivity_definition, power_constraint, test_statistic_sidedness]
+  - id: fc_sensitivity_curve
+    type: table
+    format: csv
+    label: "Cut-and-count FC sensitivity curve"
+    description: "Cross-check result: cut-and-count in the (S1c, log10 S2c) ROI with Feldman-Cousins 90% CL confidence belt on signal counts, converted to cross-section limits via the efficiency input and exposure. Columns as in plr_sensitivity_curve."
+    inputs: [background_models, wimp_signal_models]
+    decisions: [statistics, background_components, exposure_structure, test_statistic_sidedness, power_constraint]
+  - id: sensitivity_vs_lz_validation
+    type: figure
+    format: png
+    label: "Validation 5: median sensitivity vs LZ"
+    description: "The headline validation: our PLR median sensitivity curve (+/-1 and +/-2 sigma bands) overlaid on the LZ published curves from lz_si_sensitivity_reference. ACCEPTANCE: our median curve's minimum matches LZ's 5.1e-48 cm2 at 40 GeV/c2 within the statistical resolution of the toy ensemble, and the curve agrees with LZ's median across the mass range within the published 1-sigma band."
+    inputs: [plr_sensitivity_curve, lz_si_sensitivity_reference]
+    decisions: [statistics, median_sensitivity_definition, power_constraint]
+  - id: fc_plr_crosscheck
+    type: figure
+    format: png
+    label: "Validation 6: FC cross-check vs PLR"
+    description: "Internal statistical validation: the FC cut-and-count sensitivity curve overlaid on the 2D PLR curve. ACCEPTANCE: the two curves agree within their combined band widths over the mass range where the ROI cut-and-count retains efficiency; systematic disagreement localizes to the likelihood approximation, not the microphysics."
+    inputs: [plr_sensitivity_curve, fc_sensitivity_curve]
+    decisions: [statistics, test_statistic_sidedness, power_constraint]
