@@ -2975,6 +2975,8 @@ outputs:
     description: "Sanity check that the published efficiency input is ingested faithfully: the declared lz_efficiency_curve plotted against LZ's Fig. 2 presentation (50% at 5.4 keVnr). ACCEPTANCE: plotted curve identical to the input file; 50% point at 5.4 +/- 0.1 keVnr. No analysis content — it guards the input path."
     inputs: [lz_efficiency_curve]
     decisions: [efficiency_treatment]
+    recipe:
+      command: "python src/plot_efficiency.py --input {inputs.lz_efficiency_curve} --output {output}"
   - id: background_models
     type: data
     format: hdf5
