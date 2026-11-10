@@ -5,7 +5,7 @@
   "recipe": "python src/validate_bands.py --band nr --reference data/lz_ws2022_band_reference.csv --header data/lz_ws2022_nest_header.hh --output results/baseline/nr_band_validation.png",
   "definition_version": "sha256:05078cca79573f6ba5b82416659c1fb9eb40aad4d05bc9d43bba11499839b532",
   "env_version": "sha256:7c0beb4a6c9729006f13b818e2a5e8b79be88f5d4c846bda140894a4c315a3a4",
-  "data_version": "sha256:e62a158bdd047e9fab7e4906dbcb8df80f31622b712c9971cf24bb401881c21e",
+  "data_version": "sha256:c2441d76eb8f8868f4f71bdc2ac3e09315c069c2d79b900153685cb7a6d7fbad",
   "decisions": {
     "response_model": "nest_library",
     "nest_parameter_set": "ws2024_nest240",
@@ -14,9 +14,9 @@
   "input_versions": {
     "lz_ws2022_band_reference": "sha256:084368836d8d0f7645254d1e75593bd5ad6a417984d1bafd46cfc8e9d3b4a02a",
     "lz_ws2022_nest_header": "sha256:34a1b5cc8533ea0f3cf226bb42a7600f4e5c7691bf1e2cf338448bac28d2cf36",
-    "band_validation_script": "sha256:05e20df9ba2b09984ad749ad47bd614679aeb044c31f48fae2dfdc8e5300537c"
+    "band_validation_script": "sha256:a255e6893f015407abeea346b97a4e8ed991abf1ced48cc4e3980358aeb82da7"
   },
-  "git_sha": "47ec0508f1ba052a7c14677bb1c5894ec0642f7e",
+  "git_sha": "6c0fef41bd1acd109a844214af19ee7b554630e0",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -26,8 +26,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-10T02:29:17.112+00:00",
-  "finished_at": "2026-11-10T02:29:29.556+00:00",
+  "started_at": "2026-11-10T19:44:13.010+00:00",
+  "finished_at": "2026-11-10T19:44:26.734+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
