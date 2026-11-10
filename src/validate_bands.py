@@ -1,48 +1,81 @@
-"""Band validations (outputs: er_band_validation / nr_band_validation, png).
+"""Band validations (outputs: er_band_validation[_ws2024] /
+nr_band_validation[_ws2024], png).
 
 Validates the microphysics response engine against LZ's published
-calibration bands. The digitized reference (data/lz_ws2022_band_reference.csv,
-from Fig. 1 of arXiv:2207.03764v4) is in the WS2022 configuration — NEST 2.3.7,
-g1 = 0.113569, g2 = 47.1, drift field 192 V/cm — so the comparison bands are
-generated here in that same configuration, using the identical nestpy chain as
-the production response model (build_response_model.py):
+calibration bands, in the two configurations LZ itself published them in:
+
+  ws2022 (default) — reference data/lz_ws2022_band_reference.csv, digitized
+    from Fig. 1 of arXiv:2207.03764v4 (vector paths). NEST 2.3.7,
+    g1 = 0.113569, g2 = 47.1, drift field 192 V/cm. Validates the ENGINE:
+    this is the configuration the chain-equivalence forensics were done in.
+
+  ws2024 — reference data/lz_ws2024_band_reference.csv, digitized from
+    slide 9 of the collaboration's TeVPA results talk (the WS2024 paper does
+    not publish the bands; raster color segmentation). NEST 2.4.0,
+    g1 = 0.112, g2 = 34.0, drift field 97 V/cm. Validates the CONFIGURATION
+    the production analysis runs in, end to end from the WS2024 HEPData
+    header.
+
+Both use the identical nestpy chain as the production response model
+(build_response_model.py):
 
     GetYields -> GetQuanta -> GetS1 / GetS2
 
-with nestpy's built-in LZ_WS2022 detector (cross-checked against the HEPData
-header by src/probe_nest_crosscheck_ws2022.py: 25/25 scalars match), the
-header's edited NRERWidthsParam vector, and the NEST v2.3.7 default NR yield
-parameters (NEST.cpp line 21 of v2.3.7; the ER yield model is hardcoded and
-identical across versions, so no ER yield vector is needed).
+with nestpy's built-in LZ_WS2022 / LZ_WS2024 detector (both cross-checked
+against the HEPData headers by src/probe_nest_crosscheck.py) and the
+header's edited vectors.
 
-Three documented version bridges from v2.3.7 (what LZ SR1 ran) to the NEST
-master that nestpy vendors:
+Version bridges from the header's NEST version to the NEST master that
+nestpy vendors (applied per configuration, see CONFIGS below):
   1. NRERWidthsParam[6]: v2.3.7 adds [6]*sqrt(Nq)*sqrt(E_field) to the ER
      Fano factor unconditionally; v2.4.x+ treats [6] > 0 as an absolute Fano
-     value and reserves [6] < 0 for the old additive behavior. The header's
-     0.0015 is therefore passed as -0.0015.
+     value and reserves [6] < 0 for the old additive behavior. ws2022's
+     0.0015 is therefore passed as -0.0015; ws2024's 0.3 is passed as-is
+     (its header targets NEST v2.4.0, so [6] is already an absolute Fano).
   2. NRERWidthsParam[8]/[9]: v2.3.7's RecombOmegaER reads [8] = width and
      [9] = center of the omega distribution; NEST master reads [8] = center
      and [9] = width (a sanity check rejects width > center, which is what
-     the 2.3.7-ordered vector trips). The header's [8] = 0.205, [9] = 0.45
-     are therefore swapped for the nestpy call.
-  3. SkewnessER = 0.0 for ER (the header's "disabled skewed-recombination"
-     instruction, which the header maps to the v2.3.8+ GetQuanta argument).
-     NR keeps its vector-driven skewness ([5] = 2.25).
+     the 2.3.7-ordered vector trips). Both headers list the transposed
+     order, so both are swapped for the nestpy call.
+  3. Yield vectors: ws2022 uses the NEST v2.3.7 default NR yield parameters
+     (NEST.cpp line 21 of v2.3.7) and the hardcoded ER model (sentinel
+     er_parameters = [-1]*10 — the header edits only the width vector).
+     ws2024's header ships tuned NRYieldsParam AND ERYieldsParam vectors,
+     which are parsed from the header and passed as-is (positive
+     er_parameters override the hardcoded ER model element-by-element —
+     that is the intended v2.4.0 behavior for this header).
+  4. SkewnessER: ws2022's header instructs "disabled skewed-recombination"
+     for ER, mapped to SkewnessER = 0.0. ws2024's header sets no such
+     override, so ER skewness stays vector-driven ([10] = -0.26564, the
+     sentinel SkewnessER = -999 path). NR keeps its vector-driven skewness
+     in both ([5] = 2.25).
+  5. S2 threshold / ROI: both drivers zero the header's s2_thr so GetS2
+     keeps the full-S2 output branch. ws2022 re-applies the reference's ROI
+     (S2c >= 600 phd). For ws2024 the slide's calibration SCATTER is not
+     ROI-cut (it extends to log10 S2c = 2.53, below the ROI bound of
+     log10(493) = 2.69), but its band QUANTILES were evidently computed on
+     an ROI-applied sample: without the cut the simulated S1c = 3 half-width
+     is 12% too wide, with the ROI (S2c >= 493 phd = 14.5 extracted
+     electrons x g2) it is within 2% below S1c = 9. (See CONFIGS for the
+     threshold-choice evidence.)
 
-ACCEPTANCE (both bands): over every reference S1c bin with enough simulated
-events,
-  - max |median_sim - median_ref| / |median_ref| <= 5% (achieved: ER 1.05%,
-    NR 0.44% — inside LZ's own published tuning bar of 1% on NR means), and
-  - max |width_sim - width_ref| <= max(5% of width_ref, 0.0065) in
-    log10(S2c), where width is the (q90 - q10)/2 half-width. The 0.0065
-    absolute floor is the resolution of this comparison: the reference is
-    digitized from LZ's published figure, and its own curve precision
-    (measured second-difference noise 0.0005-0.0018 pointwise, larger with
-    adjacent-bin correlation) limits how tightly a half-width of only
-    ~0.06-0.11 in log10(S2c) can be compared in relative terms.
+ACCEPTANCE (both bands, both configurations): over every reference S1c bin
+with enough simulated events,
+  - max |median_sim - median_ref| / |median_ref| <= 5% (achieved ws2022:
+    ER 1.05%, NR 0.44% — inside LZ's own published tuning bar of 1% on NR
+    means), and
+  - max |width_sim - width_ref| <= max(5% of width_ref, the config's
+    w_abs_floor) in
+    log10(S2c), where width is the (q90 - q10)/2 half-width. The absolute
+    floor is the resolution of the comparison: the reference's own curve
+    precision. ws2022 (vector-digitized): 0.0065, from measured
+    second-difference noise 0.0005-0.0018 pointwise. ws2024 (raster-
+    digitized from a talk slide): 0.015, from measured second-difference
+    noise 0.0020 median / 0.005 p90 pointwise (larger with adjacent-bin
+    correlation and with the noise of two independent quantile curves
+    combining in the width).
 
-Documented residuals (root-caused, not tuned away): localized width
+ws2022 documented residuals (root-caused, not tuned away): localized width
 excursions to 6.0% (ER, S1c > 65 where tritium-spectrum support thins) and
 6.9% (NR, S1c 40-65) — all <= 0.0067 in absolute log10(S2c), at the
 reference's own resolution. The response chain was verified semantically
@@ -56,7 +89,20 @@ enter at the 1e-16 level, never the event totals). The residuals are
 attributed to the reference curves' provenance: LZ's own DD-neutron source
 spectrum, their MC statistics, and figure production choices that are not
 published.
-"""
+
+ws2024 documented residuals (root-caused, not tuned away): the NR band is
+systematically ~0.008-0.012 abs narrower than the slide band over S1c 40-61
+(up to 13.8% relative), inside the 0.015 raster floor but visibly
+systematic. It is REFERENCE-side, not engine-side: our engine gives nearly
+identical NR half-widths under the ws2022 and ws2024 parameter sets at fixed
+S1c (differences <= 0.005 abs), and the slide band is itself systematically
+~1.10-1.13x wider there than LZ's own published WS2022 paper band, which our
+engine reproduces at its usual 4-7%. The slide band's construction is
+unpublished; a plausible cause is position-dependent broadening (S1/S2
+correction residuals) absent under uniform_1d — exactly the escalation path
+to `simplified_position` anticipated in the decision space. ER shows no such
+excess (max 0.0097 abs, including at S1c > 65 where the ws2022 ER residual
+lived)."""
 
 import argparse
 import csv
@@ -74,31 +120,60 @@ import numpy as np
 
 DENSITY = 2.90  # g/cm3, liquid xenon (same as the production response model)
 
-# quantile levels: the 10%/50%/90% the reference was digitized at
+# quantile levels: the 10%/50%/90% the references were digitized at
 Q10, Q50, Q90 = 0.10, 0.50, 0.90
 
-# NEST v2.3.7 default_NRYieldsParam (NEST.cpp line 21, v2.3.7 source)
+# NEST v2.3.7 default_NRYieldsParam (NEST.cpp line 21, v2.37 source) — the
+# ws2022 configuration (its header edits only the width vector)
 NR_YIELDS_237 = [11.0, 1.1, 0.0480, -0.0533, 12.6, 0.3, 2.0, 0.3, 2.0, 0.5,
                  1.0, 1.0]
 
 # nestpy's er_parameters sentinel: negative elements make NEST master's
 # (parameterized) GetYieldBetaGR fall back to the hardcoded v2.3.7 ER yield
 # model, which is what the WS2022 configuration used. Never pass a positive
-# vector here — every element would override the model.
+# vector here unless the header ships one (ws2024 does).
 ER_YIELDS_DEFAULT = [-1.0] * 10
 
 ACCEPT = 0.05          # relative bar on medians and widths
-W_ABS_FLOOR = 0.0065   # absolute width bar in log10(S2c): the digitized
-                       # reference's own curve resolution (see docstring)
 MIN_EVENTS_PER_BIN = 200
 
-# WS2022 ROI lower bound on S2, expressed in corrected space: the header
-# bakes s2_thr = 600 * (1 + P_dphe) = 728.4 phe (uncorrected) into NEST, and
-# this driver sets s2_thr to 0 to keep the full-S2 output branch (the same
-# documented deviation as the production response model), so the threshold
-# is re-applied here at analysis level. Under uniform_1d the correction is
-# the identity, so 728.4 phe uncorrected = 600 phd corrected.
-ROI_S2C_PHD = 600.0
+# Configuration space: which detector/gain/field era the comparison runs in,
+# and which header bridges apply (see module docstring).
+CONFIGS = {
+    "ws2022": {
+        "detector": "LZ_WS2022",
+        "g2_expected": 47.07,   # published: 47.1
+        "roi_s2c": 600.0,       # uncorrected S2 > 600 phd (corrected-space
+                                # identity under uniform_1d); the WS2022
+                                # reference bands include the ROI cut
+        "w_abs_floor": 0.0065,  # vector-digitized reference resolution
+        "header_yield_vectors": False,  # v2.3.7 defaults + hardcoded ER model
+        "negate_fano": True,    # [6] = 0.0015 additive under v2.3.7 -> -0.0015
+        "swap_omega": True,     # header lists [8] = width, [9] = center
+        "er_skewness": 0.0,     # header: skewed recombination disabled for ER
+    },
+    "ws2024": {
+        "detector": "LZ_WS2024",
+        "g2_expected": 34.0,    # published: 34.0
+        "roi_s2c": 493.0,       # 14.5 extracted electrons x g2 = 34.0: the
+                                # WS2024 ROI's S2 threshold in corrected
+                                # space. The slide's calibration scatter is
+                                # NOT cut (it extends to log10 S2c = 2.53),
+                                # but the band quantiles match an ROI-applied
+                                # sample (without the cut the S1c = 3 half-
+                                # width is 12% too wide; with it, <= 2%
+                                # everywhere below S1c = 9). Note 645 phd
+                                # uncorrected / 1.214 = 531 also passes; 645
+                                # phd / 14.5 e- = 44.5 phd/e is the slide's
+                                # SES, not CalculateG2's 46.85 -- the SES
+                                # wrinkle (see AGENTS.md).
+        "w_abs_floor": 0.015,   # raster-digitized reference resolution
+        "header_yield_vectors": True,   # tuned NRYieldsParam + ERYieldsParam
+        "negate_fano": False,   # [6] = 0.3 is an absolute Fano under v2.4.0
+        "swap_omega": True,     # header lists the transposed [8]/[9] order
+        "er_skewness": -999.0,  # no header override: vector-driven ([10])
+    },
+}
 
 # dataviz palette (light mode)
 SURFACE = "#fcfcfb"
@@ -115,7 +190,6 @@ BANDS = {
         "Z": 1.0,
         "emin": 0.5,  # keVee
         "emax": 18.6,  # tritium beta endpoint (keVee); ~flat approx.
-        "skewness_er": 0.0,  # header instruction: skewed recombination off
         "title": "ER (tritium) band vs LZ",
     },
     "nr": {
@@ -125,26 +199,42 @@ BANDS = {
         "emin": 1.0,  # keVnr
         "emax": 73.5,  # max Xe recoil from 2.45 MeV DD neutrons:
                        # 4mM/(m+M)^2 * E_n; ~flat recoil spectrum
-        "skewness_er": -999.0,  # sentinel: vector-driven NR skewness
         "title": "NR (DD-neutron) band vs LZ",
     },
 }
 
 
-def parse_width_vector(header_path):
-    """Extract the edited NRERWidthsParam from the header's comment block."""
+def parse_header_vectors(header_path):
+    """Extract the edited NRERWidthsParam (and, if present, the tuned
+    NRYieldsParam / ERYieldsParam) from the header's comment block."""
     text = Path(header_path).read_text()
-    m = re.search(r"\{([^}]*0\.046452[^}]*)\}", text)
-    if not m:
-        raise ValueError("width vector not found in header")
-    vec = [float(x) for x in re.findall(r"-?\d+\.?\d*", m.group(1))]
-    if len(vec) != 11:
-        raise ValueError(f"expected 11 elements, got {len(vec)}: {vec}")
-    return vec
+
+    def braced_vector(name):
+        m = re.search(rf"{name}\s*=\s*\{{([^}}]*)\}}", text)
+        if not m:
+            return None
+        return [float(x) for x in re.findall(r"-?\d+\.?\d*", m.group(1))]
+
+    width = braced_vector("NRERWidthsParam")
+    if width is None:
+        # ws2022 header: the width vector appears without the variable name
+        m = re.search(r"\{([^}]*0\.046452[^}]*)\}", text)
+        if not m:
+            raise ValueError("width vector not found in header")
+        width = [float(x) for x in re.findall(r"-?\d+\.?\d*", m.group(1))]
+    if len(width) != 11:
+        raise ValueError(f"width vector: expected 11 elements, got {len(width)}")
+    nr_yields = braced_vector("NRYieldsParam")
+    er_yields = braced_vector("ERYieldsParam")
+    return width, nr_yields, er_yields
+
+
+NR_PARAMS = None  # set in main(): the NR yield vector passed to GetYields
+ER_PARAMS = None  # set in main(): the ER yield vector passed to GetYields
 
 
 def generate_band_events(nc, det, band, n_events, g2_params, rng,
-                         drift_velocity, width_vec):
+                         drift_velocity, width_vec, skewness_er):
     """Simulate n_events; return (S1c, S2c) in phd. Manual GetYields ->
     GetQuanta -> GetS1/GetS2 chain (FullCalculation cannot take the
     SkewnessER override)."""
@@ -164,14 +254,14 @@ def generate_band_events(nc, det, band, n_events, g2_params, rng,
             drift_field=DRIFT_FIELD_CONST,
             A=band["A"],
             Z=band["Z"],
-            nr_parameters=NR_YIELDS_237,
-            er_parameters=ER_YIELDS_DEFAULT,
+            nr_parameters=NR_PARAMS,
+            er_parameters=ER_PARAMS,
         )
         quanta = nc.GetQuanta(
             yields,
             DENSITY,
             nr_er_width_parameters=width_vec,
-            SkewnessER=band["skewness_er"],
+            SkewnessER=skewness_er,
         )
         dt = rng.uniform(dt_min, dt_max)
         z = top_drift - dt * drift_velocity
@@ -232,8 +322,9 @@ def band_quantiles(s1c, s2c, bin_edges):
 
 
 def main():
-    global DRIFT_FIELD_CONST
+    global DRIFT_FIELD_CONST, NR_PARAMS, ER_PARAMS
     ap = argparse.ArgumentParser()
+    ap.add_argument("--config", choices=tuple(CONFIGS), default="ws2022")
     ap.add_argument("--band", choices=("er", "nr"), required=True)
     ap.add_argument("--output", required=True)
     ap.add_argument("--reference", required=True)
@@ -244,53 +335,78 @@ def main():
                     help="override the band's upper energy (keV)")
     args = ap.parse_args()
 
+    cfg = CONFIGS[args.config]
     band = dict(BANDS[args.band])
     if args.emax is not None:
         band["emax"] = args.emax
 
-    # --- configuration: WS2022, from the header ---
-    det = nestpy.detectors.LZ_WS2022()
+    # --- configuration, from the header ---
+    det = getattr(nestpy.detectors, cfg["detector"])()
     det.set_s2_thr(0.0)  # ROI applied at analysis level (as in production)
     nc = nestpy.NESTcalc(det)
     nestpy.RandomGen.rndm().set_seed(args.seed)
     rng = np.random.default_rng(args.seed)
-    DRIFT_FIELD_CONST = det.FitEF(0, 0, 0)  # 192 V/cm for LZ SR1
+    DRIFT_FIELD_CONST = det.FitEF(0, 0, 0)  # 192 (ws2022) / 97 (ws2024) V/cm
 
-    header_vec = parse_width_vector(args.header)
-    # version bridges (see module docstring): negate [6], swap [8]/[9]
-    width_vec = list(header_vec)
-    width_vec[6] = -abs(width_vec[6])
-    width_vec[8], width_vec[9] = width_vec[9], width_vec[8]
+    width, nr_yields, er_yields = parse_header_vectors(args.header)
+    # version bridges (see module docstring), applied per configuration
+    width_vec = list(width)
+    if cfg["negate_fano"]:
+        width_vec[6] = -abs(width_vec[6])
+    if cfg["swap_omega"]:
+        width_vec[8], width_vec[9] = width_vec[9], width_vec[8]
     width_vec += [0.0, 0.0]  # pad to the 13-element ws_-style length
-    print(f"drift field = {DRIFT_FIELD_CONST} V/cm")
-    print(f"header width vector (v2.3.7 order) = {header_vec}")
+
+    # yield vectors: tuned header vectors (ws2024) or the v2.3.7 defaults
+    # + hardcoded-ER sentinel (ws2022)
+    if cfg["header_yield_vectors"]:
+        if nr_yields is None or er_yields is None:
+            print("FAIL: config expects NRYieldsParam/ERYieldsParam in the "
+                  "header but they were not found", file=sys.stderr)
+            return 1
+        NR_PARAMS, ER_PARAMS = nr_yields, er_yields
+    else:
+        NR_PARAMS, ER_PARAMS = NR_YIELDS_237, ER_YIELDS_DEFAULT
+
+    print(f"config = {args.config}: drift field = {DRIFT_FIELD_CONST} V/cm")
+    print(f"header width vector (header order) = {width}")
     print(f"passed to GetQuanta (master order) = {width_vec}")
+    print(f"NR yield params = {NR_PARAMS}")
+    print(f"ER yield params = {ER_PARAMS}")
 
     g2_params = nc.CalculateG2(0)
     g2 = g2_params[3]
     print(f"g2 = {g2:.3f} phd/e, ExtEff = {g2_params[1]:.4f}, "
           f"SE = {g2_params[2]:.3f} phd")
-    # published WS2022 values: g2 = 47.1, ExtEff = 0.805, SE = 58.5
-    if abs(g2 - 47.07) > 0.2:
-        print(f"FAIL: g2 {g2:.3f} does not match the published WS2022 "
-              f"47.1", file=sys.stderr)
+    # published values: ws2022 g2 = 47.1 (ExtEff 0.805, SE 58.5);
+    # ws2024 g2 = 34.0 (ExtEff 0.725, SES 46.9)
+    if abs(g2 - cfg["g2_expected"]) > 0.2:
+        print(f"FAIL: g2 {g2:.3f} does not match the published "
+              f"{args.config} {cfg['g2_expected']}", file=sys.stderr)
         return 1
     drift_velocity = nc.SetDriftVelocity(
         det.get_T_Kelvin(), DENSITY, DRIFT_FIELD_CONST, det.get_p_bar()
     )
+
+    # ER skewness is per-configuration (see docstring bridge 4); NR is
+    # vector-driven in both configurations
+    skewness_er = cfg["er_skewness"] if args.band == "er" else -999.0
 
     # --- simulate and bin ---
     print(f"simulating {args.n_events} {args.band} events "
           f"(E in [{band['emin']}, {band['emax']}] keV)...")
     s1c, s2c = generate_band_events(
         nc, det, band, args.n_events, g2_params, rng, drift_velocity,
-        width_vec,
+        width_vec, skewness_er,
     )
-    # WS2022 ROI: uncorrected S2 > 600 phd (see ROI_S2C_PHD above)
-    roi = s2c >= ROI_S2C_PHD
-    print(f"ROI pass fraction (S2c >= {ROI_S2C_PHD:.0f} phd): "
-          f"{roi.mean():.4f}")
-    s1c, s2c = s1c[roi], s2c[roi]
+    if cfg["roi_s2c"] is not None:
+        # ws2022 reference bands include the ROI cut (S2c >= 600 phd
+        # corrected-space identity under uniform_1d); the ws2024 slide's
+        # calibration data is not ROI-cut
+        roi = s2c >= cfg["roi_s2c"]
+        print(f"ROI pass fraction (S2c >= {cfg['roi_s2c']:.0f} phd): "
+              f"{roi.mean():.4f}")
+        s1c, s2c = s1c[roi], s2c[roi]
     ref_s1c, ref_med, ref_q10, ref_q90 = load_reference(args.reference,
                                                         args.band)
     edges = np.append(ref_s1c, ref_s1c[-1] + 1.0) - 0.5  # 1-phd bins
@@ -326,7 +442,7 @@ def main():
     # width passes at the 5% relative bar OR within the absolute floor set
     # by the digitized reference's own curve resolution (see docstring)
     width_ok = bool(np.all(wid_dev_abs <= np.maximum(ACCEPT * w_ref,
-                                                     W_ABS_FLOOR)))
+                                                     cfg["w_abs_floor"])))
     verdict = max_med <= ACCEPT and width_ok
 
     # --- figure ---
@@ -354,7 +470,7 @@ def main():
     ax1.plot(ref_s1c, ref_q90, "--", color=INK_2, lw=0.8)
     ax1.set_ylabel(r"log$_{10}$(S2c) [phd]", color=INK, fontsize=10)
     ax1.legend(fontsize=9, frameon=False, labelcolor=INK_2, loc="upper left")
-    ax1.set_title(f"{band['title']} — WS2022 config "
+    ax1.set_title(f"{band['title']} — {args.config} config "
                   f"({DRIFT_FIELD_CONST:.0f} V/cm, g2 = {g2:.1f} phd/e)",
                   color=INK, fontsize=10, loc="left")
 
@@ -386,7 +502,7 @@ def main():
         print(f"FAIL: band deviations exceed the acceptance bars "
               f"(median {100 * max_med:.2f}% vs {100 * ACCEPT:.0f}%; "
               f"width {100 * max_wid:.2f}% / {max_wid_abs:.4f} abs vs "
-              f"{100 * ACCEPT:.0f}% or {W_ABS_FLOOR} abs)",
+              f"{100 * ACCEPT:.0f}% or {cfg['w_abs_floor']} abs)",
               file=sys.stderr)
         return 1
     print(f"PASS: wrote {args.output}")

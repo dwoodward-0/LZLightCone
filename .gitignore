@@ -7,3 +7,6 @@ __pycache__/
 .lightcone/
 _build/
 chats/
+
+# Claude Code local settings (personal, not for the repo)
+.claude/settings.local.json
