@@ -542,8 +542,10 @@ def main():
     ax1.plot(ref_s1c, ref_q90, "--", color=INK_2, lw=0.8)
     ax1.set_ylabel(r"log$_{10}$(S2c) [phd]", color=INK, fontsize=10)
     ax1.legend(fontsize=9, frameon=False, labelcolor=INK_2, loc="upper left")
-    spec = (f", {args.er_spectrum} ER spectrum"
-            if args.band == "er" else "")
+    spec = ""
+    if args.band == "er":
+        spec = (", tritium ER spectrum" if args.er_spectrum == "tritium_beta"
+                else ", flat ER spectrum")
     ax1.set_title(f"{band['title']} — {args.config} config "
                   f"({DRIFT_FIELD_CONST:.0f} V/cm, g2 = {g2:.1f} phd/e"
                   f"{spec})",
