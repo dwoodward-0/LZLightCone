@@ -59,6 +59,22 @@ nestpy vendors (applied per configuration, see CONFIGS below):
      electrons x g2) it is within 2% below S1c = 9. (See CONFIGS for the
      threshold-choice evidence.)
 
+ER CALIBRATION SPECTRUM (decision calibration_er_spectrum, default
+tritium_beta, toggle --er-spectrum): the band's conditional distribution
+depends on the source spectrum — at fixed S1c, higher-energy events sit at
+higher S2c. The initial flat approximation (uniform in [0.5, 18.6] keVee)
+over-weights the endpoint region and biases the band median upward at high
+S1c (up to +0.6% at S1c 70-79, visible in both configurations) with a
+localized width residual at S1c > 65 in ws2022. Sampling the true tritium
+beta spectrum (dN/dE ∝ p·E·(E0−E)²·F(Z=2, E), endpoint 18.590 keV, Fermi
+function of the Z = 2 daughter included) removes both: ws2022 max width
+deviation 6.0% -> 3.6% (0.0062 -> 0.0037 abs), ws2024 max median deviation
+0.64% -> 0.36% (ws2024 max width 0.0097 -> 0.0120 abs, still inside the
+0.015 raster floor). The NR spectrum needs no such choice: a monoenergetic
+2.45 MeV DD neutron gives an exactly flat single-scatter recoil spectrum
+from 0 to 73.5 keVnr. The flat path is kept for comparison and remains
+bit-identical to the original implementation.
+
 ACCEPTANCE (both bands, both configurations): over every reference S1c bin
 with enough simulated events,
   - max |median_sim - median_ref| / |median_ref| <= 5% (achieved ws2022:
@@ -136,6 +152,42 @@ ER_YIELDS_DEFAULT = [-1.0] * 10
 
 ACCEPT = 0.05          # relative bar on medians and widths
 MIN_EVENTS_PER_BIN = 200
+
+TRITIUM_ENDPOINT = 18.590  # keV, atomic tritium beta endpoint
+ALPHA = 1.0 / 137.036
+
+
+def sample_tritium_energies(rng, n, emin):
+    """Rejection-sample the tritium beta spectrum.
+
+    dN/dE ∝ p·E·(E0−E)²·F(Z=2, E): electron momentum p = sqrt(E(E+2m_e))
+    (keV/c), the quadratic endpoint falloff, and the nonrelativistic Fermi
+    function for the Z = 2 daughter (3He), F = 2πη/(1 − exp(−2πη)) with
+    η = ZαE/p. At these energies F deviates from 1 by only a few percent,
+    but it costs nothing to include. Sampling runs over [emin, E0] —
+    events below ~0.5 keVee cannot reach the S1c >= 3 comparison range, so
+    the emin floor of the flat approximation is kept.
+    """
+    E0 = TRITIUM_ENDPOINT
+
+    def f(E):
+        p = np.sqrt(E * (E + 2.0 * 511.0))
+        eta = 2.0 * ALPHA * E / p
+        fermi = 2.0 * np.pi * eta / (1.0 - np.exp(-2.0 * np.pi * eta))
+        return np.where(E <= E0, p * E * (E0 - E) ** 2 * fermi, 0.0)
+
+    grid = np.linspace(emin, E0, 2001)
+    fmax = 1.05 * f(grid).max()
+    out = np.empty(n)
+    i = 0
+    while i < n:
+        m = min(2 * (n - i), 1_000_000)
+        prop = rng.uniform(emin, E0, m)
+        acc = prop[rng.uniform(0.0, fmax, m) < f(prop)]
+        k = min(len(acc), n - i)
+        out[i:i + k] = acc[:k]
+        i += k
+    return out
 
 # Configuration space: which detector/gain/field era the comparison runs in,
 # and which header bridges apply (see module docstring).
@@ -234,10 +286,13 @@ ER_PARAMS = None  # set in main(): the ER yield vector passed to GetYields
 
 
 def generate_band_events(nc, det, band, n_events, g2_params, rng,
-                         drift_velocity, width_vec, skewness_er):
+                         drift_velocity, width_vec, skewness_er,
+                         energies=None):
     """Simulate n_events; return (S1c, S2c) in phd. Manual GetYields ->
     GetQuanta -> GetS1/GetS2 chain (FullCalculation cannot take the
-    SkewnessER override)."""
+    SkewnessER override). energies: optional pre-sampled per-event energy
+    array (e.g. the tritium beta spectrum); None draws ~flat in
+    [emin, emax] in-loop (the original path, kept bit-identical)."""
     species = band["interaction"]
     s1c = np.empty(n_events)
     s2c = np.empty(n_events)
@@ -246,7 +301,8 @@ def generate_band_events(nc, det, band, n_events, g2_params, rng,
 
     t0 = time.time()
     for i in range(n_events):
-        energy = rng.uniform(band["emin"], band["emax"])
+        energy = energies[i] if energies is not None else rng.uniform(
+            band["emin"], band["emax"])
         yields = nc.GetYields(
             species,
             float(energy),
@@ -333,6 +389,13 @@ def main():
     ap.add_argument("--seed", type=int, default=43)
     ap.add_argument("--emax", type=float, default=None,
                     help="override the band's upper energy (keV)")
+    ap.add_argument("--er-spectrum", choices=("flat", "tritium_beta"),
+                    default="flat",
+                    help="ER calibration spectrum: 'flat' ~uniform in "
+                         "[emin, emax] (the original approximation), "
+                         "'tritium_beta' the true tritium beta spectrum "
+                         "p·E·(E0−E)²·F(Z=2,E) up to the 18.590 keV "
+                         "endpoint (ER band only)")
     args = ap.parse_args()
 
     cfg = CONFIGS[args.config]
@@ -393,11 +456,20 @@ def main():
     skewness_er = cfg["er_skewness"] if args.band == "er" else -999.0
 
     # --- simulate and bin ---
+    energies = None
+    if args.er_spectrum == "tritium_beta":
+        if args.band != "er":
+            print("FAIL: --er-spectrum tritium_beta applies to the ER band "
+                  "only", file=sys.stderr)
+            return 1
+        energies = sample_tritium_energies(rng, args.n_events, band["emin"])
+        print(f"ER spectrum: tritium beta, E in [{band['emin']}, "
+              f"{TRITIUM_ENDPOINT}] keVee")
     print(f"simulating {args.n_events} {args.band} events "
           f"(E in [{band['emin']}, {band['emax']}] keV)...")
     s1c, s2c = generate_band_events(
         nc, det, band, args.n_events, g2_params, rng, drift_velocity,
-        width_vec, skewness_er,
+        width_vec, skewness_er, energies=energies,
     )
     if cfg["roi_s2c"] is not None:
         # ws2022 reference bands include the ROI cut (S2c >= 600 phd
@@ -470,8 +542,11 @@ def main():
     ax1.plot(ref_s1c, ref_q90, "--", color=INK_2, lw=0.8)
     ax1.set_ylabel(r"log$_{10}$(S2c) [phd]", color=INK, fontsize=10)
     ax1.legend(fontsize=9, frameon=False, labelcolor=INK_2, loc="upper left")
+    spec = (f", {args.er_spectrum} ER spectrum"
+            if args.band == "er" else "")
     ax1.set_title(f"{band['title']} — {args.config} config "
-                  f"({DRIFT_FIELD_CONST:.0f} V/cm, g2 = {g2:.1f} phd/e)",
+                  f"({DRIFT_FIELD_CONST:.0f} V/cm, g2 = {g2:.1f} phd/e"
+                  f"{spec})",
                   color=INK, fontsize=10, loc="left")
 
     ax2.axhspan(-ACCEPT, ACCEPT, color=GRID, lw=0)

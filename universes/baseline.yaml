@@ -12,3 +12,4 @@ decisions:
   median_sensitivity_definition: median_of_toy_limits
   exposure_structure: combined_single
   detector_effects: uniform_1d
+  calibration_er_spectrum: tritium_beta
