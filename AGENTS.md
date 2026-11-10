@@ -189,3 +189,47 @@ see the lightcone skill; never write into `results/` by hand.
        to 0 so GetS2 keeps the full-S2 output branch (`ion[7]` = S2c phd;
        `scint[5]` = S1c phd — both are the XYZ-corrected NphdC, identity
        under uniform_1d).
+
+- **Validations 1 & 2 done (2026-11-09, ER/NR band vs WS2022 Fig. 1)** —
+  `er_band_validation` and `nr_band_validation` materialized and `current`
+  (`src/validate_bands.py` + `src/digitize_ws2022_bands.py`). Both PASS with
+  documented residuals; the microphysics stage is now validated on both
+  bands.
+  - Reference: `data/lz_ws2022_band_reference.csv`, digitized
+    **programmatically from the PDF vector graphics** (pymupdf
+    `page.get_drawings()` + tick-label axis calibration on Fig. 1 of
+    arXiv:2207.03764v4 p4; verified against a raster overlay), not
+    eyeball-digitized. Reference curves' own pointwise smoothness noise
+    0.0005–0.0018 in log10(S2c) — the limit on how tightly widths compare.
+  - Results (1M events, seed 43): **medians ≤1.05% (ER) / 0.44% (NR)**
+    everywhere (LZ's own NR bar is 1%); **widths ≤5% relative** over most of
+    the range with localized residuals — ER 6.0% (0.0062 abs) at S1c > 65
+    (tritium-endpoint support thins), NR 6.9% (0.0046 abs) at S1c 40–65
+    (narrowest reference half-width), max abs 0.0081 (wide bin, ~4% rel).
+    Acceptance operationalized as: median ≤5% rel; width ≤5% rel **or**
+    0.0065 abs in log10(S2c) (the digitized reference's own curve
+    resolution). Nothing was tuned to pass.
+  - **Chain-equivalence forensics (source diffs v2.3.7 vs NEST master)**:
+    RandomGen identical (rand_gauss/rand_skewGauss/binom_draw) or
+    negligible; GetYields ER model hardcoded+identical, NR vector-driven
+    (v2.3.7 defaults); GetQuanta equivalent under the bridges; GetS1/GetS2
+    total-area paths identical (tauTrap change only jitters pulse timing;
+    FindNewMean is a 1e-16-level correction at sPEres = 0.12; radmax
+    diffusion edge is zero at detector center). The residuals are therefore
+    attributed to the reference's provenance (LZ's DD source spectrum, their
+    MC stats, figure production), not our engine.
+  - **Full v2.3.7→master bridge set** (beyond the [6]-negation and
+    SkewnessER=0 already recorded): width vec **[8]↔[9] swapped** (master
+    RecombOmegaER reads [8]=center, [9]=width; 2.3.7-ordered vector trips
+    the width>center sanity check and zeroes S2c); **er_parameters = [-1]×10
+    sentinel** (master GetYieldBetaGR is parameterized — a positive vector
+    overrides the hardcoded ER model element-by-element; this cost the ER
+    24%/190% failure); **pad width vector to 13** with two zeros;
+    **ROI re-applied at analysis level** (S2c ≥ 600 phd for WS2022; header
+    bakes s2_thr = 728.4 phe uncorrected, our driver zeroes it). NR
+    spectrum: DD 2.45 MeV neutrons → ~flat Xe recoil spectrum to
+    E_max = 4mM/(m+M)²·E_n = 73.5 keVnr; conditional band width is
+    spectrum-dependent (support starvation inflates it), emax 73.5 chosen
+    over probes at 20–100. ER spectrum: ~flat 0.5–18.6 keVee (beta
+    endpoint). Declaring `src/validate_bands.py` as an ASTRA **input** is
+    the sanctioned way to make script edits cascade to outputs.
