@@ -152,3 +152,40 @@ see the lightcone skill; never write into `results/` by hand.
     Fig. 4 projection references (from WS2024 figures; not in HEPData).
   - Remaining agenda: implement with staged validation; then
     background-variation studies.
+
+- **Implementation progress** (2026-11-09, same day):
+  - `efficiency_passthrough` (V3) materialized and `current` — first recipe
+    wired end-to-end (`src/plot_efficiency.py`, E50 gate 5.4±0.1 keVnr,
+    measured 5.393). Note: outputs go `behind` after any `uv add` (normal);
+    `efficiency_passthrough` is currently `behind` from the h5py addition.
+  - `response_model_calibration` (hdf5) materialized and `current` —
+    `src/build_response_model.py`: nestpy driver calling NEST's own
+    FullCalculation + GetS1 + GetS2 with the LZ_WS2024 built-in detector,
+    ws_* vectors passed explicitly; 200k events per band (er_ch3t, nr),
+    mean Ly/Qy tables, and band quantiles of log10(S2c) in S1c bins
+    (0.0228/0.1587/0.5/0.8413/0.9772). Verified headline numbers:
+    g2 = 34.02 phd/e, ExtEff = 0.7262, SE = 46.85 phd — NEST's
+    CalculateG2 reproduces LZ's published g2/extraction/SES from the
+    header parameters on its own.
+  - **nestpy 2.1.3 gotchas** (each cost a debug cycle; do not rediscover):
+    1. `FullCalculation`'s named kwargs are mislabeled — `er_parameters`
+       and `nr_er_width_parameters` land in each other's C++ slots (the
+       C++ master signature order is NRy, Width, ERy; the binding's
+       py::arg order disagrees). Call it **positionally**:
+       `(species, E, density, field, A, Z, NRy, Width, ERy, do_times)`.
+    2. No `INTERACTION_TYPE`; the enum is `nestpy.interactions` with
+       `NR`, `beta`, `CH3T`, `DD`, `WIMP`, ... (no generic `ER`; use
+       `beta`/`CH3T`). YieldResult has `PhotonYield`/`ElectronYield` only
+       (no TotalYield); QuantaResult has `photons`/`electrons`/`excitons`
+       /`ions` (no excfrac).
+    3. `GetQuanta` kwarg is `nr_er_width_parameters=`; `GetYields` kwargs
+       are `nr_parameters=`/`er_parameters=` (these named bindings are
+       correct — only FullCalculation's are scrambled).
+    4. `SetDriftVelocity(T, density, field, pressure)` — note density
+       before pressure. Gives 1.33 mm/us at LZ conditions (NEST model;
+       true LZ ~1.4; only used for z, irrelevant under uniform_1d).
+    5. Seeding: `nestpy.RandomGen.rndm().set_seed(n)` (singleton, no
+       constructor). Detector has `set_s2_thr(...)`; our driver sets it
+       to 0 so GetS2 keeps the full-S2 output branch (`ion[7]` = S2c phd;
+       `scint[5]` = S1c phd — both are the XYZ-corrected NphdC, identity
+       under uniform_1d).
