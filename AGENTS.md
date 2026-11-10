@@ -201,14 +201,17 @@ see the lightcone skill; never write into `results/` by hand.
     arXiv:2207.03764v4 p4; verified against a raster overlay), not
     eyeball-digitized. Reference curves' own pointwise smoothness noise
     0.0005–0.0018 in log10(S2c) — the limit on how tightly widths compare.
-  - Results (1M events, seed 43): **medians ≤1.05% (ER) / 0.44% (NR)**
-    everywhere (LZ's own NR bar is 1%); **widths ≤5% relative** over most of
-    the range with localized residuals — ER 6.0% (0.0062 abs) at S1c > 65
-    (tritium-endpoint support thins), NR 6.9% (0.0046 abs) at S1c 40–65
-    (narrowest reference half-width), max abs 0.0081 (wide bin, ~4% rel).
-    Acceptance operationalized as: median ≤5% rel; width ≤5% rel **or**
-    0.0065 abs in log10(S2c) (the digitized reference's own curve
-    resolution). Nothing was tuned to pass.
+  - Results (1M events, seed 43, tritium beta spectrum — see the 2026-11-10
+    entry): **medians ≤0.54% (ER) / 0.44% (NR)** everywhere (LZ's own NR bar
+    is 1%); **widths ≤5% relative** everywhere — ER max 3.6% (0.0037 abs),
+    NR 6.9% (0.0046 abs) at S1c 40–65 (narrowest reference half-width),
+    max abs 0.0081 (wide bin, ~4% rel). Acceptance operationalized as:
+    median ≤5% rel; width ≤5% rel **or** 0.0065 abs in log10(S2c) (the
+    digitized reference's own curve resolution). Nothing was tuned to pass.
+    (Under the original flat-ER-spectrum approximation the numbers were
+    ER 1.05% median / 6.0% width at S1c > 65 — that residual was the
+    spectrum, not the engine; the flat toggle is kept via `--er-spectrum
+    flat`.)
   - **Chain-equivalence forensics (source diffs v2.3.7 vs NEST master)**:
     RandomGen identical (rand_gauss/rand_skewGauss/binom_draw) or
     negligible; GetYields ER model hardcoded+identical, NR vector-driven
@@ -239,6 +242,18 @@ see the lightcone skill; never write into `results/` by hand.
   and `current`; both PASS. `src/validate_bands.py` now takes
   `--config {ws2022,ws2024}` (default ws2022 — existing recipes unchanged);
   ws2022 results bit-identical after the refactor.
+  - **ER spectrum choice (decision `calibration_er_spectrum`, default
+    `tritium_beta`)**: the user noticed the simulated band sat slightly high
+    vs LZ at high S1c in both configs — root cause: the flat spectrum
+    (uniform 0.5–18.6 keVee) over-weights the tritium endpoint region, and
+    at fixed S1c higher-energy events sit at higher S2c. Sampling the true
+    tritium beta spectrum (dN/dE ∝ p·E·(E0−E)²·F(Z=2, E), endpoint
+    18.590 keV) removes the bias and the ws2022 S1c > 65 width residual
+    (ER medians ≤0.54%/0.36% and widths ≤3.6% now; ws2024 max width 0.0120
+    abs, inside the 0.015 raster floor). Toggle `--er-spectrum flat` kept
+    (bit-identical to the original path). NR needs no choice: monoenergetic
+    2.45 MeV DD neutrons give an exactly flat single-scatter recoil
+    spectrum.
   - Reference: `data/lz_ws2024_band_reference.csv`, digitized
     programmatically from **slide 9 of the collaboration's TeVPA results
     talk** (`data/lz_ws2024_tevpa_talk.pdf`, sha256-pinned) — the WS2024
@@ -249,9 +264,9 @@ see the lightcone skill; never write into `results/` by hand.
     0.0022 dex; measured second-difference noise 0.0020 median / 0.005 p90
     — the raster reference's acceptance floor is 0.015 abs, vs ws2022's
     0.0065 for the vector-digitized one).
-  - Results (1M events, seed 43): medians ≤0.64% both bands; widths ER max
-    9.1% rel (0.0097 abs), NR max 13.8% rel (0.0120 abs) — inside the 0.015
-    raster floor.
+  - Results (1M events, seed 43, tritium beta spectrum): medians ≤0.36%
+    (ER) / 0.64% (NR); widths ER max 12.2% rel (0.0120 abs, S1c 46), NR max
+    13.8% rel (0.0120 abs, S1c 42–61) — both inside the 0.015 raster floor.
   - **WS2024 bridges differ from WS2022**: the header ships tuned
     `NRYieldsParam` AND `ERYieldsParam` vectors (positive er_parameters
     override the hardcoded ER model — intended v2.4.0 behavior);
