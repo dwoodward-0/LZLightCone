@@ -2749,6 +2749,21 @@ prior_insights:
           suffix: "For WS2024, 15% of the low-mixing, tag-active exposure"
         location:
           page: 6
+  lz_2018_neutron_nr_spectra:
+    id: lz_2018_neutron_nr_spectra
+    label: "LZ 2018 projection publishes per-source neutron NR energy spectra"
+    claim: "The LZ 2018 sensitivity projection (arXiv:1802.06039) publishes projected NR recoil-energy spectra for each neutron background source, in counts/kg/day/keV for single-scatter events in the 5.6-tonne fiducial volume, with no detector efficiency or ROI cuts applied — so the spectra are in recoil-energy space, independent of the (different) drift-field configuration of that projection, and can be resampled through our own response model."
+    created_at: "2026-11-10T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1802.06039"
+        version: 2
+        quote:
+          exact: "NR background spectra in the 5.6-tonne ﬁducial volume for single scatter events with neither a xenon skin nor an OD veto signal. No detector eﬃciency or WIMP-search region of interest cuts on S1c have been applied."
+          prefix: "FIG. 5. "
+          suffix: "duced by more than 6 orders of magnitude"
+        location:
+          page: 10
 decisions:
   statistics:
     id: statistics
@@ -2985,6 +3000,16 @@ inputs:
     label: "LZ WS2024 calibration band reference"
     source: data/lz_ws2024_band_reference.csv
     description: "ER (tritium) and NR (DD-neutron) calibration bands — median and 10%/90% quantiles of log10(S2c) as a function of S1c — digitized programmatically from the embedded 2048x1481 raster of slide 9 of the TeVPA talk (lz_ws2024_tevpa_talk) by color segmentation (ER curves light blue, NR red, distinct from the navy/orange scatter), axes calibrated from the tick marks (fit residuals max 0.042 phd / 0.0022 dex; measured second-difference noise 0.0020 median / 0.005 p90 pointwise). The dashed quantiles are assumed to be the 10%/90% quantiles (LZ's WS2022 Fig. 1 convention), confirmed empirically by the band validations. The validation reference for er_band_validation_ws2024 and nr_band_validation_ws2024; the WS2024 bands are not published in HEPData or the paper."
+  - id: lz_sensitivity2018_paper
+    type: data
+    label: "LZ 2018 projected sensitivity paper"
+    source: data/lz_sensitivity2018_paper.pdf
+    description: "arXiv:1802.06039v2 (Projected WIMP sensitivity of the LUX-ZEPLIN experiment; in-project copy of the cached paper 10.48550/arXiv.1802.06039, sha256 5913d97d2d45710e4a6c7fddf8aac3a98f20adc3be3faec7c553a98611f9c058). Its Fig. 5 (page 10, insight lz_2018_neutron_nr_spectra) gives the projected NR recoil-energy spectra per neutron background source in counts/kg/day/keV for the 5.6-tonne fiducial volume; the 'Det. + Sur. + Env.' curve is the source for lz_neutron_spectrum_2018."
+  - id: lz_neutron_spectrum_2018
+    type: data
+    label: "LZ 2018 projected Det.+Sur.+Env. neutron NR spectrum"
+    source: data/lz_neutron_spectrum_2018.csv
+    description: "The 'Det. + Sur. + Env.' neutron NR recoil-energy spectrum digitized programmatically from the vector graphics of Fig. 5 of arXiv:1802.06039v2 (lz_sensitivity2018_paper) by src/digitize_neutron_spectrum.py: 98 contiguous bins tiling 0-100 keV (1 keV, a few 2 keV), rate in counts/kg/day/keV, axes calibrated from the major tick marks anchored to the decade labels (17.787 pt/decade; overlay-verified against the page raster). Used as the SHAPE input for the detector-neutron background component of background_components.all_table1: events are sampled in recoil energy and pushed through the NEST response — the S1c/S2c distributions in the 2018 paper are NOT used (different drift-field configuration). Normalization comes from the WS2024 Table I expected counts (lz_table1_counts_reference), not from this curve's absolute rate."
 outputs:
   - id: response_model_calibration
     type: data
