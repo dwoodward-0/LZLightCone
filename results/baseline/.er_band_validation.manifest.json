@@ -2,21 +2,22 @@
   "schema_version": 1,
   "output_id": "er_band_validation",
   "universe_id": "baseline",
-  "recipe": "python src/validate_bands.py --band er --reference data/lz_ws2022_band_reference.csv --header data/lz_ws2022_nest_header.hh --output results/baseline/er_band_validation.png",
-  "definition_version": "sha256:677e33e1f935f2a008cc16ee36797aff5f9c6e1f02aa0c6a1c28822209bd3ec1",
+  "recipe": "python src/validate_bands.py --band er --er-spectrum tritium_beta --reference data/lz_ws2022_band_reference.csv --header data/lz_ws2022_nest_header.hh --output results/baseline/er_band_validation.png",
+  "definition_version": "sha256:1213e4995f26c15436ae8f1b4576b4fcaaeb4713518c722ce31887bcf2585e8b",
   "env_version": "sha256:7c0beb4a6c9729006f13b818e2a5e8b79be88f5d4c846bda140894a4c315a3a4",
-  "data_version": "sha256:50a1bdd16331b7e421e55749e7e0eb836f926638622e5780fd30fed041869762",
+  "data_version": "sha256:87db4636dcf3fd9e4c5b252a82ed949142a230bb4327fc1d71ecaaae2e25bc50",
   "decisions": {
     "response_model": "nest_library",
     "nest_parameter_set": "ws2024_nest240",
-    "detector_effects": "uniform_1d"
+    "detector_effects": "uniform_1d",
+    "calibration_er_spectrum": "tritium_beta"
   },
   "input_versions": {
     "lz_ws2022_band_reference": "sha256:084368836d8d0f7645254d1e75593bd5ad6a417984d1bafd46cfc8e9d3b4a02a",
     "lz_ws2022_nest_header": "sha256:34a1b5cc8533ea0f3cf226bb42a7600f4e5c7691bf1e2cf338448bac28d2cf36",
-    "band_validation_script": "sha256:a255e6893f015407abeea346b97a4e8ed991abf1ced48cc4e3980358aeb82da7"
+    "band_validation_script": "sha256:0eefe4d8aff4e4213969f1d1a5d5eaa1e588cd7a1b95af9a305b13a8e3738726"
   },
-  "git_sha": "6c0fef41bd1acd109a844214af19ee7b554630e0",
+  "git_sha": "d4773d0a1efe3ce1355b9a96b62fd456a2fc0e56",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -26,8 +27,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-10T19:44:13.009+00:00",
-  "finished_at": "2026-11-10T19:44:26.677+00:00",
+  "started_at": "2026-11-10T20:29:43.996+00:00",
+  "finished_at": "2026-11-10T20:29:56.764+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
