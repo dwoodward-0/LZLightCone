@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "output_id": "response_model_calibration",
+  "universe_id": "baseline",
+  "recipe": "python src/build_response_model.py --output results/baseline/response_model_calibration.hdf5",
+  "definition_version": "sha256:34f7a00773b8a64534a4e3a19365373002abae47c3cb60bd4b6fb151413b1b7b",
+  "env_version": "sha256:e5c64048efa0a5122aa64355fbcb88549306a84c0c86eb98e02f9869118c57e9",
+  "data_version": "sha256:7a1a9f3d85035a93e45e42b8ea4a242730f8895a24179a2a9decfbae9e89cce8",
+  "decisions": {
+    "response_model": "nest_library",
+    "nest_parameter_set": "ws2024_nest240",
+    "detector_effects": "uniform_1d"
+  },
+  "input_versions": {
+    "lz_nest_header_ws2024": "sha256:4c5ded34d69646dfc8842b2c07f796e89f4fb218565ae11b32c1c608f233e9ce"
+  },
+  "git_sha": "165ded0aade6a21ed28ef82375d08fac5a018475",
+  "git_remote": "",
+  "lc_version": "0.5.0",
+  "hermeticity": {
+    "mechanism": "seatbelt",
+    "fs": "declared",
+    "network": "allowed",
+    "landlock_abi": null,
+    "exec_allowlist_version": 1
+  },
+  "started_at": "2026-11-10T00:03:52.548+00:00",
+  "finished_at": "2026-11-10T00:08:23.904+00:00",
+  "uv_version": "0.13.7",
+  "image": null
+}
