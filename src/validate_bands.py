@@ -354,10 +354,9 @@ def main():
     ax1.plot(ref_s1c, ref_q90, "--", color=INK_2, lw=0.8)
     ax1.set_ylabel(r"log$_{10}$(S2c) [phd]", color=INK, fontsize=10)
     ax1.legend(fontsize=9, frameon=False, labelcolor=INK_2, loc="upper left")
-    ax1.set_title(f"{band['title']} — WS2022 configuration "
-                  f"(field {DRIFT_FIELD_CONST:.0f} V/cm, "
-                  f"g2 = {g2:.1f} phd/e)",
-                  color=INK, fontsize=11, loc="left")
+    ax1.set_title(f"{band['title']} — WS2022 config "
+                  f"({DRIFT_FIELD_CONST:.0f} V/cm, g2 = {g2:.1f} phd/e)",
+                  color=INK, fontsize=10, loc="left")
 
     ax2.axhspan(-ACCEPT, ACCEPT, color=GRID, lw=0)
     ax2.plot(s1_good, med_dev, "o-", color=SERIES_1, lw=1.2, ms=3,
@@ -374,10 +373,9 @@ def main():
     status = "PASS" if verdict else "FAIL"
     ax2.text(
         0.99, 0.97,
-        f"{status}: max median {100 * max_med:.1f}%, "
-        f"max width {100 * max_wid:.1f}% rel / {max_wid_abs:.4f} abs "
-        f"(bars: 5% rel or {W_ABS_FLOOR} abs)",
-        transform=ax2.transAxes, ha="right", va="top", fontsize=9,
+        f"{status}\nmax median {100 * max_med:.1f}%\n"
+        f"max width {100 * max_wid:.1f}% rel\n({max_wid_abs:.4f} abs)",
+        transform=ax2.transAxes, ha="right", va="top", fontsize=8,
         color=INK,
         bbox=dict(facecolor=SURFACE, edgecolor=GRID),
     )

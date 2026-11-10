@@ -2951,6 +2951,11 @@ inputs:
     label: "LZ WS2022 calibration band reference"
     source: data/lz_ws2022_band_reference.csv
     description: "ER (tritium) and NR (DD-neutron) calibration bands — median and 10%/90% quantiles of log10(S2c) as a function of S1c — digitized programmatically from the vector graphics of Fig. 1 of arXiv:2207.03764v4 (LZ WS2022, NEST 2.3.7 configuration, g1 = 0.114, g2 = 47.1), axes calibrated from the tick labels. The validation reference for er_band_validation and nr_band_validation; the bands are not published in HEPData."
+  - id: band_validation_script
+    type: data
+    label: "Band validation script"
+    source: src/validate_bands.py
+    description: "The response-engine band validator for er_band_validation and nr_band_validation, declared as an input so that changes to it cascade to the outputs (it implements the v2.3.7-to-NEST-master bridges and the acceptance arithmetic, so its exact behavior is part of what the validations assert)."
   - id: lz_ws2022_nest_header
     type: data
     label: "LZ WS2022 NEST header"
@@ -2971,7 +2976,7 @@ outputs:
     format: png
     label: "Validation 1: ER band vs LZ"
     description: "Validation of the microphysics stage: the response engine (the same GetYields -> GetQuanta -> GetS1/GetS2 nestpy chain as build_response_model.py) run in the WS2022 configuration that the digitized reference corresponds to (nestpy LZ_WS2022 detector, drift field 192 V/cm from FitEF, tritium events drawn ~flat over 0.5-18.6 keVee = the beta endpoint, 1M events, ROI S2c > 600 phd re-applied at analysis level), overlaid on the digitized LZ tritium ER band. Version bridges from NEST v2.3.7 (what LZ SR1 ran) to the NEST master that nestpy vendors: NRERWidthsParam[6] passed negated (v2.4.x treats [6] > 0 as absolute Fano, [6] < 0 reproduces v2.3.7's additive term); [8]/[9] swapped (v2.3.7 reads [8] = omega width, [9] = center; master reads [8] = center, [9] = width); SkewnessER = 0.0 for ER (the header's instruction); er_parameters = the [-1]x10 sentinel (master's GetYieldBetaGR is parameterized and a positive vector would override the hardcoded v2.3.7 ER model); width vector padded with two zeros to 13 elements. The chain was verified semantically equivalent to v2.3.7 by source-level diffing (RandomGen, GetYields, GetQuanta, GetS1/GetS2 total-area paths). ACCEPTANCE: band median agrees to better than 5% relative in log10(S2c) over every comparable reference bin (achieved: max 1.05%, inside LZ's own 1% NR-mean tuning bar, insight lz_nest_er_band_tuning); band width (the (q90-q10)/2 half-width) within 5% relative OR 0.0065 absolute in log10(S2c), the floor being the digitized reference's own curve resolution. Result: max width deviation 6.0% (0.0067 abs) at S1c > 65 where tritium-spectrum support thins — a documented residual attributed to the reference's provenance (LZ's figure production, not the response chain), not tuned away."
-    inputs: [lz_ws2022_band_reference, lz_ws2022_nest_header]
+    inputs: [lz_ws2022_band_reference, lz_ws2022_nest_header, band_validation_script]
     decisions: [response_model, nest_parameter_set, detector_effects]
     recipe:
       command: "python src/validate_bands.py --band er --reference {inputs.lz_ws2022_band_reference} --header {inputs.lz_ws2022_nest_header} --output {output}"
@@ -2980,7 +2985,7 @@ outputs:
     format: png
     label: "Validation 2: NR band vs LZ"
     description: "Validation of the microphysics stage, NR analogue of er_band_validation: the response engine run in the WS2022 configuration (nestpy LZ_WS2022 detector, the header's edited NRERWidthsParam vector, v2.3.7 default NR yield parameters, drift field 192 V/cm), overlaid on the digitized LZ DD-neutron NR band; DD events drawn ~flat over 1.0-73.5 keVnr (the max Xe recoil from a 2.45 MeV DD neutron, 4mM/(m+M)^2 * E_n — the best physically-motivated approximation of the calibration spectrum; the conditional band width is spectrum-dependent, probed against emax 20-100). Same version bridges and chain-equivalence verification as er_band_validation. ACCEPTANCE: band median within 5% relative (achieved: max 0.44%, inside LZ's own 1% tuning bar); band width within 5% relative OR 0.0065 absolute in log10(S2c) (the reference's own curve resolution). Result: max width deviation 6.9% relative (0.0046 abs) over S1c 40-65, where the reference half-width is narrowest (~0.06-0.08) and relative comparison least well-conditioned; the maximum absolute deviation anywhere is 0.0081 (a wide half-width bin, ~4% relative) — both documented residuals attributed to the reference's provenance (LZ's DD source spectrum and MC statistics are not published), not tuned away."
-    inputs: [lz_ws2022_band_reference, lz_ws2022_nest_header]
+    inputs: [lz_ws2022_band_reference, lz_ws2022_nest_header, band_validation_script]
     decisions: [response_model, nest_parameter_set, detector_effects]
     recipe:
       command: "python src/validate_bands.py --band nr --reference {inputs.lz_ws2022_band_reference} --header {inputs.lz_ws2022_nest_header} --output {output}"
