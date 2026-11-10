@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "output_id": "er_band_validation_ws2024",
+  "universe_id": "baseline",
+  "recipe": "python src/validate_bands.py --config ws2024 --band er --reference data/lz_ws2024_band_reference.csv --header data/lz_ws2024_nest_header.hh --output results/baseline/er_band_validation_ws2024.png",
+  "definition_version": "sha256:bb38239f9d13ce9737861fa678680e430c2a5085efc41464acc519d4972574a2",
+  "env_version": "sha256:7c0beb4a6c9729006f13b818e2a5e8b79be88f5d4c846bda140894a4c315a3a4",
+  "data_version": "sha256:79757b8fcd63bb721d124dabb954472c58bc8a3c9d719b79ce58aa608220104f",
+  "decisions": {
+    "response_model": "nest_library",
+    "nest_parameter_set": "ws2024_nest240",
+    "detector_effects": "uniform_1d"
+  },
+  "input_versions": {
+    "lz_ws2024_band_reference": "sha256:bcf5b8ed6a150fa14ddf8ed9b4b703c1955ca4d2b35f542df7183d6abfea6608",
+    "lz_nest_header_ws2024": "sha256:4c5ded34d69646dfc8842b2c07f796e89f4fb218565ae11b32c1c608f233e9ce",
+    "band_validation_script": "sha256:a255e6893f015407abeea346b97a4e8ed991abf1ced48cc4e3980358aeb82da7"
+  },
+  "git_sha": "6c0fef41bd1acd109a844214af19ee7b554630e0",
+  "git_remote": "",
+  "lc_version": "0.5.0",
+  "hermeticity": {
+    "mechanism": "seatbelt",
+    "fs": "declared",
+    "network": "allowed",
+    "landlock_abi": null,
+    "exec_allowlist_version": 1
+  },
+  "started_at": "2026-11-10T19:44:13.009+00:00",
+  "finished_at": "2026-11-10T19:44:27.075+00:00",
+  "uv_version": "0.13.7",
+  "image": null
+}
