@@ -5,7 +5,7 @@
   "recipe": "python src/validate_bands.py --config ws2024 --band er --er-spectrum tritium_beta --reference data/lz_ws2024_band_reference.csv --header data/lz_ws2024_nest_header.hh --output results/baseline/er_band_validation_ws2024.png",
   "definition_version": "sha256:422915c0c000d56cc2d4dd3c65577f316d06841ef8dc9f7df42ed5e033e03cbf",
   "env_version": "sha256:7c0beb4a6c9729006f13b818e2a5e8b79be88f5d4c846bda140894a4c315a3a4",
-  "data_version": "sha256:c54c5b504c8507acb86a8c79beefd4cfcfd2ce2158e80e4abd49a543e0da7570",
+  "data_version": "sha256:df87248f889d47df7f57709b0530a86f8ce536a89a75f90c8d4cbc4665f8d473",
   "decisions": {
     "response_model": "nest_library",
     "nest_parameter_set": "ws2024_nest240",
@@ -15,9 +15,9 @@
   "input_versions": {
     "lz_ws2024_band_reference": "sha256:bcf5b8ed6a150fa14ddf8ed9b4b703c1955ca4d2b35f542df7183d6abfea6608",
     "lz_nest_header_ws2024": "sha256:4c5ded34d69646dfc8842b2c07f796e89f4fb218565ae11b32c1c608f233e9ce",
-    "band_validation_script": "sha256:0eefe4d8aff4e4213969f1d1a5d5eaa1e588cd7a1b95af9a305b13a8e3738726"
+    "band_validation_script": "sha256:1ffd22bd08a55206f4c703c2bba8046b244bb0512a038f351c7ea00cd496e2bd"
   },
-  "git_sha": "d4773d0a1efe3ce1355b9a96b62fd456a2fc0e56",
+  "git_sha": "8a6d9e2c60f0a278d5a2d466240f9b921087f9fe",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -27,8 +27,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-10T20:29:43.996+00:00",
-  "finished_at": "2026-11-10T20:29:56.974+00:00",
+  "started_at": "2026-11-10T20:33:13.295+00:00",
+  "finished_at": "2026-11-10T20:33:26.165+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
