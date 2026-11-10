@@ -233,3 +233,45 @@ see the lightcone skill; never write into `results/` by hand.
     over probes at 20–100. ER spectrum: ~flat 0.5–18.6 keVee (beta
     endpoint). Declaring `src/validate_bands.py` as an ASTRA **input** is
     the sanctioned way to make script edits cascade to outputs.
+
+- **Validations 1 & 2 in the WS2024 configuration done (2026-11-10)** —
+  `er_band_validation_ws2024` and `nr_band_validation_ws2024` materialized
+  and `current`; both PASS. `src/validate_bands.py` now takes
+  `--config {ws2022,ws2024}` (default ws2022 — existing recipes unchanged);
+  ws2022 results bit-identical after the refactor.
+  - Reference: `data/lz_ws2024_band_reference.csv`, digitized
+    programmatically from **slide 9 of the collaboration's TeVPA results
+    talk** (`data/lz_ws2024_tevpa_talk.pdf`, sha256-pinned) — the WS2024
+    paper does not publish the bands. The slide's plot is a pasted raster,
+    so extraction is by **color segmentation** (ER curves light blue, NR
+    red, distinct from navy/orange scatter), axes calibrated on all 41
+    inward-pointing ticks per axis (fit residuals max 0.042 phd /
+    0.0022 dex; measured second-difference noise 0.0020 median / 0.005 p90
+    — the raster reference's acceptance floor is 0.015 abs, vs ws2022's
+    0.0065 for the vector-digitized one).
+  - Results (1M events, seed 43): medians ≤0.64% both bands; widths ER max
+    9.1% rel (0.0097 abs), NR max 13.8% rel (0.0120 abs) — inside the 0.015
+    raster floor.
+  - **WS2024 bridges differ from WS2022**: the header ships tuned
+    `NRYieldsParam` AND `ERYieldsParam` vectors (positive er_parameters
+    override the hardcoded ER model — intended v2.4.0 behavior);
+    `[6] = 0.3` is an **absolute Fano under v2.4.0 semantics, passed
+    as-is** (no negation); `[8]↔[9]` swap still applies; **ER skewness
+    vector-driven** (SkewnessER = -999 sentinel reads [10] = -0.26564; no
+    header disable-instruction).
+  - **The slide's band quantiles were computed on an ROI-applied sample**,
+    even though its scatter is not ROI-cut (extends to log10 S2c = 2.53):
+    without the cut the NR S1c = 3 half-width is 12% too wide; with
+    **S2c ≥ 493 phd = 14.5 extracted electrons × g2 = 34.0** it is within
+    2% below S1c = 9. (645 phd uncorrected / 1.214 = 531 also passes; 645
+    corrected is too aggressive at 13.6%.)
+  - **SES wrinkle evidence**: 645 phd / 14.5 e⁻ = 44.5 phd/e — LZ's
+    threshold rendering uses the slide's SES (44.5), not CalculateG2's
+    SE = 46.85. Relevant to the user's ongoing investigation.
+  - **NR mid-range residual is reference-side**: our engine gives nearly
+    identical NR half-widths under ws2022 and ws2024 parameters at fixed
+    S1c (diffs ≤0.005 abs), and the slide band is ~1.10–1.13× wider than
+    LZ's own WS2022 paper band over S1c 40–61 (which we reproduce at the
+    usual 4–7%). Plausibly position-dependent broadening absent under
+    uniform_1d — the anticipated escalation path to `simplified_position`.
+
