@@ -280,9 +280,27 @@ see the lightcone skill; never write into `results/` by hand.
     **S2c ≥ 493 phd = 14.5 extracted electrons × g2 = 34.0** it is within
     2% below S1c = 9. (645 phd uncorrected / 1.214 = 531 also passes; 645
     corrected is too aggressive at 13.6%.)
-  - **SES wrinkle evidence**: 645 phd / 14.5 e⁻ = 44.5 phd/e — LZ's
-    threshold rendering uses the slide's SES (44.5), not CalculateG2's
-    SE = 46.85. Relevant to the user's ongoing investigation.
+  - **SES wrinkle resolved (2026-11-10, user's investigation)**: no
+    contradiction — the numbers live in two spaces. Table S2 is the NEST
+    model in corrected space: g2 = ExtEff × SES by LZ's own definition
+    (measured "as the ratio of the best-fit electroluminescence gain g2 to
+    the observed single electron signal size"); 0.725 × 46.9 = 34.0, and
+    CalculateG2 reproduces it independently (34.02 = 0.7262 × 46.85; same
+    structure in WS2022: 0.805 × 58.5 = 47.09). The ROI parenthetical is in
+    raw/uncorrected space: "a lower bound on uncorrected S2 pulse size of
+    645 phd, equivalent to 14.5 extracted electrons" → 645/14.5 = 44.5
+    phd/e = the slide's SES, the raw (uncorrected, average-position)
+    single-electron size (14.5 × 44.5 = 645.25). The ratio 46.9/44.5 =
+    1.054 ≈ exp(t_mean/τ) for τ ≈ 9–10 ms is the average S2 position
+    correction (electron lifetime + x-y map at mean drift time), NOT a PMT
+    efficiency ("phd" already counts detected photoelectrons; P_dphe = 1.214
+    is separately explicit). Empirical support: NEST's SE = 46.85 reproduces
+    the band medians to ≤0.6% in corrected space, and a corrected-space ROI
+    at 645 is far too aggressive (13.6% too narrow at S1c = 3) — a raw 645
+    maps to a position-DEPENDENT corrected cut, softer than any single
+    corrected threshold, consistent with the 493–531 window the bands
+    prefer. Nothing in our chain changes: we are wholly in corrected space,
+    where 46.9 is the data-agreeing value.
   - **NR mid-range residual is reference-side**: our engine gives nearly
     identical NR half-widths under ws2022 and ws2024 parameters at fixed
     S1c (diffs ≤0.005 abs), and the slide band is ~1.10–1.13× wider than
