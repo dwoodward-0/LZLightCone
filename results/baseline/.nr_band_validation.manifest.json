@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "output_id": "nr_band_validation",
+  "universe_id": "baseline",
+  "recipe": "python src/validate_bands.py --band nr --reference data/lz_ws2022_band_reference.csv --header data/lz_ws2022_nest_header.hh --output results/baseline/nr_band_validation.png",
+  "definition_version": "sha256:05078cca79573f6ba5b82416659c1fb9eb40aad4d05bc9d43bba11499839b532",
+  "env_version": "sha256:7c0beb4a6c9729006f13b818e2a5e8b79be88f5d4c846bda140894a4c315a3a4",
+  "data_version": "sha256:2993a6a0f886266d22c3fb1559c115619399874e74f04ddd706c40cdb12c32a1",
+  "decisions": {
+    "response_model": "nest_library",
+    "nest_parameter_set": "ws2024_nest240",
+    "detector_effects": "uniform_1d"
+  },
+  "input_versions": {
+    "lz_ws2022_band_reference": "sha256:084368836d8d0f7645254d1e75593bd5ad6a417984d1bafd46cfc8e9d3b4a02a",
+    "lz_ws2022_nest_header": "sha256:34a1b5cc8533ea0f3cf226bb42a7600f4e5c7691bf1e2cf338448bac28d2cf36"
+  },
+  "git_sha": "b9fab327bb968da85c6baaa4865bc006faa9f212",
+  "git_remote": "",
+  "lc_version": "0.5.0",
+  "hermeticity": {
+    "mechanism": "seatbelt",
+    "fs": "declared",
+    "network": "allowed",
+    "landlock_abi": null,
+    "exec_allowlist_version": 1
+  },
+  "started_at": "2026-11-10T02:23:56.763+00:00",
+  "finished_at": "2026-11-10T02:24:09.218+00:00",
+  "uv_version": "0.13.7",
+  "image": null
+}
