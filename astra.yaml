@@ -2954,6 +2954,8 @@ outputs:
     description: "Calibrated NEST-style response engine outputs, consumed by every later stage: ER and NR light/charge yields vs recoil energy at the LZ drift field, and the ER/NR band medians and widths in (S1c, log10 S2c) space, written as lookup tables. Uses the NEST header input for detector parameters."
     inputs: [lz_nest_header_ws2024]
     decisions: [response_model, nest_parameter_set, detector_effects]
+    recipe:
+      command: "python src/build_response_model.py --output {output}"
   - id: er_band_validation
     type: figure
     format: png
