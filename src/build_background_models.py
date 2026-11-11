@@ -81,8 +81,16 @@ HIST_Y_EDGES = np.arange(2.69, 4.51, 0.02)
 # output sample cap per source (weighted samples are thinned to this)
 MAX_SAMPLES = 50_000
 
-# EC charge suppression (pre-fit): Qy_L/Qy_beta = 0.87 +/- 0.03
+# EC charge suppression (pre-fit): Qy_L/Qy_beta = 0.87 +/- 0.03 for
+# single L-shell EC decays (5.2 keV 127Xe/125Xe; the 124Xe LM mode).
+# The 124Xe LL mode gets the Thomas-Imel box model value 0.65 instead:
+# the overlap of the two L-shell cascades adds recombination, and the
+# WS2024 paper quotes the TI box model with the increased ionization
+# density as the 0.65 bound of its Qy_LL/Qy_beta nuisance range
+# [0.65, 0.87] (0.87 is the single-EC measured value, stated not to
+# hold for LL).
 Q_EC = 0.87
+Q_EC_LL = 0.65
 
 # tritium / 14C analytic spectra
 TRITIUM_ENDPOINT = 18.590  # keV
@@ -90,8 +98,8 @@ C14_ENDPOINT = 156.476  # keV
 TRITIUM_C14_RATIO = 8.0 / 1.0  # activity ratio (WS2024 text)
 ALPHA = 1.0 / 137.036
 
-# 124Xe DEC lines (keVee, branch fraction within the decay)
-XE124_LINES = [(10.00, 1.4), (5.98, 0.8)]
+# 124Xe DEC lines: (energy keVee, branch fraction, q = Qy/Qy_beta)
+XE124_LINES = [(10.00, 1.4, Q_EC_LL), (5.98, 0.8, Q_EC)]
 # 127Xe/125Xe EC: single L-shell stand-in (REVIEW ITEM, see docstring)
 XE127_EC_LINE = 5.2  # keVee
 
@@ -133,9 +141,11 @@ SOURCE_NOTES = {
                          "ratio 8:1 tritium:14C",
     "xe136_2nubb": "136Xe curve of LZ-2018 Fig. 4 (2nu-beta-beta spectrum)",
     "xe124_dec": "monoenergetic lines 10.00 keV (BR 1.4%) + 5.98 keV "
-                 "(BR 0.8%), EC charge suppression q=0.87 applied at the "
-                 "quanta boundary (S2 from 0.87 Ne; recombined charge "
-                 "added to S1 as Gaussian(dNph*g1, sqrt(dNph*g1)))",
+                 "(BR 0.8%), per-line EC charge suppression at the quanta "
+                 "boundary: LL 0.65 (Thomas-Imel box model, WS2024 paper) "
+                 "and LM 0.87 (measured single-EC Qy_L/Qy_beta; S2 from "
+                 "q Ne; recombined charge added to S1 as "
+                 "Gaussian(dNph*g1, sqrt(dNph*g1)))",
     "xe127_xe125_ec": "5.2 keV L-shell EC line stand-in for the full "
                       "127Xe/125Xe cascade, q=0.87 (REVIEW ITEM: coarse)",
     "accidental_coincidences": "factorized P(S1c)*P(log10 S2c) PDF "
@@ -320,7 +330,9 @@ class ResponseEngine:
         S2 is generated from the suppressed electron count (GetS2 takes
         the count directly), and the recombined charge's photon
         contribution is added to S1c as a Gaussian with the correct mean
-        (dNph * g1) and counting variance (sqrt(dNph * g1)).
+        (dNph * g1) and counting variance (sqrt(dNph * g1)). q_ec may be
+        a scalar or a per-event array (e.g. the two 124Xe lines carry
+        different q).
         nestpy's QuantaResult is immutable (def_readonly), so the extra
         photons cannot be pushed through GetS1 itself; the approximation
         is subdominant to the published +/-0.03 uncertainty on q."""
@@ -350,7 +362,8 @@ class ResponseEngine:
             dphot = 0.0
             if q_ec is not None:
                 ne = quanta.electrons
-                dphot = (1.0 - q_ec) * ne  # charge re-emitted as light
+                q_i = q_ec[i] if hasattr(q_ec, "__len__") else q_ec
+                dphot = (1.0 - q_i) * ne  # charge re-emitted as light
             dt = self.rng.uniform(dt_min, dt_max)
             z = top_drift - dt * self.drift_velocity
             pos = (0.0, 0.0, z)  # uniform_1d
@@ -360,7 +373,7 @@ class ResponseEngine:
                 species, i, self.drift_field, energy,
                 nestpy.S1CalculationMode.Full, 0, wf_time, wf_amp,
             )
-            ne_for_s2 = int(round(q_ec * quanta.electrons)) \
+            ne_for_s2 = int(round(q_i * quanta.electrons)) \
                 if q_ec is not None else quanta.electrons
             ion = nc.GetS2(
                 ne_for_s2, *pos, *pos, dt, self.drift_velocity, i,
@@ -805,16 +818,22 @@ def main():
                     print(f"  efficiency: {keep.mean():.4%} of events pass")
                 if energies is None:  # analytic spectra
                     if shape_key in ("xe124_lines", "xe127_ec"):
-                        q_ec = Q_EC
                         energies = np.full(args.n_er, float(
                             XE124_LINES[0][0] if shape_key == "xe124_lines"
                             else XE127_EC_LINE))
+                        # each 124Xe line carries its own charge yield
+                        # (LL 0.65 TI box model, LM 0.87 single-EC)
+                        q_ec = np.full(
+                            args.n_er,
+                            XE124_LINES[0][2]
+                            if shape_key == "xe124_lines" else Q_EC)
                         if shape_key == "xe124_lines":
                             # mixture of the two lines by branch ratio
                             w_lo = XE124_LINES[0][1] / (XE124_LINES[0][1]
                                                         + XE124_LINES[1][1])
                             is_hi = engine.rng.uniform(size=args.n_er) > w_lo
                             energies[is_hi] = XE124_LINES[1][0]
+                            q_ec[is_hi] = XE124_LINES[1][2]
                     elif shape_key == "tritium_c14":
                         energies = sample_tritium_c14(engine.rng, args.n_er)
                     else:
