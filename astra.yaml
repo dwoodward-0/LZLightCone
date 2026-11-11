@@ -2687,6 +2687,20 @@ prior_insights:
           suffix: " Gray lines show contours of constant ER-equivalent (keVee) and NR-equivalent (keVnr) energy."
         location:
           page: 6
+  lz_2018_component_er_spectra:
+    id: lz_2018_component_er_spectra
+    label: "LZ 2018 paper publishes per-source ER spectra (Fig. 4) with RRPA solar scaling"
+    claim: "The LZ 2018 sensitivity projection publishes per-source ER recoil-energy spectra (Fig. 4: Solar nu, 222Rn, 220Rn, 85Kr, 136Xe, Total, Det.+Sur.+Env.) in counts/kg/day/keV for the 5.6-tonne fiducial volume, single scatter, with no detector efficiency or S1c ROI cuts applied, including a 0-200 keV close-up panel that covers the WIMP ROI. Below 30 keV the pp+7Be+13N solar-neutrino electron-scattering contribution is scaled by the RRPA calculation (a suppression relative to the free-electron rate, drawn as the solid curve with a visible step at the joining energy; the dashed low-energy piece is the free-electron continuation). These curves are the per-source spectral-shape inputs for the WS2024 background model's ER and NR-neutrino components — they remove the need to reconstruct beta-branch structures from nuclear data."
+    created_at: "2026-11-11T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.1802.06039"
+        quote:
+          exact: "Below 30 keV the contribution from elastic scattering of pp+7Be+13N solar neutrinos is scaled according to the relativistic random phase approximation (RRPA) calculation in [54]."
+          prefix: "The right-hand panel shows a close-up of the 0–200 keV region of the left-hand panel. "
+          suffix: " C. Detector and surface beta backgrounds"
+        location:
+          page: 8
   lz_bkg_atm_nu_nr:
     id: lz_bkg_atm_nu_nr
     label: "Background: atmospheric neutrino CEvNS"
@@ -3062,12 +3076,17 @@ inputs:
     type: data
     label: "LZ 2018 projected sensitivity paper"
     source: data/lz_sensitivity2018_paper.pdf
-    description: "arXiv:1802.06039v2 (Projected WIMP sensitivity of the LUX-ZEPLIN experiment; in-project copy of the cached paper 10.48550/arXiv.1802.06039, sha256 5913d97d2d45710e4a6c7fddf8aac3a98f20adc3be3faec7c553a98611f9c058). Its Fig. 5 (page 10, insight lz_2018_neutron_nr_spectra) gives the projected NR recoil-energy spectra per neutron background source in counts/kg/day/keV for the 5.6-tonne fiducial volume; the 'Det. + Sur. + Env.' curve is the source for lz_neutron_spectrum_2018."
+    description: "arXiv:1802.06039v2 (Projected WIMP sensitivity of the LUX-ZEPLIN experiment; in-project copy of the cached paper 10.48550/arXiv.1802.06039, sha256 5913d97d2d45710e4a6c7fddf8aac3a98f20adc3be3faec7c553a98611f9c058). Its Fig. 4 (page 8, insight lz_2018_component_er_spectra) gives the projected ER recoil-energy spectra per background source in counts/kg/day/keV with a 0-200 keV close-up panel, and its Fig. 5 (page 10, insight lz_2018_neutron_nr_spectra) the projected NR spectra; the 'Det. + Sur. + Env.' curves are the sources for lz_neutron_spectrum_2018 and, together with the per-source curves, for lz2018_component_spectra."
   - id: lz_neutron_spectrum_2018
     type: data
     label: "LZ 2018 projected Det.+Sur.+Env. neutron NR spectrum"
     source: data/lz_neutron_spectrum_2018.csv
     description: "The 'Det. + Sur. + Env.' neutron NR recoil-energy spectrum digitized programmatically from the vector graphics of Fig. 5 of arXiv:1802.06039v2 (lz_sensitivity2018_paper) by src/digitize_neutron_spectrum.py: 98 contiguous bins tiling 0-100 keV (1 keV, a few 2 keV), rate in counts/kg/day/keV, axes calibrated from the major tick marks anchored to the decade labels (17.787 pt/decade; overlay-verified against the page raster). Used as the SHAPE input for the detector-neutron background component of background_components.all_table1: events are sampled in recoil energy and pushed through the NEST response — the S1c/S2c distributions in the 2018 paper are NOT used (different drift-field configuration). Normalization comes from the WS2024 Table I expected counts (lz_table1_counts_reference), not from this curve's absolute rate."
+  - id: lz2018_component_spectra
+    type: data
+    label: "LZ 2018 per-source ER/NR background spectra (Figs. 4-5)"
+    source: data/lz2018_component_spectra.csv
+    description: "Per-source background energy spectra digitized programmatically from the vector graphics of arXiv:1802.06039v2 (lz_sensitivity2018_paper) by src/digitize_lz2018_spectra.py: from the Fig. 4 right panel (0-200 keV ER close-up, page 8) the smooth curves er_pb214 (navy solid '222Rn'), er_pb212 (olive dashed '220Rn'), er_kr85 (teal solid '85Kr'), er_xe136 (orange dash-dot '136Xe'), er_solar_nu_rrpa (green solid incl. its RRPA-suppressed below-~25-keV piece, insight lz_2018_component_er_spectra) and er_solar_nu_free (the dashed free-electron low-energy piece, kept for reference), plus the pink step histogram er_det_gammas ('Det. + Sur. + Env.' ER); from Fig. 5 (page 10) the step histograms nr_b8 ('8B'; first bin clipped at the axis top, a lower bound, far below the NR efficiency turn-on), nr_hep ('hep') and nr_atm ('Atm'). Color-to-label mapping verified against rendered overlays of both panels (line styles: dashed=220Rn/DSN, dash-dot=136Xe/Atm). Rates in counts/kg/day/keV as plotted (5.6-t fiducial volume, single scatter, no detector efficiency or ROI cuts, insight lz_2018_component_er_spectra). SHAPE inputs for the ER and NR-neutrino background components of background_components.all_table1: sampled in recoil energy, pushed through the NEST response, normalized to the WS2024 Table I counts (lz_table1_counts_reference) — not to these curves' absolute rates (the 2018 assumptions differ from WS2024)."
   - id: lz_ws2024_paper
     type: data
     label: "LZ WS2024 search paper (in-project copy)"
