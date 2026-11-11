@@ -2644,6 +2644,49 @@ prior_insights:
           suffix: "Atm. νNR 0.12 ± 0.02 0.12 ± 0.02"
         location:
           page: 6
+  lz_accidentals_factorized_pdf:
+    id: lz_accidentals_factorized_pdf
+    label: "Accidentals PDF construction: outer product of the S1 and S2 marginals"
+    claim: "LZ's accidental-coincidence PDF is factorized by construction: it is the outer product of the smoothed isolated-S1 and isolated-S2 marginal distributions (the paired pulses are uncorrelated by definition), with regions of low statistics smoothed; only the rate comes from an independent UDT-sideband calculation. This makes a P(S1c)*P(log10 S2c) reconstruction from published marginal information well-posed."
+    created_at: "2026-11-10T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.17120"
+        quote:
+          exact: "The two-dimensional PDF was constructed by taking the outer product of the smoothed out versions of the S1 and S2 projections."
+          prefix: "Instead, the S1-S2 distribution was projected into its corresponding axes and an interpolating function was found for those regions at large pulse areas where the number of events was low. "
+          suffix: " The resulting PDF is shown in Figure 12. The PDF was normalized using an independent calculation of the accidentals rate."
+        location:
+          page: 21
+  lz_accidentals_pdf_marginals_fig12:
+    id: lz_accidentals_pdf_marginals_fig12
+    label: "Fig. 12: the SR1 accidentals-PDF marginal functions are published"
+    claim: "The WS2022-companion paper publishes (Fig. 12) the SR1 accidentals PDF itself, normalized to events/tonne/yr, with the top and right panels showing the two marginal functions used to build it (orange curves) — so the factorized construction's marginals are publicly available as a shape cross-check, in the SR1 configuration (note the fall-off at small log10(S2c) from the SR1 raw-S2 600-phd bound). The predicted SR1 count is 1.2 events in the ROI (0.2 inside the NR band)."
+    created_at: "2026-11-10T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2211.17120"
+        quote:
+          exact: "The orange lines represent the functions that were used to build the two-dimensional PDF."
+          prefix: "The top and right panels show the projections on each axis of the ACS events surviving all analysis cuts, where the distribution falls off at small log10(S2c) due to the applied 600 phd lower bound in raw S2 pulse size. "
+          suffix: " Regions with larger data fluctuations, starting from the dashed gray lines, were smoothed out."
+        location:
+          page: 20
+  lz_ws2024_fig3_accidentals_contours:
+    id: lz_ws2024_fig3_accidentals_contours
+    label: "WS2024 Fig. 3 publishes accidentals quantile contours"
+    claim: "The WS2024 paper's Fig. 3 overlays the 68% and 95% quantile contours of the best-fit accidental-coincidence distribution in (S1c, log10 S2c) space (orange contours, 'All Data' top panel) — the only public WS2024-specific morphological constraint on the accidentals background, whose underfluctuation drove the WS2024-only limit."
+    created_at: "2026-11-10T12:00:00Z"
+    evidence:
+      - id: ev1
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Green and orange contours show the same quantiles for the best-fit 124Xe distribution and the accidental coincidence events, respectively."
+          prefix: "light gray and purple shading show the regions containing 68% and 95% of the ER portion of the background model and a 40 GeV/c2 WIMP, respectively. "
+          suffix: " Gray lines show contours of constant ER-equivalent (keVee) and NR-equivalent (keVnr) energy."
+        location:
+          page: 6
   lz_bkg_atm_nu_nr:
     id: lz_bkg_atm_nu_nr
     label: "Background: atmospheric neutrino CEvNS"
@@ -2954,6 +2997,21 @@ decisions:
         description: "Sample ER calibration energies uniformly in [0.5, 18.6] keVee; the initial approximation, kept as a toggle (--er-spectrum flat). Over-weights the endpoint region and biases high-S1c band medians upward."
         insights: [lz_nest_er_band_tuning]
 
+  accidentals_model:
+    id: accidentals_model
+    label: "Accidental-coincidence 2D model from public sources"
+    rationale: "Accidentals are a data-driven LZ background (no simulation), and the WS2024-only limit's underfluctuation is attributed to them, so their 2D shape matters. Only public material is used (LZ-internal model documents are off-limits by project decision). Two public constraints exist: the WS2024 Fig. 3 68%/95% quantile contours (vector-digitized, lz_ws2024_accidentals_contours) and the SR1 Fig. 12 marginal functions of the companion paper (raster-digitized, lz_accidentals_marginals_sr1). Because LZ's construction is exactly factorized (outer product of the S1 and S2 marginals, insight lz_accidentals_factorized_pdf), a P(S1c)*P(log10 S2c) model reconstructed from the WS2024 contours is well-posed: two nested contours constrain the two marginals, and the SR1 marginals are then an independent morphology cross-check (LZ states the WS2024 method is identical to the SR1 one)."
+    default: factorized_contour_constrained
+    options:
+      factorized_contour_constrained:
+        label: "Factorized PDF constrained by WS2024 Fig. 3 contours"
+        description: "Build P(S1c, log10 S2c) = P(S1c)*P(log10 S2c) (the published construction) with the two marginals chosen to reproduce the digitized WS2024 Fig. 3 68%/95% quantile contours; normalize to the Table I count 2.8 +/- 0.6 events; cross-check morphology against the digitized SR1 Fig. 12 marginals."
+        insights: [lz_accidentals_factorized_pdf, lz_ws2024_fig3_accidentals_contours, lz_accidentals_pdf_marginals_fig12]
+      sr1_marginals_rescaled:
+        label: "SR1 Fig. 12 marginals rescaled to WS2024"
+        description: "Use the digitized SR1 marginal functions directly as the WS2024 factorized PDF's shape (they are the actual functions LZ used, but in the SR1 configuration: SR1 ROI, SR1 raw-S2 600-phd bound), rescaled to the WS2024 Table I count. Lower fidelity to the WS2024-specific distribution; kept as the fallback if the contour-constrained reconstruction cannot reproduce both contours."
+        insights: [lz_accidentals_pdf_marginals_fig12]
+
 inputs:
   - id: lz_nest_header_ws2024
     type: data
@@ -3010,6 +3068,26 @@ inputs:
     label: "LZ 2018 projected Det.+Sur.+Env. neutron NR spectrum"
     source: data/lz_neutron_spectrum_2018.csv
     description: "The 'Det. + Sur. + Env.' neutron NR recoil-energy spectrum digitized programmatically from the vector graphics of Fig. 5 of arXiv:1802.06039v2 (lz_sensitivity2018_paper) by src/digitize_neutron_spectrum.py: 98 contiguous bins tiling 0-100 keV (1 keV, a few 2 keV), rate in counts/kg/day/keV, axes calibrated from the major tick marks anchored to the decade labels (17.787 pt/decade; overlay-verified against the page raster). Used as the SHAPE input for the detector-neutron background component of background_components.all_table1: events are sampled in recoil energy and pushed through the NEST response — the S1c/S2c distributions in the 2018 paper are NOT used (different drift-field configuration). Normalization comes from the WS2024 Table I expected counts (lz_table1_counts_reference), not from this curve's absolute rate."
+  - id: lz_ws2024_paper
+    type: data
+    label: "LZ WS2024 search paper (in-project copy)"
+    source: data/lz_ws2024_paper.pdf
+    description: "arXiv:2410.17036v3 (Dark Matter Search Results from LUX-ZEPLIN, 4.2 tonne-years; in-project copy of the cached paper 10.48550/arXiv.2410.17036 v3, sha256 d358bffbaed7eaddd431f9b540790673d650f00d0964282a089a15c84b2f9544). Its Fig. 3 (page 7, insight lz_ws2024_fig3_accidentals_contours) overlays the 68% and 95% quantile contours of the best-fit accidental-coincidence distribution in (S1c, log10 S2c) — the only public WS2024-specific morphological constraint on the accidentals background; the source for lz_ws2024_accidentals_contours."
+  - id: lz_backgrounds_paper
+    type: data
+    label: "LZ backgrounds paper (in-project copy)"
+    source: data/lz_backgrounds_paper.pdf
+    description: "arXiv:2211.17120 (Background Determination for the LUX-ZEPLIN experiment; in-project copy of the cached paper 10.48550/arXiv.2211.17120, sha256 52223054fcdcb65c14787ec4c82c5a2685d222cfd189aa29bdbc230829c7c2e7). Its Section V F states the factorized construction of the accidentals PDF (insight lz_accidentals_factorized_pdf) and its Fig. 12 (page 21, insight lz_accidentals_pdf_marginals_fig12) publishes the SR1 accidentals PDF with the marginal functions used to build it; the source for lz_accidentals_marginals_sr1."
+  - id: lz_ws2024_accidentals_contours
+    type: data
+    label: "LZ WS2024 accidentals quantile contours (Fig. 3)"
+    source: data/lz_ws2024_accidentals_contours.csv
+    description: "The 68% and 95% quantile contours of the WS2024 best-fit accidental-coincidence distribution in (S1c, log10 S2c), digitized programmatically from the vector graphics of Fig. 3 (top panel, 'All Data') of arXiv:2410.17036v3 (lz_ws2024_paper) by src/digitize_accidentals_ws2024.py, axes calibrated from the tick labels (residuals < 0.3 phd / 0.01 dex; overlay-verified against the page raster). Contours are clipped at the ROI boundaries (S1c = 3 phd, the S2c lower bound) — the accidentals PDF lives inside the ROI. SHAPE constraint for the accidentals background component under decision accidentals_model.factorized_contour_constrained; normalization from the WS2024 Table I count (2.8 +/- 0.6 events, lz_table1_counts_reference)."
+  - id: lz_accidentals_marginals_sr1
+    type: data
+    label: "LZ SR1 accidentals-PDF marginal functions (Fig. 12)"
+    source: data/lz_accidentals_marginals_sr1.csv
+    description: "The SR1 accidentals-PDF marginal functions — the smoothed isolated-S1 and isolated-S2 distributions LZ took the outer product of (caption: 'The orange lines represent the functions that were used to build the two-dimensional PDF') — digitized programmatically from the embedded 2998x2173 raster of Fig. 12 of arXiv:2211.17120 (lz_backgrounds_paper) by src/digitize_accidentals_sr1.py: color segmentation of the orange curves, axes calibrated from the major tick marks. Values carry the plotted SR1 normalization (events/tonne/yr; SR1 ROI and cuts) and are used as SHAPE only — the morphology cross-check for the WS2024 accidentals reconstruction under decision accidentals_model.factorized_contour_constrained (LZ states the WS2024 method is identical to the SR1 one); the alternative option sr1_marginals_rescaled would use them directly, rescaled to the WS2024 Table I count."
 outputs:
   - id: response_model_calibration
     type: data

@@ -13,3 +13,4 @@ decisions:
   exposure_structure: combined_single
   detector_effects: uniform_1d
   calibration_er_spectrum: tritium_beta
+  accidentals_model: factorized_contour_constrained
