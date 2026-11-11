@@ -344,3 +344,62 @@ see the lightcone skill; never write into `results/` by hand.
     caption). Normalize the accidentals model to Table I 2.8 ± 0.6;
     SR1 marginals are SHAPE-only cross-check (SR1 ROI/600-phd raw-S2
     bound baked in).
+
+- **Validation 4 done (2026-11-11)** — `background_models` (rebuilt,
+  current) and `background_projection_validation` (figure + JSON
+  sidecar, current) materialized; **all six acceptance gates PASS**.
+  `src/validate_backgrounds.py` (declared input
+  `background_projection_script`, so edits cascade) + digitized
+  reference `data/lz_ws2024_fig4_projection.csv`
+  (`src/digitize_fig4_projection.py`, input `lz_ws2024_fig4_projection`).
+  - Projection: u = (log10 S2c − μER(S1c))/σER(S1c), μ/σ from the
+    `response_model_calibration` ER-band quantiles (validated bands);
+    two S1c panels (3–40, 40–80); 0.556-wide bins as in LZ's figure.
+    Category mapping: pb214 | other-ER-as-drawn = kr85+136Xe | xe124 |
+    xe127+125 | accidentals | b8(=8B+hep+atm+n) — see the omission
+    finding below.
+  - **Fig. 4 digitization finding**: LZ's drawn "Other ER betas"
+    outline holds ONLY kr85+136Xe — exact ratios prove it
+    (Total/214Pb = 1.628 = 1210/743; other/214Pb = 0.293 =
+    217.6/743). Solar-ν ER, 212Pb, and the tritium+14C calibration
+    sources (223 events, 18.4%) appear only in "Total Bkg". The
+    bottom-panel accidentals outline lies entirely below the 10⁻²
+    figure floor (absent from the CSV). Digitized from the WS2024
+    paper's vector graphics (pymupdf get_drawings, tick-calibrated,
+    positional negative-label check).
+  - **124Xe LL charge yield fixed — per-line q**: was 0.87 on both
+    lines; now LL (10.00 keV, BR 1.4%) q = **0.65** (Thomas-Imel box
+    model — the WS2024 paper's own model-derived lower prior bound,
+    motivated by the overlap of two L-shell cascades) and LM (5.98
+    keV, BR 0.8%) q = 0.87 (measured single-EC). NOT tuned to the
+    figure: the drawn pre-fit figure implies q ≈ 0.68–0.78 (mid-way
+    in LZ's published [0.65, 0.87] prior), which validates the
+    direction. `q_LL` is the natural knob for the background-variation
+    studies.
+  - Acceptance design (information-content-based, documented in the
+    script docstring): dex metrics only over bins with LZ drawn level
+    ≥ 1 event/bin (MAIN_FLOOR — below it the drawn line's ~0.02–0.05
+    dex thickness against the 10⁻² floor dominates and bins carry
+    ≤0.1% of the model each); the sub-floor region is gated instead in
+    ABSOLUTE counts on the total curve (|ours−LZ| ≤ 8 events ≈ 0.7%).
+    All-bins residuals still reported informationally. 124Xe is
+    evaluated at the best q within LZ's published prior via analytic
+    charge rescaling (Δlog10 S2c = log10(q/q_gen) on S1c>40 events).
+  - Results: total 1209.2 vs 1210±91; per-component exact (Table I);
+    panel totals 581.7 vs 582.7 (−0.2%) and 625.3 vs 593.9 (+5.3%,
+    both within the 20% gate); total-curve rms 0.131 dex (≤0.15);
+    pb214 0.166, other-ER-as-drawn 0.122, xe124 0.276 at pre-fit
+    q=0.65 / **0.052 at best q=0.78**, xe127 ~0.11 top-panel,
+    accidentals 0.29 (SR1-shape cross-check agrees); sub-floor tail
+    4.04 events (≤8).
+  - **Documented structural residuals** (both attributed, no tuning):
+    (1) pb214 sits ~0.5σ (0.036 dex) left of LZ's outline — spectrum/
+    response side; response and bands are validated, no principled
+    mechanism identified; (2) both pb214/total miss the deep
+    low-charge tail (|u| ≳ 3) — LZ's curves come from their full
+    position-dependent simulation; the uniform_1d limitation, same
+    attribution as the WS2024 NR mid-range width residual; escalation
+    universe `simplified_position` covers it. The full other-ER sum
+    (incl. solar/212Pb/tritium) sits +0.287 dex above the drawn
+    outline, exactly as expected from the omission finding.
+
