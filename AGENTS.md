@@ -308,3 +308,39 @@ see the lightcone skill; never write into `results/` by hand.
     usual 4–7%). Plausibly position-dependent broadening absent under
     uniform_1d — the anticipated escalation path to `simplified_position`.
 
+
+- **Detector-neutron + accidentals inputs done (2026-11-10, both from
+  public sources only — the user's internal LZ accidentals PDF is
+  off-limits by their explicit request)**:
+  - Detector neutrons: `data/lz_neutron_spectrum_2018.csv` — the pink
+    "Det. + Sur. + Env." step histogram of Fig. 5 of arXiv:1802.06039v2
+    (vector-extracted, tick-mark-calibrated, 98 bins 0-100 keV; SHAPE
+    only, normalized to Table I; sample in recoil energy, push through
+    the response — not the 2018 paper's S1c/S2c distributions).
+  - Accidentals decision `accidentals_model` (default
+    `factorized_contour_constrained`): LZ's construction is exactly
+    factorized — P(S1c, log10 S2c) = outer product of the smoothed S1/S2
+    marginals (arXiv:2211.17120 Sec. V F, verified quote) — so a
+    two-marginal reconstruction constrained by the WS2024 Fig. 3
+    68%/95% contours is well-posed. Fallback option
+    `sr1_marginals_rescaled`.
+  - `data/lz_ws2024_accidentals_contours.csv`
+    (`src/digitize_accidentals_ws2024.py`): Fig. 3 top panel ("All
+    Data") orange contours, vector-extracted; q68 S1c [3.03, 14.87] /
+    q95 S1c [3.00, 59.99]; both clipped at the ROI edges (S1c = 3, S2c
+    lower bound) — edge segments carry information, don't trim them.
+  - `data/lz_accidentals_marginals_sr1.csv`
+    (`src/digitize_accidentals_sr1.py`): Fig. 12 of arXiv:2211.17120
+    (embedded 2998x2173 raster, page index 20) orange marginal
+    functions, color-segmented. Raster gotchas: ticks point INWARD (x
+    majors in rows 1880-1918, y majors right of the left spine at col
+    ~305-308 — NOT col ~100, that region is the rotated axis label);
+    dark-purple heatmap cells and black scatter dots masquerade as tick
+    columns (snap x majors to the arithmetic grid; width filters don't
+    suffice); top strip's spines merge with its end ticks.
+  - Both papers now also in-project (sha256-pinned inputs
+    `lz_ws2024_paper`, `lz_backgrounds_paper`); 3 new verified insights
+    (factorization sentence, Fig. 12 orange-lines caption, Fig. 3
+    caption). Normalize the accidentals model to Table I 2.8 ± 0.6;
+    SR1 marginals are SHAPE-only cross-check (SR1 ROI/600-phd raw-S2
+    bound baked in).
