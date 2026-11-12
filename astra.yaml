@@ -3020,17 +3020,46 @@ decisions:
   halo_model:
     id: halo_model
     label: "Astrophysical (halo) model"
-    rationale: "Velocity distribution and parameters for the WIMP recoil spectrum. LZ uses the standard halo model parameterized per the community conventions paper (Baxter et al. 2021)."
+    rationale: "Velocity distribution and parameters for the WIMP recoil spectrum. The native pinned TestSpectra implementation provides an SHM at rho0=0.3 GeV/cm3, v0=238 km/s, vesc=544 km/s and V_SUN=250.2 km/s, with its own scalar Earth-speed expression; these are fixed conventions, not profiled parameters or a claim that NEST implements every vector-valued convention-paper detail. LZ's standard-halo choice and the conventions paper fix-parameters guidance motivate this non-default-modulation baseline; the exact code conventions are recorded in the WIMP adapter/provenance and artifacts."
     default: shm_standard
     options:
       shm_standard:
         label: "Standard halo model, canonical parameters"
-        description: "Isotropic Maxwell-Boltzmann with truncated escape velocity; parameters per the recommended conventions (Baxter et al. 2021)."
+        description: "The fixed isotropic Maxwell-Boltzmann/truncated-escape native NEST implementation: rho0=0.3 GeV/cm3, v0=238 km/s, vesc=544 km/s, V_SUN=250.2 km/s, and the documented scalar Earth-speed convention under wimp_time_treatment. Native Helm form factors and xenon-isotope selection stay unchanged; no halo parameter is profiled in the current construction."
         insights: [lz_halo_shm, shm_recommended_parameters, shm_rho0_0p3, shm_vesc_544, shm_v0_238, shm_earth_speed_29p8, shm_vpec_11_12_7, shm_fix_params_do_not_profile, report_results_under_nominal_halo]
       shm_with_variations:
         label: "SHM with parameter variations"
         description: "Explore halo-parameter uncertainty impact on sensitivity as an additional study axis."
         insights: [report_results_under_nominal_halo, halo_shape_variation_threshold_effect, shm_fix_params_do_not_profile]
+  wimp_time_treatment:
+    id: wimp_time_treatment
+    label: "Time convention for the non-modulating WIMP projection"
+    rationale: "NEST's native WIMP day parameter changes the scalar Earth speed and recoil rate; day=0 is a dated realization, not an annual average. This forward model does not perform a modulation analysis. The representative-day default removes the periodic term within NEST's 365.24-day convention and is checked against a direct annual mixture, through the complete response, at the 40 GeV/c2 checkpoint only."
+    default: representative_day
+    options:
+      representative_day:
+        label: "Representative day with zero periodic Earth-speed term"
+        description: "Use one native spectrum preparation at day = 365.24*(0.415-0.25) = 60.2646, giving the pinned scalar v_e = 250.2 km/s. Preserve its own native normalization. The 40 GeV/c2 direct 12-phase annual control is retained in the same archive; do not add phase-resolved production at other masses or claim an exact phase integration."
+        insights: [shm_recommended_parameters, report_results_under_nominal_halo]
+      annual_12phase:
+        label: "Direct twelve-phase annual mixture"
+        description: "Generate 12 equally weighted native phase midpoints separately, each with its own native preparation, normalization, native-support diagnostics and response stream. Used for the 40 GeV/c2 diagnostic, not as the representative-day approximation or for phase-resolved sensitivity production."
+        insights: [shm_recommended_parameters, report_results_under_nominal_halo]
+  wimp_native_support:
+    id: wimp_native_support
+    label: "High-recoil support of NEST's native WIMP preparation"
+    rationale: "The native WIMP preparation integrates 0-100 keVnr, but high WIMP masses have a non-negligible folded recoil tail beyond it. Dropping or rescaling that tail would change absolute yields. The extension samples NEST's own exposed WIMP_dRate density beyond the preparation support, adds the native tail integral, and records the unadded far-tail guard. This is numerical support accounting, not another recoil model."
+    default: native_drate_extension
+    options:
+      native_drate_extension:
+        label: "Sample native dRate above the prepared 0-100 keVnr integral"
+        description: "Use the native preparation on 0-100 keVnr and independently integrate WIMP_dRate on 0-100, 100-500 and the unadded 500-5000 keVnr guard. If the efficiency-folded 100-500 tail exceeds 1e-4 of the base folded rate, sample its stored piecewise-linear native-dRate density as a binomial mixture with native-grid samples, using event-dependent weights and a summed native integral; do not apply a final rate-correction factor. Require the far-tail folded guard below 1e-4, record failed numerical grid controls and isotope-sampling variation separately from event MC, and retain response extrapolation warnings. No recoil physics, halo parameter, form factor, isotope choice, or NEST response is changed."
+        insights: [lz_halo_shm, report_results_under_nominal_halo]
+      strict_native_truncation:
+        label: "Reject masses with non-negligible support outside native preparation"
+        description: "Use only the native 0-100 keVnr preparation, and mark a mass unsupported instead of sampling the omitted tail when its folded fraction exceeds 1e-4. Never silently normalize a truncated rate as if it were the full spectrum. This is a conservative non-default comparison option, not currently implemented in the production selector."
+        insights: [lz_halo_shm, report_results_under_nominal_halo]
+
   nest_parameter_set:
     id: nest_parameter_set
     label: "NEST version / detector parameter pinning"
@@ -3319,6 +3348,47 @@ inputs:
     label: "Background projection validator script"
     source: src/validate_backgrounds.py
     description: "The Validation 4 script (background_projection_validation), declared as an input so that changes to it cascade to the output: it implements the u-projection against the ER-band quantiles of response_model_calibration, the category mapping (including the as-drawn other-ER variant), the main-floor dex acceptance with the sub-floor absolute-count tail check, and the 124Xe charge-yield prior scan, so its exact behavior is part of what the output contains."
+  - id: wimp_native_adapter
+    type: data
+    label: "Native NEST WIMP spectrum adapter and support diagnostics"
+    source: src/wimp_native.py
+    description: "Checked access to native WIMP_dRate and one preparation's samples and normalization. Implements the representative-day convention, independent native-dRate quadrature, grid/isotope controls, native-tail sampling and event-dependent weights; it is not a second scattering model."
+  - id: wimp_signal_builder_script
+    type: data
+    label: "Absolute WS2024 WIMP model builder"
+    source: src/build_wimp_signal_models.py
+    description: "Builds exactly the 26 masses in lz_si_sensitivity_reference through pre-ROI selection, the unchanged WS2024 NEST response, one corrected-observable ROI and absolute native-rate normalization; archives full integer/weighted histograms, MC variances, event-energy stages, native support diagnostics and a 40 GeV/c2 direct annual control. Declared as an input so edits cascade."
+  - id: wimp_signal_validation_script
+    type: data
+    label: "40 GeV/c2 Fig.-4 validation and numerical metrics"
+    source: src/validate_wimp_signal.py
+    description: "Checks the full-grid and active-decision metadata, exact native reference and fixed observed-limit display semantic, full-ROI integer/weighted closures, and the representative-day constant-weight variance. Produces either one declared PNG or one declared JSON per invocation; PNG recipes never silently emit an undeclared numerical sidecar."
+  - id: wimp_signal_test_script
+    type: data
+    label: "WIMP normalization and full-selection focused tests"
+    source: src/test_wimp_signal.py
+    description: "Unit and small-response controls for the unchanged native sample stream, scalar timing, exact normalization, native-tail linear density and weights, selection-weight indexing, full-histogram/event reconciliation and reproducibility. Run through lc run local before production; it is a code input, not a separate materialized result."
+  - id: nestpy_wimp_connector_binding
+    type: data
+    label: "Binding-only exposure of NEST WIMP rate and preparation metadata"
+    source: vendor/nestpy/src/nestpy/spectra.cpp
+    description: "Local binding extension for the lock-pinned public nestpy 2.1.3 source at version 2.1.3+lz.wimp1. Exposes native WIMP_dRate, read-only integral/xMax/divisor, and one-preparation samples plus metadata. The native NEST scattering model, isotope/halo conventions, response and original sampler are not edited; same-seed equality is tested."
+  - id: nestpy_wimp_connector_patch
+    type: data
+    label: "Auditable WIMP connector patch"
+    source: vendor/NESTPY_WIMP_CONNECTOR.patch
+    description: "Recorded connector and local-version diff against upstream nestpy 2.1.3 with verified sdist SHA256 258155894377e24c02a763e8e58319e01fbd42f12aa7a8c960084848b1a84e84."
+  - id: nestpy_wimp_provenance
+    type: data
+    label: "Vendored NEST connector provenance"
+    source: vendor/NESTPY_PROVENANCE.md
+    description: "Upstream public nestpy source and license provenance, verified upstream archive hash, and the restricted scope of the local binding modifications. No internal LZ material is used."
+  - id: nestpy_local_package_definition
+    type: data
+    label: "Patched nestpy package definition"
+    source: vendor/nestpy/pyproject.toml
+    description: "The local versioned 2.1.3+lz.wimp1 package definition for the publicly pinned and hashed NEST source, used by the uv lockfile rather than an untracked installed state."
+
 outputs:
   - id: response_model_calibration
     type: data
@@ -3431,10 +3501,30 @@ outputs:
   - id: wimp_signal_models
     type: data
     format: hdf5
-    label: "WIMP signal models per mass"
-    description: "SI WIMP recoil spectra for the mass grid, drawn from the standard halo model (decision halo_model.shm_standard, parameters fixed not profiled). Under efficiency_treatment.input_pre_roi_curve, apply the pre-ROI Fig. 2 stage in recoil-energy space, propagate through NEST, then apply the explicit observable ROI once; one (S1c, log10 S2c) distribution per mass, normalized to unit cross section at the analysis exposure without a Table-I-style renormalization. The total efficiency already contains an ROI and must not precede a second explicit ROI."
-    inputs: [response_model_calibration, lz_efficiency_curve, lz_fig2_efficiency]
-    decisions: [halo_model, efficiency_treatment, exposure_structure, nest_parameter_set, detector_effects]
+    label: "Absolute WS2024 WIMP signal templates"
+    description: "Exactly the 26 published SI-reference mass rows propagated through the validated WS2024 chain: native NEST WIMP recoil sampling -> only the public Fig. 2 pre-ROI trigger+SS/data-analysis efficiency -> unchanged NEST NR response -> exactly one corrected-space ROI (3<S1c<80 phd, S2c>=493 phd, log10 S2c<4.5) -> absolute native yield at the native SI per-nucleon 1e-36 cm2 reference and 3.3 WS2024 tonne-years. No Table-I normalization, LZ-background/cross-section fit, published total ROI efficiency, raw-S2 re-cut, or WS2024 exposure scaling. This is the WS2024 component, not a 4.2/3.3-scaled combined exposure: a future 4.2-tonne-year model must add a separately validated 0.9-tonne-year WS2022 response, efficiency, ROI and component-specific backgrounds. Native SHM conventions are fixed (rho0=0.3 GeV/cm3, v0=238 km/s, vesc=544 km/s, V_SUN=250.2 km/s), not profiled. The representative-day scalar Earth-speed approximation and its directly generated 12-phase 40 GeV/c2 control are retained, not a phase-resolved analysis. Native >100 keVnr tail use and 500-5000 keVnr unadded guards are explicit per wimp_native_support; distant dRate evaluation can trigger NEST's AmBe end-point response warnings, stored as a limitation rather than hidden. Every mass retains full integer MC and physical-weight (S1c,log10S2c) histograms and variances, both full Fig.-4 projections, generation/selection/ROI energy records, source/patch provenance, native integration/grid/isotope metadata, and tail stages. Display samples are separately capped and preserved; they never determine absolute yield. A future PLR/FC stage consumes this archive; neither is implemented here."
+    inputs: [response_model_calibration, lz_nest_header_ws2024, lz_fig2_efficiency, lz_si_sensitivity_reference, lz_ws2024_fig4_projection, background_models_script, background_projection_script, wimp_native_adapter, wimp_signal_builder_script, wimp_signal_validation_script, wimp_signal_test_script, nestpy_wimp_connector_binding, nestpy_wimp_connector_patch, nestpy_wimp_provenance, nestpy_local_package_definition]
+    decisions: [response_model, halo_model, wimp_time_treatment, wimp_native_support, efficiency_treatment, exposure_structure, nest_parameter_set, detector_effects]
+    recipe:
+      command: "python src/build_wimp_signal_models.py --header {inputs.lz_nest_header_ws2024} --efficiency {inputs.lz_fig2_efficiency} --response {inputs.response_model_calibration} --sensitivity {inputs.lz_si_sensitivity_reference} --fig4-reference {inputs.lz_ws2024_fig4_projection} --output {output} --annual-comparison --response-model {decisions.response_model} --time-mode {decisions.wimp_time_treatment} --support-treatment {decisions.wimp_native_support} --efficiency-treatment {decisions.efficiency_treatment} --exposure-structure {decisions.exposure_structure} --nest-parameter-set {decisions.nest_parameter_set} --detector-effects {decisions.detector_effects} --halo-model {decisions.halo_model}"
+  - id: wimp_fig4_validation
+    type: figure
+    format: png
+    label: "WIMP checkpoint: absolute 40 GeV/c2 yield vs LZ Fig. 4"
+    description: "Two-panel Fig.-4-style comparison at 40 GeV/c2 in the validated WS2024 configuration at 3.3 tonne-years. The native absolute model is multiplied ONLY by 2.1816833824484827e-48 / 1e-36, reading the exact tabulated observed power-constrained SI limit from lz_si_sensitivity_reference; median 5.0587223537493065e-48 is explicitly rejected for this display. This is the requested display convention, not a refit, a power-constraint calculation, a claim to rediscover LZ's drawn amplitude, or permission to tune the model. Show the sparse purple LZ reference, absolute this-work line and model-only finite-MC uncertainty band, with model-minus-LZ residual panels. The existing reference has 8 top and 3 bottom above-floor rows; clipped entries remain missing, never zero. Report comparable-bin model/LZ sums and signed residuals, peak displacement, all-grid and reference-absent model weight separately in wimp_fig4_validation_metrics; no background one-event/bin dex-RMS gate or LZ background-band uncertainty is applied to the WIMP. This is a descriptive go/no-go checkpoint: any unresolved normalization/shape problem must be reported, not tuned or hidden."
+    inputs: [wimp_signal_models, response_model_calibration, lz_si_sensitivity_reference, lz_ws2024_fig4_projection, background_projection_script, wimp_signal_validation_script]
+    decisions: [response_model, halo_model, wimp_time_treatment, wimp_native_support, efficiency_treatment, exposure_structure, nest_parameter_set, detector_effects]
+    recipe:
+      command: "python src/validate_wimp_signal.py --models {inputs.wimp_signal_models} --response {inputs.response_model_calibration} --fig4-reference {inputs.lz_ws2024_fig4_projection} --sensitivity {inputs.lz_si_sensitivity_reference} --output {output} --require-full-grid --response-model {decisions.response_model} --time-mode {decisions.wimp_time_treatment} --support-treatment {decisions.wimp_native_support} --efficiency-treatment {decisions.efficiency_treatment} --exposure-structure {decisions.exposure_structure} --nest-parameter-set {decisions.nest_parameter_set} --detector-effects {decisions.detector_effects} --halo-model {decisions.halo_model}"
+  - id: wimp_fig4_validation_metrics
+    type: data
+    format: json
+    label: "Numerical 40 GeV/c2 Fig.-4 validation"
+    description: "Separately declared one-file JSON companion to wimp_fig4_validation (not a silent PNG sidecar). Records the exact native reference/display limits, native rate, absolute full-ROI and displayed yields, MC precision and direct/acceptance yield closures, complete per-bin model/LZ/residual arrays, comparable-bin signed sums, reference-absent model weights, peak displacement, full integer-grid/ER-band dependency checks, active-decision checks and the 40 GeV/c2 representative-vs-annual response diagnostic. Reference-limited diagnostics and missing-reference handling are explicit; no artificial acceptance improvement target is introduced."
+    inputs: [wimp_signal_models, response_model_calibration, lz_si_sensitivity_reference, lz_ws2024_fig4_projection, background_projection_script, wimp_signal_validation_script]
+    decisions: [response_model, halo_model, wimp_time_treatment, wimp_native_support, efficiency_treatment, exposure_structure, nest_parameter_set, detector_effects]
+    recipe:
+      command: "python src/validate_wimp_signal.py --models {inputs.wimp_signal_models} --response {inputs.response_model_calibration} --fig4-reference {inputs.lz_ws2024_fig4_projection} --sensitivity {inputs.lz_si_sensitivity_reference} --output {output} --require-full-grid --response-model {decisions.response_model} --time-mode {decisions.wimp_time_treatment} --support-treatment {decisions.wimp_native_support} --efficiency-treatment {decisions.efficiency_treatment} --exposure-structure {decisions.exposure_structure} --nest-parameter-set {decisions.nest_parameter_set} --detector-effects {decisions.detector_effects} --halo-model {decisions.halo_model}"
   - id: plr_sensitivity_curve
     type: table
     format: csv

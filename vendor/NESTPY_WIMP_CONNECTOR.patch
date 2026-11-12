@@ -1,0 +1,96 @@
+--- a/nestpy/src/nestpy/spectra.cpp
++++ b/nestpy/src/nestpy/spectra.cpp
+@@ -29,7 +29,7 @@
+ // Function to vectorise WIMP sampling
+ py::array_t<double> fill_spectra(
+ 	int number,
+-	double mass, 
++	double mass,
+ 	double eStep,
+ 	double day
+ ){
+@@ -39,6 +39,29 @@
+ 	return py::array_t<double>(vec.size(), vec.data());
+ }
+ 
++// Expose samples and their matching native preparation metadata. The NEST
++// spectrum, reference cross-section, RNG, and normalization are unchanged.
++py::dict fill_wimp_with_metadata(int number, double mass, double eStep, double day) {
++	if (number < 0) {
++		throw py::value_error("number must be non-negative");
++	}
++	auto ws = TestSpectra::WIMP_prep_spectrum(mass, eStep, day);
++	py::array_t<double> samples(number);
++	auto out = samples.mutable_unchecked<1>();
++	for (int i = 0; i < number; ++i) {
++		out(i) = TestSpectra::WIMP_spectrum(ws, mass, day);
++	}
++	return py::dict(
++		"samples"_a = samples,
++		"integral"_a = ws.integral,
++		"xMax"_a = ws.xMax,
++		"divisor"_a = ws.divisor,
++		"mass"_a = mass,
++		"eStep"_a = eStep,
++		"day"_a = day
++	);
++}
++
+ // Function to vectorise b8 sampling
+ py::array_t<double>fill_spectra(
+ 	int number,
+@@ -82,7 +105,10 @@
+ 
+ 	// Binding for the WIMP Spectrum Prep struct
+ 	py::class_<TestSpectra::WIMP_spectrum_prep>(m_spectra, "WIMP_spectrum_prep", py::dynamic_attr())
+-		.def(py::init<>());
++		.def(py::init<>())
++		.def_readonly("integral", &TestSpectra::WIMP_spectrum_prep::integral)
++		.def_readonly("xMax", &TestSpectra::WIMP_spectrum_prep::xMax)
++		.def_readonly("divisor", &TestSpectra::WIMP_spectrum_prep::divisor);
+ 
+ 	m_spectra.def("CH3T_spectrum", 
+ 		&TestSpectra::CH3T_spectrum, 
+@@ -131,7 +157,13 @@
+ 		py::arg("xMin") = 0.,
+ 		py::arg("xMax") = 85.
+ 	);
+-	m_spectra.def("WIMP_prep_spectrum", 
++	m_spectra.def("WIMP_dRate",
++		&TestSpectra::WIMP_dRate,
++		py::arg("ER"),
++		py::arg("mWimp") = 50.,
++		py::arg("day") = 0.
++	);
++	m_spectra.def("WIMP_prep_spectrum",
+ 		&TestSpectra::WIMP_prep_spectrum,
+ 		py::arg("mass") = 50.,
+ 		py::arg("eStep") = 5.,
+@@ -208,8 +240,15 @@
+ 		py::arg("eStep") = 5.,
+ 		py::arg("day")=0.
+ 	);
++	m_spectra.def("WIMP_with_metadata",
++		&fill_wimp_with_metadata,
++		py::arg("number"),
++		py::arg("mass"),
++		py::arg("eStep") = 5.,
++		py::arg("day") = 0.
++	);
+ 	m_spectra.def("WIMP",
+-		[](int number, double mass, double eStep, double day){return fill_spectra(number, mass, eStep, day);},  
++		[](int number, double mass, double eStep, double day){return fill_spectra(number, mass, eStep, day);},
+ 		py::arg("number"),
+ 		py::arg("mass"),
+ 		py::arg("eStep") = 5.,
+--- a/nestpy/pyproject.toml
++++ b/nestpy/pyproject.toml
+@@ -7,7 +7,7 @@
+ 
+ [project]
+ name = "nestpy"
+-version = "2.1.3"
++version = "2.1.3+lz.wimp1"
+ description = "Python bindings for the NEST noble element simulation"
+ authors = [
+     {name = "Sam Eriksen", email = "sam.eriksen@bristol.ac.uk"},

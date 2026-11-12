@@ -7,6 +7,8 @@ decisions:
   er_efficiency_treatment: staged_conditional
   response_model: nest_library
   halo_model: shm_standard
+  wimp_time_treatment: representative_day
+  wimp_native_support: native_drate_extension
   nest_parameter_set: ws2024_nest240
   test_statistic_sidedness: two_sided
   power_constraint: applied_1sigma

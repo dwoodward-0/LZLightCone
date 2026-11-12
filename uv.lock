@@ -601,7 +601,7 @@ dependencies = [
 requires-dist = [
     { name = "h5py", specifier = ">=3.16.0" },
     { name = "matplotlib", specifier = ">=3.11.2" },
-    { name = "nestpy", specifier = ">=2.1.3" },
+    { name = "nestpy", directory = "vendor/nestpy" },
     { name = "numpy", specifier = ">=2.4.6" },
     { name = "pymupdf", specifier = ">=2.1" },
 ]
@@ -681,22 +681,20 @@ wheels = [
 
 [[package]]
 name = "nestpy"
-version = "2.1.3"
-source = { registry = "https://pypi.org/simple" }
+version = "2.1.3+lz.wimp1"
+source = { directory = "vendor/nestpy" }
 dependencies = [
     { name = "awkward" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pandas" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4c/ed/e3b0465c42efee32946d08e632cb2c42693215d8189900c40c3daa4621aa/nestpy-2.1.3.tar.gz", hash = "sha256:258155894377e24c02a763e8e58319e01fbd42f12aa7a8c960084848b1a84e84", size = 1006379, upload-time = "2026-10-07T13:47:56.11Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/0e/b1/9f3a0c7f05c4061334c6ceae2c8adcb152a4a2b020c1a5bc1d15648b49b0/nestpy-2.1.3-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:48878b763a6f1aafdd2c61e63f40747e898eedf09e51c0094646ba56d1f31cca", size = 363439, upload-time = "2026-10-07T13:47:44.575Z" },
-    { url = "https://files.pythonhosted.org/packages/e2/62/e49ccf8b3e9f0502e4152dbf91b11296199581d7ed02c1c6cfc1baf124f1/nestpy-2.1.3-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:61799047607d6722b933884d871bbbff340aa3b9c7f77ccebe1fa7a8ce7ea765", size = 468200, upload-time = "2026-10-07T13:47:45.753Z" },
-    { url = "https://files.pythonhosted.org/packages/26/3a/27887ff252f8fc2f54f44da4e77e07951e4fe7bddc53e7bdbb71ece21c38/nestpy-2.1.3-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:70ca78b63d2b9b29fb905768ef11175e3bfd8dbbcfa3c0238ce64dc1773b0161", size = 1520921, upload-time = "2026-10-07T13:47:47.037Z" },
-    { url = "https://files.pythonhosted.org/packages/d7/00/50602d795841a26e31835145de5f05cae98863085b4e65e73e7cdcc41112/nestpy-2.1.3-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:e6c604cef3522294c74ec24b51216e07c64b1e56d11eb5fe464d49dc04e20b44", size = 364990, upload-time = "2026-10-07T13:47:48.259Z" },
-    { url = "https://files.pythonhosted.org/packages/d3/89/fb0a4c3eee9c18a74009fe1d9fcc317167f0ce3000cad5d2bdabf3b59ad1/nestpy-2.1.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c569c7685bc4f1bfe42709ca1a5f40429bb83ef2d12a7055f07a085c8c54a398", size = 468405, upload-time = "2026-10-07T13:47:49.464Z" },
-    { url = "https://files.pythonhosted.org/packages/04/15/f7b3558d467c9ce9d76c3ab4a8b4f2ba843392868570faf2b15fb09cbd53/nestpy-2.1.3-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:8947ddf533c3a1c67d626d1c52fbb734756c498a872e05333932762df95facd8", size = 1523038, upload-time = "2026-10-07T13:47:50.899Z" },
+
+[package.metadata]
+requires-dist = [
+    { name = "awkward" },
+    { name = "numpy" },
+    { name = "pandas" },
 ]
 
 [[package]]

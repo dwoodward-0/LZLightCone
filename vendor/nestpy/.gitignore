@@ -1,0 +1,13 @@
+build/*
+dist/*
+.DS_store
+.idea/*
+nestpy/.DS_Store
+nestpy/nestpy.egg-info/
+src/nestpy/__pycache__/
+src/nestpy.egg-info
+nestpy/nestpy.cpython-38-darwin.so
+tests/__pycache__/
+venv/
+*.png
+*.so
