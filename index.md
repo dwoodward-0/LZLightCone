@@ -57,3 +57,51 @@ effect of the efficiency change.
 :::{astra} outputs.nr_efficiency_validation
 :caption: Matched NR efficiency comparison. Shape differences conditional on the ROI are not changes to the imposed physical rates.
 :::
+
+## Staged ER efficiency
+
+Electron-recoil selection follows the public cumulative stages of
+{astra}`inputs.lz_er_efficiency_paper` rather than treating the published
+total efficiency as another independent weight. The active choice is
+{astra:value}`decisions.er_efficiency_treatment`.
+
+For each sampled true recoil energy, the public trigger curve B(E) is applied
+before NEST. NEST's own threefold coincidence and the explicit S1c > 3 phd
+selection follow. Events that pass S1 then receive one conditional
+single-scatter/data-analysis acceptance C(E) = G(E)/Y(E), evaluated at the
+retained sampled true energy. Y(E) is the cumulative trigger, coincidence,
+and lower-S1 efficiency. G(E) is supplied by the public total-1D HEPData
+curve through 15 keV, where the user identified its overlap with the green
+SS/data-analysis curve; above 15 keV, G(E) is held at G(15) = 0.959. This is
+an input convention based on that visual identification, not a separately
+fitted green curve.
+
+B, Y, and G are **not** multiplied as three independent efficiencies. The
+only energy-space selections are B and the one conditional G/Y rejection.
+The remaining corrected-observable ROI is S1c < 80 phd, S2c >= 493 phd,
+and log10(S2c) < 4.5, applied exactly once. There is no additional raw-S2
+cut, threefold coincidence, 1D-analysis energy cut, or total-efficiency
+factor. NEST does not reconstruct or unfold the true energy used by this
+selection.
+
+This construction is an energy-dependent average acceptance. It does not
+recover the unpublished dependence of reconstruction and quality cuts on
+S1c, S2c, position, or their correlations; that limitation also applies to
+the NR energy-space treatment. Table I still fixes each background's central
+physical mean after selection. Monte Carlo multiplicities, effective sample
+sizes, and observable shapes are simulation outputs, not changes to those
+physical rates. Accidentals remain an observable-space model and never pass
+through this ER energy chain.
+
+{astra}`outputs.er_efficiency_comparison` archives complete old/new
+regeneration of all twelve sources at matched budgets, all eight ER energy-
+space source shapes, exact NR/accidentals controls, and both evaluations of
+the six unchanged Validation 4 gates. Cumulative-Y and the independent
+HEPData total-2D curve are forward diagnostics only: neither is multiplied
+into the production selection. Residual disagreement is retained rather than
+fitted away, with central-curve extraction and finite-MC precision stated
+separately.
+
+:::{astra} outputs.er_efficiency_validation
+:caption: Complete staged ER selection comparison. The conditional G/Y stage uses retained sampled true energy. Unit-shape differences and Monte Carlo multiplicities are distinct from the unchanged Table-I physical means; the independent total-2D curve is never another selection factor.
+:::
