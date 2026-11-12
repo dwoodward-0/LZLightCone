@@ -5,15 +5,15 @@
   "recipe": "python src/plot_nr_efficiency.py --input results/baseline/nr_efficiency_comparison.hdf5 --efficiency-treatment input_pre_roi_curve --output results/baseline/nr_efficiency_validation.png",
   "definition_version": "sha256:389756c462080eee93874e3054b58a3c31174ea330dd9c9aa350eec82722e612",
   "env_version": "sha256:7c0beb4a6c9729006f13b818e2a5e8b79be88f5d4c846bda140894a4c315a3a4",
-  "data_version": "sha256:1c44234c9103daf2815976370e0176f172e3d2e94dc6a01a976137d47ae12648",
+  "data_version": "sha256:8384dfc7509811ccee8eeed92279e373ad1c959a18a8e81908d1d93f1a192c42",
   "decisions": {
     "efficiency_treatment": "input_pre_roi_curve"
   },
   "input_versions": {
-    "nr_efficiency_comparison": "sha256:a478fa10575bceadbd79adbbc3c68bfa76a106ee029d090077ce073840b24815",
+    "nr_efficiency_comparison": "sha256:12fd15e5ce3826029f4228a01e5c67076808c374bfa632dd9e9c41a698f29c06",
     "nr_efficiency_plot_script": "sha256:152df1f859cc9e10d799f369783817140e0797dcb3db1ac5b8f394044a99f8f8"
   },
-  "git_sha": "f2e2f66067a7b195e40a76cab0d3374e88572d8f",
+  "git_sha": "454688e5c0bd04236b8ef58db135c128ca94c035",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -23,8 +23,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-12T17:35:24.167+00:00",
-  "finished_at": "2026-11-12T17:35:26.019+00:00",
+  "started_at": "2026-11-12T19:49:50.590+00:00",
+  "finished_at": "2026-11-12T19:49:52.502+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
