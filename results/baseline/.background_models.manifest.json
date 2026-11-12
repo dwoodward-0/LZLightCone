@@ -2,28 +2,30 @@
   "schema_version": 1,
   "output_id": "background_models",
   "universe_id": "baseline",
-  "recipe": "python src/build_background_models.py --output results/baseline/background_models.hdf5 --spectra data/lz2018_component_spectra.csv --neutron-spectrum data/lz_neutron_spectrum_2018.csv --efficiency data/lz_ws2024_efficiency.csv --table1 data/lz_ws2024_table1_counts.csv --contours data/lz_ws2024_accidentals_contours.csv --sr1-marginals data/lz_accidentals_marginals_sr1.csv --nest-header data/lz_ws2024_nest_header.hh --background-components all_table1 --exposure-structure combined_single --nest-parameter-set ws2024_nest240 --detector-effects uniform_1d --accidentals-model factorized_contour_constrained",
-  "definition_version": "sha256:ad017c708fce45188a9e8959783ad68f198742a3f58471461bd6248d629bd6b0",
+  "recipe": "python src/build_background_models.py --output results/baseline/background_models.hdf5 --spectra data/lz2018_component_spectra.csv --neutron-spectrum data/lz_neutron_spectrum_2018.csv --efficiency data/lz_ws2024_efficiency.csv --fig2-efficiency data/lz_ws2024_fig2_efficiency.csv --efficiency-treatment input_pre_roi_curve --table1 data/lz_ws2024_table1_counts.csv --contours data/lz_ws2024_accidentals_contours.csv --sr1-marginals data/lz_accidentals_marginals_sr1.csv --nest-header data/lz_ws2024_nest_header.hh --background-components all_table1 --exposure-structure combined_single --nest-parameter-set ws2024_nest240 --detector-effects uniform_1d --accidentals-model factorized_contour_constrained",
+  "definition_version": "sha256:44734daf40b1e2c4da918726c55693e92aea71f787f738f85801cfa05fe8a920",
   "env_version": "sha256:7c0beb4a6c9729006f13b818e2a5e8b79be88f5d4c846bda140894a4c315a3a4",
-  "data_version": "sha256:25e2e72823a0e9bee6ff924ae52d412d79598d859ccdb1df5962d0f4efb4e9ff",
+  "data_version": "sha256:169434c149c0f3784fea6b2447169d0363a33405409bc23b1fb5dab283402082",
   "decisions": {
     "background_components": "all_table1",
     "exposure_structure": "combined_single",
     "nest_parameter_set": "ws2024_nest240",
     "detector_effects": "uniform_1d",
-    "accidentals_model": "factorized_contour_constrained"
+    "accidentals_model": "factorized_contour_constrained",
+    "efficiency_treatment": "input_pre_roi_curve"
   },
   "input_versions": {
     "lz_nest_header_ws2024": "sha256:4c5ded34d69646dfc8842b2c07f796e89f4fb218565ae11b32c1c608f233e9ce",
     "lz_efficiency_curve": "sha256:5f007b20449756e68d2afc4cf3e5c93be1373f7ddd985f50fee873afbd1a2b3e",
+    "lz_fig2_efficiency": "sha256:3fe8d85a2f79ad9e4f88bee90689f4e0c84a86c489230e2daaf2d78efb481e34",
     "lz_table1_counts_reference": "sha256:7f9eaab6ccdc934f8f6d1101125db59a0e499922939ed96f745b0b3959371510",
     "lz2018_component_spectra": "sha256:f19abdd7ff8287cb1d4c3dea384f07683ad5a09a7c07bb05a97f7ccdd36f3fe1",
     "lz_neutron_spectrum_2018": "sha256:aff84e2122008ca603d108d1589e959b177b8a4545b1dbb706f8aec79f13ebf1",
     "lz_ws2024_accidentals_contours": "sha256:8d7af8c07c18a6f42fb42e7fe8a971d8a0a48f3c6089df8fa3264ea0597501be",
     "lz_accidentals_marginals_sr1": "sha256:d676f725b34894081a93513473d1823679dd7d84406451b69b71a70e7f6c394d",
-    "background_models_script": "sha256:e042d05b39257953d2b1a14f3703a18af51db4e025a7fbc4de40b574790b5109"
+    "background_models_script": "sha256:c04f7af920b497135c8070098c52f595a0b83c10a9ad00485512b4874ffd0c87"
   },
-  "git_sha": "3c36db4d557dd0b53e1bae5334a8101665ae3538",
+  "git_sha": "baa24e6a6692d11c3c271904457a34d6bec8fe20",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -33,8 +35,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-11T18:35:22.345+00:00",
-  "finished_at": "2026-11-11T18:35:33.309+00:00",
+  "started_at": "2026-11-12T17:34:04.063+00:00",
+  "finished_at": "2026-11-12T17:34:15.417+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
