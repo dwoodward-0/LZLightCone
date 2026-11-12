@@ -70,8 +70,8 @@ before NEST. NEST's own threefold coincidence and the explicit S1c > 3 phd
 selection follow. Events that pass S1 then receive one conditional
 single-scatter/data-analysis acceptance C(E) = G(E)/Y(E), evaluated at the
 retained sampled true energy. Y(E) is the cumulative trigger, coincidence,
-and lower-S1 efficiency. G(E) is supplied by the public total-1D HEPData
-curve through 15 keV, where the user identified its overlap with the green
+and lower-S1 efficiency. G(E) is supplied by the public 1D-ROI HEPData
+curve t3 through 15 keV, where the user identified its overlap with the green
 SS/data-analysis curve; above 15 keV, G(E) is held at G(15) = 0.959. This is
 an input convention based on that visual identification, not a separately
 fitted green curve.
@@ -101,6 +101,17 @@ HEPData total-2D curve are forward diagnostics only: neither is multiplied
 into the production selection. Residual disagreement is retained rather than
 fitted away, with central-curve extraction and finite-MC precision stated
 separately.
+
+At full production budgets, the active model and both matched comparison
+modes pass the same six gates. The active-model reproduction, full/display
+normalization, and NR/accidental controls pass as well. Measured stage
+acceptances and shape changes are recorded in
+{astra}`findings.er_staged_source_acceptances_and_shapes`; the independent
+forward-check and summed-background results are in
+{astra}`findings.er_efficiency_forward_and_validation4`. Residual differences
+from cumulative Y and independent total-2D t4 remain diagnostics of the
+central-curve, energy-conditional approximation, not additional production
+weights.
 
 :::{astra} outputs.er_efficiency_validation
 :caption: Complete staged ER selection comparison. The conditional G/Y stage uses retained sampled true energy. Unit-shape differences and Monte Carlo multiplicities are distinct from the unchanged Table-I physical means; the independent total-2D curve is never another selection factor.

@@ -452,36 +452,42 @@ see the lightcone skill; never write into `results/` by hand.
     intentional `efficiency_treatment` label. Same seeds are NOT exact
     common random numbers after different rejection streams change later
     RNG draws. No acceptance gate requires Fig. 4 agreement to improve.
-  - Pre-efficiency acceptances legacy -> corrected: atm 0.630742 ->
-    0.695083, B8+hep 0.000560 -> 0.00654333, detector neutrons 0.473200 ->
-    0.564925. Conditional post-NEST ROI: 0.934918 -> 0.884810, 0.175595 ->
-    0.0213958, 0.924345 -> 0.816451. Full-ROI MC counts atm 70763 -> 73802,
-    B8+hep 59 -> 84, detector 52488 -> 55348. These are MC acceptances and
-    shape controls, NOT physical-rate changes. Detector-neutron mean is zero
-    so compare its unit-area full-count shapes. No energetic NR out-of-
-    support event survives the ROI; retained-ROI B8 energies have support.
+  - Final pre-efficiency acceptances legacy -> corrected (after the
+    independent per-source seeding introduced with the ER work): atm
+    0.632017 -> 0.696642, B8+hep 0.000475 -> 0.00657833, detector neutrons
+    0.474750 -> 0.567192. Conditional post-NEST ROI: 0.935392 -> 0.884960,
+    0.178947 -> 0.0164682, 0.926821 -> 0.818918. Full-ROI MC counts atm
+    70942 -> 73980, B8+hep 51 -> 65, detector 52801 -> 55738. These are
+    simulation acceptances/shapes, NOT physical-rate changes.
+    Detector-neutron mean is zero so compare its unit-area full-count
+    shapes. Efficiencies are interpolated with held endpoints; 1/55738 ROI
+    detector-neutron events is beyond the sampled efficiency support, and
+    none of the B8 ROI events is. Full support counts are archived.
   - B8 efficiency-folded spectral-integral fraction 0.887715578 ->
     0.984966985. Use the same selected efficiency in the isotope integrals
     and in rejection. The parent remains exactly 0.06 physical events; its
     isotope ratio is not separately normalized as a physical measurement.
-    Independent fivefold B8+hep control, seed 1000047, gives 323 legacy and
-    370 corrected ROI events (from 1676/19379 pre-selections); no events in
+    Independent fivefold B8+hep control, seed 1000047, gives 304 legacy and
+    368 corrected ROI events (from 1631/19690 pre-selections); no events in
     the 40-80 phd panel. Fivefold max unit-area differences (per-mode
-    multinomial sigma, no ratios/z for zero-variance bins): S1c 0.087298
-    (2.74 sigma), log10 S2c 0.362296 (10.28), u 0.078286 (3.92). Base B8 u
-    max 0.160815 (2.69) is sparse-MC-sensitive. Atm top S1c/log10-S2c/u
-    maxima 0.011432/0.011537/0.008831 (7.92/9.73/4.81 sigma); detector
-    neutron u max 0.008101 (4.46). Persist even those that move negligibly
-    in the physical summed background.
+    multinomial sigma at the max-difference bin, no ratios/z for
+    zero-variance bins): S1c 0.082809 (2.43 sigma), log10 S2c 0.268164
+    (7.19), u 0.090818 (4.14). Base B8 max S1c/log10-S2c/u differences
+    0.052790/0.335143/0.141478 (0.63/3.80/2.66 sigma). Atm top same
+    order maxima 0.009738/0.011862/0.004572 (4.17/5.25/3.53 sigma);
+    detector neutron top same order 0.015294/0.013851/0.010180
+    (5.74/5.41/4.62). Persist even those that move negligibly in the
+    physical summed background.
   - With exclusive totals both modes PASS all six Validation 4 gates:
-    total RMS 0.129199943 -> 0.129337987 dex (change +0.000138044),
-    sub-floor 3.960610966 -> 3.960276576 events; physical total always
-    1209.2. NB: previous 0.131-RMS values double-counted
+    total RMS 0.122200319 -> 0.122200262 dex (change -0.000057305),
+    sub-floor 3.214814535 -> 3.216575128 events; physical total always
+    1209.2. Both NR modes share staged ER efficiency in this final
+    comparison. NB: previous 0.131-RMS values double-counted
     `other_er_as_drawn` in `total_srcs`; that auxiliary outline is never a
     physical contributor. Six explicit exclusive categories cover the 12
-    sources exactly once. Apart from these NR and bookkeeping corrections,
-    earlier 214Pb/ER/124Xe residual findings stand; no improvement is
-    claimed from the negligible total-shape change.
+    sources exactly once. Earlier 214Pb/ER/124Xe residual findings need
+    comparison in the current staged-ER realization. No improvement is
+    claimed from the negligible NR total-shape change.
   - Bookkeeping gotchas fixed: generic NR sources now use `n_nr`, not
     `n_er`; full histogram lower edge is log10(493), not 2.69 (the latter
     silently clips valid ROI events); `weight` is the 50000-capped DISPLAY
@@ -492,4 +498,92 @@ see the lightcone skill; never write into `results/` by hand.
     printed finite-residual filter. `nr_efficiency_validation` reads the
     HDF5 comparison, with independent fivefold B8 difference shown
     separately; light/dark palettes and both renders inspected.
+
+- **Staged conditional ER efficiency correction (2026-11-12)** — default
+  `er_efficiency_treatment.staged_conditional`. All six dependent declared
+  outputs materialized at full budgets (backgrounds, its Fig.-4 validation,
+  both NR and ER comparisons/figures) and are `current`; response calibration
+  is merely `behind` due to an environment change. **Both complete ER modes
+  pass all six unchanged Validation-4 gates.**
+  - Production order: sampled true ER E -> public blue trigger B(E) -> NEST,
+    INCLUDING its existing threefold coincidence (`coinLevel=3`) -> explicit
+    S1c > 3 phd -> ONE conditional SS/data-analysis acceptance G(E)/Y(E) at
+    the retained true E -> remaining ROI S1c < 80, S2c >= 493 phd,
+    log10(S2c) < 4.5 -> Table I normalization. Do NOT multiply cumulative
+    B, Y, and G as independent factors. Do NOT apply independent HEPData
+    total-2D t4 as another weight. No duplicate coincidence/lower-S1
+    efficiency, raw S2 > 645 cut, Erec < 20 keV cut, or published total
+    efficiency enters. Failed native NEST coincidence is removed by the
+    explicit S1c selection, not by another energy-space coincidence factor.
+  - Definitions: Y = cumulative trigger + coincidence + lower-S1 efficiency;
+    G = cumulative trigger + S1 + SS/data-analysis; conditional C = G/Y.
+    There is no unfolding of true E from NEST S1c/S2c. This is an average
+    energy-conditional cut model, not the unpublished full dependence on
+    S1c/S2c/position; the same limitation applies to NR. Observable-space
+    accidentals never enter this ER chain.
+  - Public inputs: SHA-pinned `data/lz_er_efficiency_paper.pdf`
+    (arXiv:2511.17350v1, Fig. 1 bottom/WS2024) digitized by
+    `src/digitize_er_efficiency.py`; HEPData record 181350 t3/t4 prepared by
+    `src/prepare_er_hepdata.py` (no dependent-variable covariance recovered;
+    YAML SHA256 digests recorded). The USER visually confirmed green/black overlap
+    through 15 keV, so t3 supplies G there; hold G(E>15) = G(15) = 0.959,
+    deliberately NOT inheriting t4's high-energy total-ROI decline. This is a
+    declared user-identified input convention, not a digitized green curve.
+    Guard `ORDERING_TOLERANCE = 0.01`; measured max(G-Y) = 0 and
+    max raw G/Y = 0.969102236, no conditional clipping. Keep
+    `legacy_no_energy_efficiency` solely as the matched old-mode comparison.
+  - Production budgets n_ER 40000, n_NR 120000, n_B8 600000, seed 44.
+    Per-source streams are `seed + 1000003*(source_index+1)`, giving exact
+    unaffected NR/accidentals controls but NOT event-level common random
+    numbers after rejection differs. All 8 ER sources have zero Y < 0.01
+    events after S1. Legacy->staged full-ROI counts are 214Pb 2115->2034;
+    Kr85/Ar39/detector gamma 2115->1980; solar ER 3147->2970;
+    212Pb/218Po 2548->2413; 3H/14C 32012->30342; 136Xe 141->145;
+    124Xe 38881->37105; 127Xe/125Xe 40000->37705. All full ROI ESS equals
+    those counts (no ER display cap is reached). These are simulation
+    multiplicities: every Table-I physical mean stays EXACTLY fixed.
+  - Exact staged acceptances B | native-S1 given B | conditional G/Y given
+    S1 | remaining ROI given G/Y: 214Pb 0.999475|0.994822|0.958212|0.053372;
+    Kr85+Ar39+gamma 0.999550|0.994748|0.960600|0.051826; solar ER
+    0.999100|0.991968|0.957067|0.078279; 212Pb/218Po
+    0.999625|0.993072|0.956810|0.063512; 3H/14C
+    0.999900|0.987649|0.951445|0.807312; 136Xe
+    1|0.999800|0.958317|0.003783; 124Xe 1|1|0.954550|0.971793;
+    127Xe/125Xe 1|1|0.942625|1. Counts above 15 keV in the final ROI, in
+    that same source order: 46, 45, 60, 32, 146, 6, 0, 0. G15 use is stored,
+    not hidden. All EC charge-yield assignments are unchanged
+    (q_LL 0.65, q_LM 0.87, 127Xe/125Xe stand-in 0.87).
+  - Figure unit-shape changes use FULL histograms, NOT the capped samples,
+    and combine both S1c panels. Maximum |staged-legacy| in S1c/log10-S2c/u:
+    214Pb 0.013758/0.018157/0.012829; Kr85+Ar39+gamma
+    0.018021/0.013282/0.025467; solar ER 0.011003/0.018885/0.015407;
+    212Pb/218Po 0.015338/0.014750/0.022398; 3H/14C
+    0.002760/0.004756/0.008005; 136Xe 0.020836/0.078699/0.089019;
+    124Xe 0.004866/0.002934/0.003015; 127Xe/125Xe
+    0.001194/0.002802/0.005220. Overview bins stay below 3 sigma (largest
+    2.316); separately stored tritium/14C bottom-panel u has one bin at
+    3.160 sigma. Sparse 136Xe (141/145 ROI events) remains finite-MC limited.
+    The full per-source/panel shapes and two-mode multinomial variances are
+    in `er_efficiency_comparison`, all 24 panels shown in the ER figure.
+  - Independent fixed-E forward checks (5000 events per 0.25-keV point
+    through 20 keV, seed 17000061): cumulative-Y max difference 0.0672567
+    for Y >= 0.01 (75/79 within the 0.02 + 2-MC-sigma diagnostic allowance);
+    total-2D RMS/max vs independent t4 = 0.0304519/0.0789023 (60/81 within),
+    residual -0.0760445 at 15 keV and -0.0038082 at 20 keV. These are
+    central-curve/finite-MC approximation diagnostics, NOT fitted HEPData
+    uncertainties, covariance, or pass/fail production gates. Nothing in
+    `src/check_er_efficiency_forward.py` supplies production efficiencies.
+  - Exclusive totals both PASS unchanged Validation 4: legacy/staged total
+    RMS 0.127569403/0.122200262 dex; sub-floor 3.088195409/3.216575128
+    events; physical total 1209.2 both. Legacy/staged top panel
+    596.963/584.331, bottom 610.005/622.654 vs digitized 582.725/593.858.
+    No tuning or CLAIM of improvement is made. Exact production staged
+    model reproduction, Table-I normalization, full/display ROI
+    reconciliation, and NR+accidentals identity controls all PASS.
+    Light/dark renders with final title/legend layout inspected; no
+    clipping/label collisions. No signal production was started.
+  - **Dependent NR numerical reroll note**: source-specific streams changed
+    every MC realization, including the NR comparison. Do not retain its
+    pre-seeding numbers; the measured NR block above has been refreshed and
+    agrees with the updated ASTRA findings.
 

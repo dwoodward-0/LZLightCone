@@ -2857,12 +2857,48 @@ prior_insights:
     scope: "Fig. 1 lower WS2024 panel, printed page 6 of v1. Green/black overlap through 15 keV and the green high-energy plateau are the user's visual observations, not extracted from this quote. No covariance is published in the dependent variables of HEPData t3/t4. These central curves do not specify the full S1c/S2c/position dependence of SS and quality cuts."
 
 findings:
+  er_staged_conditional_chain:
+    id: er_staged_conditional_chain
+    label: "Staged ER selection preserves cumulative stage semantics"
+    claim: "Full-budget production applies the public trigger before NEST, NEST's own threefold coincidence plus S1c > 3 phd, one conditional SS/data-analysis acceptance G/Y at the retained sampled true energy, and the remaining explicit corrected-space ROI once. G comes from HEPData t3 through 15 keV at the user's identified green/black overlap and is held at 0.959 above 15 keV. Neither cumulative Y nor independent total-2D t4 is applied as another production factor. No S1 efficiency, coincidence factor, raw-S2 threshold, Erec < 20 keV cut, or total efficiency is applied a second time."
+    created_at: "2026-11-12T00:00:00Z"
+    scope: "Public arXiv:2511.17350v1 Fig. 1 and HEPData record 181350 v1 t3/t4 central values; WS2024 NEST response, seed 44, n_er=40000 per ER source, n_nr=120000, n_b8=600000. Per-source seeding isolates unaffected NR and observable-space accidental samples exactly without claiming common random numbers after ER rejection. Fixed Table-I means are not inferred from these MC acceptances."
+    notes: "The active model reproduces exactly, NR/accidental datasets and metadata match between ER modes, and full/display samples preserve Table-I physical means. The observed NEST coinLevel is 3. Low-Y generated samples receive no arbitrary ratio-one substitution: every energy-space ER source has zero Y<0.01 events after S1. The staged full-ROI plateau-event counts (E>15 keV), ordered 214Pb, Kr85/Ar39/detector gamma, solar ER, 212Pb/218Po, tritium/14C, 136Xe, 124Xe, 127Xe/125Xe are 46, 45, 60, 32, 146, 6, 0, 0. This model does not recover unpublished conditional S1c/S2c/position dependence."
+    evidence:
+      - id: ev1
+        artifact: er_efficiency_comparison
+      - id: ev2
+        artifact: background_models
+  er_staged_source_acceptances_and_shapes:
+    id: er_staged_source_acceptances_and_shapes
+    label: "All eight ER stage acceptances and observable shape changes"
+    claim: "All eight energy-space ER backgrounds show the intended approximately 0.94–0.96 conditional SS/data-analysis acceptance, while their response- and spectrum-dependent shapes and finite MC multiplicities change independently of their fixed Table-I physical means. Full-ROI MC counts, legacy -> staged, are 214Pb 2115 -> 2034; Kr85/Ar39/detector gamma 2115 -> 1980; solar ER 3147 -> 2970; 212Pb/218Po 2548 -> 2413; tritium/14C 32012 -> 30342; 136Xe 141 -> 145; 124Xe 38881 -> 37105; 127Xe/125Xe 40000 -> 37705."
+    created_at: "2026-11-12T00:00:00Z"
+    scope: "For each source, the four conditional staged acceptances B, native coincidence+S1 given B, G/Y given S1, and remaining ROI given G/Y are respectively: 214Pb 0.999475, 0.994822, 0.958212, 0.053372; Kr85/Ar39/detector gamma 0.999550, 0.994748, 0.960600, 0.051826; solar ER 0.999100, 0.991968, 0.957067, 0.078279; 212Pb/218Po 0.999625, 0.993072, 0.956810, 0.063512; tritium/14C 0.999900, 0.987649, 0.951445, 0.807312; 136Xe 1, 0.999800, 0.958317, 0.003783; 124Xe 1, 1, 0.954550, 0.971793; 127Xe/125Xe 1, 1, 0.942625, 1. Histograms retain the complete unthinned samples; display weights are independently Table-I normalized after any cap."
+    notes: "For the figure's summed two-S1c-panel full unit histograms, maximum absolute staged-minus-legacy differences in the order S1c, log10 S2c, u are: 214Pb 0.013758, 0.018157, 0.012829; Kr85/Ar39/detector gamma 0.018021, 0.013282, 0.025467; solar ER 0.011003, 0.018885, 0.015407; 212Pb/218Po 0.015338, 0.014750, 0.022398; tritium/14C 0.002760, 0.004756, 0.008005; 136Xe 0.020836, 0.078699, 0.089019; 124Xe 0.004866, 0.002934, 0.003015; 127Xe/125Xe 0.001194, 0.002802, 0.005220. No displayed overview bin exceeds 3 sigma; the largest is 2.316 sigma. The separate per-panel archive has one 3.160-sigma bin in tritium/14C bottom-panel u, reported rather than suppressed. Sparse 136Xe differences are not resolved shape effects at this MC budget. Full per-source/panel arrays and conservative two-mode MC variances are stored in er_efficiency_comparison."
+    evidence:
+      - id: ev1
+        artifact: er_efficiency_comparison
+      - id: ev2
+        artifact: er_efficiency_validation
+  er_efficiency_forward_and_validation4:
+    id: er_efficiency_forward_and_validation4
+    label: "Independent ER diagnostics and unchanged Validation-4 gates"
+    claim: "Both legacy and staged complete twelve-source models pass all six unchanged Validation-4 gates with total physical ROI counts of 1209.2. Total-projection RMS is 0.127569403 versus 0.122200262 dex and sub-floor residual is 3.088195409 versus 3.216575128 events, respectively; no improvement was required or tuned. The 5000-events-per-energy independent total-2D comparison has RMS difference 0.030451913 and maximum 0.078902317, with 60/81 points inside the declared 0.02 plus two-MC-sigma diagnostic precision allowance. It is not a recovered HEPData uncertainty or a production selection."
+    created_at: "2026-11-12T00:00:00Z"
+    scope: "Fixed-energy forward checks use seed 17000061. The cumulative-Y comparison has maximum difference 0.067256698 for Y>=0.01 and 75/79 compared points inside the diagnostic allowance. Independent t4 is never multiplied into production; its high-energy decline is intentionally not imported into the G(15) plateau."
+    notes: "The legacy top/bottom model panel totals are 596.963/610.005 and staged totals 584.331/622.654, versus digitized LZ totals 582.725/593.858. The same 12 exclusive sources enter each total exactly once; other_er_as_drawn is auxiliary only. Remaining observable-dependent residuals are limitation diagnostics, not evidence for an additional efficiency multiplier or a fitted cancellation of uncertainties."
+    evidence:
+      - id: ev1
+        artifact: er_efficiency_comparison
+      - id: ev2
+        artifact: background_projection_validation
   nr_pre_roi_chain:
     id: nr_pre_roi_chain
     label: "Corrected NR efficiency chain and measured acceptances"
-    claim: "The correction replaces the ROI-inclusive total efficiency with the public Fig. 2 pre-ROI stage before NEST and applies the corrected-observable ROI exactly once. In the complete matched-budget A/B, atmospheric-neutrino pre-efficiency acceptance changes from 0.630742 to 0.695083, detector-neutron acceptance from 0.473200 to 0.564925, and B8+hep acceptance from 0.000560 to 0.006543; the corresponding conditional ROI acceptances are 0.934918 -> 0.884810, 0.924345 -> 0.816451, and 0.175595 -> 0.021396. Fixed Table I central physical means are unchanged."
+    claim: "The correction replaces the ROI-inclusive total efficiency with the public Fig. 2 pre-ROI stage before NEST and applies the corrected-observable ROI exactly once. In the complete matched-budget A/B, atmospheric-neutrino pre-efficiency acceptance changes from 0.632017 to 0.696642, detector-neutron acceptance from 0.474750 to 0.567192, and B8+hep acceptance from 0.000475 to 0.006578; the corresponding conditional ROI acceptances are 0.935392 -> 0.884960, 0.926821 -> 0.818918, and 0.178947 -> 0.016468. Fixed Table I central physical means are unchanged."
     created_at: "2026-11-12T00:00:00Z"
-    scope: "WS2024 response, corrected space, seed 44, n_er=40000, n_nr=120000, n_b8=600000. The independent black/HEPData efficiency input check has maximum residual 0.00136346. These are simulation acceptances, not changes to the Table I physical event rates."
+    scope: "WS2024 response, corrected space, seed 44, n_er=40000, n_nr=120000, n_b8=600000, with independent per-source streams. The independent black/HEPData efficiency input check has maximum residual 0.00136346. These are simulation acceptances, not changes to the Table I physical event rates. This new realization supersedes numerical NR values recorded before the ER source-seeding work."
     notes: "The controlled comparison reproduces the active declared model exactly, and non-NR arrays and metadata agree except for the intentional efficiency_treatment label. Full unthinned histograms and thinned display samples are separately normalized to Table I. The black total-mode behavior is diagnostic only and is not allowed for absolute WIMP yields."
     evidence:
       - id: ev1
@@ -2872,10 +2908,10 @@ findings:
   nr_efficiency_shape_changes:
     id: nr_efficiency_shape_changes
     label: "Resolved NR shape changes and finite-MC control"
-    claim: "The efficiency correction changes observable NR shapes even after Table I normalization. In the 3-40 phd panel, maximum binwise unit-area S1c differences are 0.011432 (7.92 sigma) for atmospheric neutrinos and 0.012561 (6.96 sigma) for detector neutrons; the B8+hep log10-S2c maximum difference is 0.362296 (10.28 sigma) in the independent fivefold study. The efficiency-folded B8 spectral-integral fraction changes from 0.887716 to 0.984967. These are shape and mixture effects, not changes to imposed physical parent rates."
+    claim: "The efficiency correction changes observable NR shapes even after Table I normalization. In the 3-40 phd panel, maximum binwise unit-area S1c differences are 0.009738 (4.17 sigma at that bin) for atmospheric neutrinos and 0.015294 (5.74 sigma) for detector neutrons; the B8+hep log10-S2c maximum difference is 0.268164 (7.19 sigma) in the independent fivefold study. The efficiency-folded B8 spectral-integral fraction changes from 0.887716 to 0.984967. These are shape and mixture effects, not changes to imposed physical parent rates. These final independent-source-seeded NR values supersede the earlier MC realization."
     created_at: "2026-11-12T00:00:00Z"
     scope: "Unit-area full-histogram projections conditional on the common explicit ROI. Sigmas are per-mode multinomial uncertainties added in quadrature, without claiming matched-seed covariance cancellation; zero-variance empty bins are not used. Detector-neutron central physical weight is zero, so only its unit-area shape is compared."
-    notes: "Atmospheric-neutrino top-panel maxima are 0.011537 (9.73 sigma) in log10 S2c and 0.008831 (4.81 sigma) in u; the detector-neutron u maximum is 0.008101 (4.46 sigma). Sparse base B8+hep ROI counts are 59 legacy and 84 corrected. The independent seed 1000047 fivefold study gives 323 and 370 ROI events respectively, with u maximum difference 0.078286 (3.92 sigma), S1c maximum difference 0.087298 (2.74 sigma), and log10-S2c maximum difference 0.362296 (10.28 sigma); no B8+hep events enter the 40-80 phd panel in either fivefold mode. Isotope-specific finite samples describe the simulation mixture and are not independently constrained physical subcomponent rates."
+    notes: "Atmospheric-neutrino top-panel maxima are 0.011862 (5.25 sigma) in log10 S2c and 0.004572 (3.53 sigma) in u; detector-neutron top-panel maxima are 0.013851 (5.41 sigma) in log10 S2c and 0.010180 (4.62 sigma) in u. Sparse base B8+hep ROI counts are 51 legacy and 65 corrected; its log10-S2c maximum is 0.335143 (3.80 sigma) and u maximum 0.141478 (2.66 sigma). The independent seed 1000047 fivefold study gives 304 and 368 ROI events respectively, with u maximum difference 0.090818 (4.14 sigma), S1c maximum difference 0.082809 (2.43 sigma), and log10-S2c maximum difference 0.268164 (7.19 sigma); no B8+hep events enter the 40-80 phd panel in either fivefold mode. Isotope-specific finite samples describe the simulation mixture and are not independently constrained physical subcomponent rates."
     evidence:
       - id: ev1
         artifact: nr_efficiency_comparison
@@ -2884,9 +2920,9 @@ findings:
   nr_efficiency_validation4_effect:
     id: nr_efficiency_validation4_effect
     label: "Efficiency correction has negligible total Fig. 4 effect"
-    claim: "With the same exclusive 12-source total and six-gate validator, both legacy and corrected models pass Validation 4. Total background shape RMS changes from 0.129199943 to 0.129337987 dex (change +0.000138044), and the sub-floor absolute residual changes from 3.960610966 to 3.960276576 events. This is a negligible total-projection effect because the NR contributions have small physical weight, not a demonstrated improvement in agreement with LZ."
+    claim: "With the same exclusive 12-source total and six-gate validator, both legacy and corrected models pass Validation 4. In the final source-independent regeneration, total background shape RMS changes from 0.122200319 to 0.122200262 dex (change -0.000057305), and the sub-floor absolute residual changes from 3.214814535 to 3.216575128 events. This negligible total-projection effect is not a demonstrated improvement in agreement with LZ."
     created_at: "2026-11-12T00:00:00Z"
-    scope: "WS2024 Fig. 4 projection and exclusive-total bookkeeping correction; 214Pb, other ER and 124Xe residuals remain the dominant, documented model comparisons."
+    scope: "WS2024 Fig. 4 projection and exclusive-total bookkeeping correction with ER staged_conditional common to both NR modes; 214Pb, other ER and 124Xe residuals remain the dominant, documented comparisons."
     notes: "Total physical ROI counts remain 1209.2 in both modes. The correction sums 12 exclusive sources exactly once; other_er_as_drawn is only an auxiliary outline comparison and never enters a physical total. Earlier total-RMS values included the duplicated auxiliary category and are superseded by these matched-validator values. No property was tuned to change Fig. 4 agreement."
     evidence:
       - id: ev1
