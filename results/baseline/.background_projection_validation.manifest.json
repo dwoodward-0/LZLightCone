@@ -2,25 +2,26 @@
   "schema_version": 1,
   "output_id": "background_projection_validation",
   "universe_id": "baseline",
-  "recipe": "python src/validate_backgrounds.py --models results/baseline/background_models.hdf5 --response results/baseline/response_model_calibration.hdf5 --table1 data/lz_ws2024_table1_counts.csv --reference data/lz_ws2024_fig4_projection.csv --output results/baseline/background_projection_validation.png --background-components all_table1 --exposure-structure combined_single --nest-parameter-set ws2024_nest240 --detector-effects uniform_1d",
-  "definition_version": "sha256:6c3f5e25cec9491fab612b0a6f2523e3b35c7b511282d683f6e3aca3fab036f7",
+  "recipe": "python src/validate_backgrounds.py --models results/baseline/background_models.hdf5 --response results/baseline/response_model_calibration.hdf5 --table1 data/lz_ws2024_table1_counts.csv --reference data/lz_ws2024_fig4_projection.csv --output results/baseline/background_projection_validation.png --efficiency-treatment input_pre_roi_curve --background-components all_table1 --exposure-structure combined_single --nest-parameter-set ws2024_nest240 --detector-effects uniform_1d",
+  "definition_version": "sha256:c7b33e6ae20ad3eda1b6354ab3dd02d5cd2e55f7048be9fa264e473d130384d2",
   "env_version": "sha256:7c0beb4a6c9729006f13b818e2a5e8b79be88f5d4c846bda140894a4c315a3a4",
-  "data_version": "sha256:d585549e4e385474cf6525d0eb23385a8c3f86246d2af9560d500de8354e7381",
+  "data_version": "sha256:52accac1c5f4cd9f1b8366606630bec83c32547feb4cc7a95cbb6a6b70957365",
   "decisions": {
     "background_components": "all_table1",
     "exposure_structure": "combined_single",
     "nest_parameter_set": "ws2024_nest240",
     "detector_effects": "uniform_1d",
-    "accidentals_model": "factorized_contour_constrained"
+    "accidentals_model": "factorized_contour_constrained",
+    "efficiency_treatment": "input_pre_roi_curve"
   },
   "input_versions": {
-    "background_models": "sha256:25e2e72823a0e9bee6ff924ae52d412d79598d859ccdb1df5962d0f4efb4e9ff",
+    "background_models": "sha256:169434c149c0f3784fea6b2447169d0363a33405409bc23b1fb5dab283402082",
     "response_model_calibration": "sha256:7a1a9f3d85035a93e45e42b8ea4a242730f8895a24179a2a9decfbae9e89cce8",
     "lz_table1_counts_reference": "sha256:7f9eaab6ccdc934f8f6d1101125db59a0e499922939ed96f745b0b3959371510",
     "lz_ws2024_fig4_projection": "sha256:3925d20a10daa24f650eb6215c353a6994188aea5f1590bb36185f32270548a0",
-    "background_projection_script": "sha256:2f5eb4e1b229bcfc55ac27f58a64c0132572d63cb2800fad125eebbc0a345b42"
+    "background_projection_script": "sha256:e250c9b7688643a6076352b61579bbf7f7c54c46b8a34243eac526b267fb30b9"
   },
-  "git_sha": "2a0c005e12b79661bc1c8e402fc2b9f3c2d279af",
+  "git_sha": "cfb997be1ea5a89440fdcbd9a3bee086afd8f603",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -30,8 +31,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-11T18:35:38.887+00:00",
-  "finished_at": "2026-11-11T18:35:42.005+00:00",
+  "started_at": "2026-11-12T17:34:30.010+00:00",
+  "finished_at": "2026-11-12T17:34:32.957+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
