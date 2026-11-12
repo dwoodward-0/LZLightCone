@@ -43,10 +43,24 @@ rejection to the three NR components (neutrons, atm nu, 8B+hep nu). The
 baseline uses the public Fig. 2 orange trigger + SS/data-analysis-cuts curve,
 then applies the explicit observable ROI. The HEPData total already includes
 the S2/S1 ROI and is retained only for the legacy comparison treatment; it
-must not be multiplied by the pre-ROI curve. ER components and observable-
-space accidentals receive no NR-efficiency folding; Table I normalization
-absorbs their selection efficiencies. The 8B/hep initial mixture uses the
-same selected pre-response efficiency in the spectral integrals.
+must not be multiplied by the pre-ROI curve. ER components use the staged
+conditional treatment below; observable-space accidentals use neither energy
+chain. The 8B/hep initial mixture uses the same selected pre-response
+efficiency in the spectral integrals.
+
+ER staged selection: B(E) = Fig. 1 blue trigger rejection before NEST, with
+the sampled true ER energy and any EC charge-yield label carried together.
+GetS1 already implements the detector's threefold-coincidence requirement;
+S1c > 3 phd explicitly removes its negative failure flags. For those events
+only, one conditional SS/data-analysis acceptance C(E) = G(E)/Y(E) is applied
+at the retained true energy, where Y is the cumulative yellow trigger +
+coincidence + lower-S1 stage and G is HEPData t3 through 15 keV held at G(15)
+above it (the user's confirmed green/black overlap). Then exactly one
+remaining ROI S1c < 80, S2c >= 493, log10(S2c) < 4.5 is applied. No separate
+coincidence, raw-S2 or second total-efficiency factor is used. C is not an
+unfolding of the NEST observables. This is an energy-dependent average cut
+acceptance; its unpublished S1c/S2c/position dependence is a limitation.
+The legacy_no_energy_efficiency ER mode retains the explicit full ROI alone.
 
 ROI (WS2024, corrected space, applied at analysis level): 3 < S1c < 80
 phd, log10(S2c) < 4.5, S2c >= 493 phd (= 14.5 extracted electrons x
@@ -62,10 +76,13 @@ and an SR1-marginals morphology cross-check.
 
 import argparse
 import csv
+import json
 import re
 import sys
 import time
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import h5py
 import nestpy
@@ -305,6 +322,16 @@ class ResponseEngine:
 
     def __init__(self, header_path, seed):
         self.det = nestpy.detectors.LZ_WS2024()
+        if (self.det.get_coinLevel() != 3 or
+                abs(self.det.get_coinWind() - 150.0) > 1e-12 or
+                abs(self.det.get_sPEthr() - 0.1) > 1e-12):
+            raise ValueError("Unexpected LZ_WS2024 coincidence configuration")
+        # NEST GetS1 already applies threefold coincidence. Failed coincidence
+        # negates S1c-related outputs (including scint[5]); our S1c > 3 cut
+        # removes those flagged failures. Never multiply another coincidence
+        # efficiency. Raw S1/S2 and ROI handling are unchanged.
+        self.nest_coincidence_level = self.det.get_coinLevel()
+        self.nest_s1_failed_coincidence_negative = True
         self.det.set_s2_thr(0.0)  # ROI applied at analysis level
         self.nc = nestpy.NESTcalc(self.det)
         nestpy.RandomGen.rndm().set_seed(seed)
@@ -327,6 +354,12 @@ class ResponseEngine:
             self.det.get_T_Kelvin(), DENSITY, self.drift_field,
             self.det.get_p_bar(),
         )
+
+    def reseed(self, seed):
+        """Independent source stream, leaving the validated response unchanged."""
+        self.source_seed = int(seed)
+        nestpy.RandomGen.rndm().set_seed(self.source_seed)
+        self.rng = np.random.default_rng(self.source_seed)
 
     def generate(self, energies, nr, n_events=None, q_ec=None):
         """Push energies through the response; returns (S1c, S2c).
@@ -673,10 +706,16 @@ def make_parser():
                     help="HEPData total efficiency, including both ROI stages")
     ap.add_argument("--fig2-efficiency", required=True,
                     help="digitized staged Fig.-2 curves")
+    ap.add_argument("--er-staged-efficiency", required=True,
+                    help="digitized Fig.-1 blue/yellow staged ER curves")
+    ap.add_argument("--er-1d-efficiency", required=True,
+                    help="HEPData t3 total-1D central curve, used as G through 15 keV")
     ap.add_argument("--efficiency-treatment", default="input_pre_roi_curve",
                     choices=["input_pre_roi_curve", "input_published_curve"],
-                    help="pre-ROI selection (baseline), or total efficiency "
-                         "plus explicit ROI (legacy comparison only)")
+                    help="NR pre-response selection; default is pre-ROI, not the total curve")
+    ap.add_argument("--er-efficiency-treatment", default="staged_conditional",
+                    help="staged ER selection (baseline), or the legacy chain "
+                         "with no explicit pre-response ER efficiency")
     ap.add_argument("--table1", required=True)
     ap.add_argument("--contours", required=True)
     ap.add_argument("--sr1-marginals", required=True)
@@ -703,12 +742,13 @@ def main():
 
 
 def build_models(args, source_names=None):
-    """Build sources with one pre-response efficiency and one explicit ROI.
+    """Build sources with explicit staged selection and Table-I normalization.
 
-    source_names is optional and implementation-only. In particular it must
-    not be used for the matched full-model A/B, because rejecting a different
-    number of NR events changes subsequent random draws. All other arguments
-    are shared by both efficiency treatments.
+    The NR and ER energy-space selections are independent decisions. Each
+    source has its own deterministic random stream, so changing the number of
+    rejected events in one source does not alter the response or observable-
+    space draws for another source. Per-source streams do not guarantee
+    event-level common random numbers between treatments within one source.
     """
     args.output = str(args.output)
     if source_names is not None:
@@ -742,6 +782,11 @@ def build_models(args, source_names=None):
                                   stage="pre_roi_ss_data_cuts")
     eff = (eff_pre_roi if args.efficiency_treatment == "input_pre_roi_curve"
            else eff_total)
+    # Import after this module is defined: the shared helper reads inputs via
+    # load_efficiency and supplies checks for the declared ER decomposition.
+    from er_efficiency import load_staged_er
+    er_b, er_y, er_g_e, er_g_v, er_diagnostics = load_staged_er(
+        args.er_staged_efficiency, args.er_1d_efficiency)
     # neutron spectrum CSV: (e_lo, e_hi, log10_rate) bins
     neutron_bins = np.array(
         [[float(r[0]), float(r[1]), 10.0 ** float(r[2])]
@@ -760,6 +805,8 @@ def build_models(args, source_names=None):
         f.attrs["g1"] = engine.det.get_g1()
         f.attrs["g2"] = engine.g2
         f.attrs["drift_field_Vcm"] = engine.drift_field
+        f.attrs["nest_coincidence_level"] = engine.nest_coincidence_level
+        f.attrs["nest_s1_failed_coincidence_negative"] = engine.nest_s1_failed_coincidence_negative
         f.attrs["roi_s1c"] = (ROI_S1C_MIN, ROI_S1C_MAX)
         f.attrs["roi_log10s2c_max"] = ROI_LOG10S2C_MAX
         f.attrs["roi_s2c_min_phd"] = ROI_S2C_MIN
@@ -770,10 +817,24 @@ def build_models(args, source_names=None):
             f"nest_parameter_set={args.nest_parameter_set}, "
             f"detector_effects={args.detector_effects}, "
             f"accidentals_model={args.accidentals_model}, "
-            f"efficiency_treatment={args.efficiency_treatment}"
+            f"efficiency_treatment={args.efficiency_treatment}, "
+            f"er_efficiency_treatment={args.er_efficiency_treatment}"
         )
         f.attrs["n_generated"] = f"er={args.n_er}, nr={args.n_nr}, b8={args.n_b8}"
         f.attrs["efficiency_treatment"] = args.efficiency_treatment
+        f.attrs["er_efficiency_treatment"] = args.er_efficiency_treatment
+        f.attrs["er_chain"] = (
+            "B(E) trigger before NEST -> GetS1 threefold coincidence + "
+            "S1c>3 -> conditional G/Y using retained true energy -> "
+            "S1c<80, S2c>=493, log10 S2c<4.5 -> Table I normalization"
+            if args.er_efficiency_treatment == "staged_conditional" else
+            "No ER energy-space efficiency; NEST response -> explicit full corrected-space ROI once -> Table I normalization")
+        f.attrs["er_g_minus_y_max"] = er_diagnostics["max_g_minus_y"]
+        f.attrs["er_conditional_raw_max"] = er_diagnostics["max_raw_conditional"]
+        f.attrs["er_conditional_ordering_tolerance"] = er_diagnostics["ordering_tolerance"]
+        f.attrs["er_plateau_start_kevee"] = er_diagnostics["plateau_start_kevee"]
+        f.attrs["er_plateau_efficiency"] = er_diagnostics["plateau_efficiency"]
+        f.attrs["er_input_diagnostics_json"] = json.dumps(er_diagnostics)
         f.attrs["nr_preresponse_efficiency_stage"] = eff.stage
         f.attrs["nr_preresponse_efficiency_source"] = eff.source
         f.attrs["nr_preresponse_efficiency_domain_kevnr"] = (
@@ -782,9 +843,16 @@ def build_models(args, source_names=None):
 
         fit_diagnostics = f.create_group("accidentals_fit")
 
-        for source, (kind, shape_key) in SOURCE_SPECS.items():
+        for source_index, (source, (kind, shape_key)) in enumerate(SOURCE_SPECS.items()):
             if source_names is not None and source not in source_names:
                 continue
+            # Per-source streams make all other sources independent of the
+            # number of ER accept/reject draws. This enables exact non-ER
+            # equality in the complete matched budget A/B without claiming
+            # common random numbers for retained events within an ER source.
+            source_seed = args.seed + 1_000_003 * (source_index + 1)
+            engine.reseed(source_seed)
+            if source not in table1:
                 print(f"FAIL: Table I reference lacks {source}",
                       file=sys.stderr)
                 return 1
@@ -793,10 +861,21 @@ def build_models(args, source_names=None):
 
             q_ec = None
             isotope_labels = None
+            nr = kind == "nr_curve"
             n_sampled = args.n_er
             n_pre_eff = args.n_er
             outside_support = None
             n_sampled_outside_support = 0
+            er_staged_active = (kind not in ("nr_curve", "accidentals")
+                                and args.er_efficiency_treatment == "staged_conditional")
+            n_negative_s1 = n_after_s1_stage = n_after_er_conditional = 0
+            er_n_after_trigger = 0
+            er_outside_b_generated = er_outside_g_generated = 0
+            er_low_y_generated = er_low_y_s1 = 0
+            selected_energies = np.empty(0)
+            er_conditional_acceptance_numerator = 0
+            er_conditional_acceptance_denominator = 0
+            er_y_probabilities = np.empty(0)
             if kind == "accidentals":
                 # observable-space PDF; no response chain
                 if args.accidentals_model == "factorized_contour_constrained":
@@ -886,7 +965,6 @@ def build_models(args, source_names=None):
                 else:
                     energies = None  # analytic: sampled below
 
-                nr = kind == "nr_curve"
                 if nr:
                     n_sampled = len(energies)
                     outside_support = ((energies < eff.energy_kevnr[0])
@@ -933,9 +1011,77 @@ def build_models(args, source_names=None):
 
                 if outside_support is None:
                     outside_support = np.zeros(len(energies), dtype=bool)
+                if er_staged_active:
+                    # Evaluate all energy-dependent stages against the retained
+                    # true sampled recoil energy, never an unfolded NEST energy.
+                    n_sampled = len(energies)
+                    er_outside_b_generated = int(np.count_nonzero(
+                        (energies < er_b.energy_kevnr[0]) |
+                        (energies > er_b.energy_kevnr[-1])))
+                    er_outside_g_generated = int(np.count_nonzero(
+                        (energies < er_g_e[0]) | (energies > er_g_e[-1])))
+                    er_low_y_generated = int(np.count_nonzero(er_y(energies) < .01))
+                    n_sampled_outside_support = er_outside_b_generated
+                    trigger_keep = (engine.rng.uniform(size=n_sampled)
+                                    < er_b(energies))
+                    er_n_after_trigger = int(trigger_keep.sum())
+                    n_pre_eff = er_n_after_trigger
+                    er_y_probabilities = (er_y(energies[trigger_keep])
+                                          if er_n_after_trigger else np.empty(0))
+                    energies = energies[trigger_keep]
+                    if q_ec is not None:
+                        q_ec = q_ec[trigger_keep]
+                    outside_support = np.zeros(len(energies), dtype=bool)
+                    print(f"  ER trigger: {len(energies)}/{n_sampled} = "
+                          f"{trigger_keep.mean():.6g}")
                 s1c_all, s2c_all = engine.generate(energies, nr=nr,
                                                    q_ec=q_ec)
-                m = roi_mask(s1c_all, s2c_all)
+                n_negative_s1 = int(np.count_nonzero(s1c_all < 0))
+                s1_keep = s1c_all > ROI_S1C_MIN
+                n_after_s1_stage = int(s1_keep.sum())
+                if er_staged_active:
+                    # One energy-space conditional acceptance follows the
+                    # NEST response and explicit lower-S1 stage. Do not apply
+                    # another coincidence or published total efficiency.
+                    y_stage = er_y(energies[s1_keep])
+                    low_y = y_stage < .01
+                    er_low_y_s1 = int(low_y.sum())
+                    g_after_s1 = np.interp(energies[s1_keep], er_g_e, er_g_v)
+                    if np.any((y_stage <= 1e-12) & (g_after_s1 > .01)):
+                        raise ValueError(f"{source}: G nonzero at negligible Y")
+                    conditional = np.zeros_like(y_stage)
+                    positive_y = y_stage > 1e-12
+                    conditional[positive_y] = (g_after_s1[positive_y] /
+                                               y_stage[positive_y])
+                    if (conditional.min(initial=0.) < 0
+                            or conditional.max(initial=0.) > 1.01):
+                        raise ValueError(f"{source}: invalid conditional ER acceptance")
+                    conditional = np.minimum(conditional, 1.0)
+                    conditional_keep = (engine.rng.uniform(size=conditional.size)
+                                        < conditional)
+                    post_s1_indices = np.flatnonzero(s1_keep)
+                    post_c_indices = post_s1_indices[conditional_keep]
+                    n_after_er_conditional = len(post_c_indices)
+                    er_conditional_acceptance_denominator = post_s1_indices.size
+                    er_conditional_acceptance_numerator = n_after_er_conditional
+                    s1c_all = s1c_all[post_c_indices]
+                    s2c_all = s2c_all[post_c_indices]
+                    selected_energies = energies[post_c_indices]
+                    # S1c>3 was performed above, using NEST's native S1c (with
+                    # negative coincidence-failure flags already handled). The
+                    # remaining ROI is applied exactly once, not roi_mask twice.
+                    y_all = np.log10(np.maximum(s2c_all, 1e-6))
+                    m = ((s1c_all < ROI_S1C_MAX)
+                         & (y_all < ROI_LOG10S2C_MAX)
+                         & (s2c_all >= ROI_S2C_MIN))
+                    outside_support = ((selected_energies < er_g_e[0]) |
+                                       (selected_energies > er_g_e[-1]))
+                    print(f"  NEST coincidence + S1c>3: {n_after_s1_stage}; "
+                          f"conditional G/Y (at known true energy): "
+                          f"{n_after_er_conditional}; remaining ROI: {m.sum()}")
+                else:
+                    n_after_er_conditional = n_after_s1_stage
+                    m = roi_mask(s1c_all, s2c_all)
                 s1, s2c = s1c_all[m], s2c_all[m]
                 y = np.log10(s2c)
                 base_w = np.ones(len(s1))
@@ -961,18 +1107,70 @@ def build_models(args, source_names=None):
             grp.attrs["n_generated"] = int(n_sampled)
             grp.attrs["n_pre_efficiency"] = int(n_pre_eff)
             grp.attrs["n_in_roi"] = n_kept
+            grp.attrs["source_seed"] = source_seed
             grp.attrs["efficiency_treatment"] = args.efficiency_treatment
+            grp.attrs["er_efficiency_treatment"] = (
+                args.er_efficiency_treatment if not nr else "not_applicable")
+            if nr:
+                er_chain = "not_applicable_nr"
+                er_stage = "not_applicable_nr"
+                roi_denominator = n_pre_eff
+            elif kind == "accidentals":
+                er_chain = "not_applicable_observable_space"
+                er_stage = "not_applicable_observable_space"
+                roi_denominator = n_pre_eff
+            else:
+                er_chain = "energy_space_recursive_to_corrected_observables"
+                er_stage = ("trigger__nest_coincidence_s1__conditional_g_over_y"
+                            if er_staged_active else "legacy_roi_only_no_energy_space_er_efficiency")
+                roi_denominator = (n_after_er_conditional
+                                   if er_staged_active else n_pre_eff)
+            grp.attrs["er_chain_applicability"] = er_chain
+            grp.attrs["er_y_true_energy_mean"] = (
+                float(er_y_probabilities.mean()) if er_staged_active and len(er_y_probabilities) else float("nan"))
+            grp.attrs["er_y_true_energy_binomial_sigma"] = (
+                float(np.sqrt(np.sum(er_y_probabilities * (1.0 - er_y_probabilities))) / len(er_y_probabilities))
+                if er_staged_active and len(er_y_probabilities) else float("nan"))
+            grp.attrs["er_efficiency_stage"] = er_stage
+            grp.attrs["roi_denominator_stage"] = (
+                "er_conditional_ss_data_analysis" if er_staged_active
+                else "pre_response_efficiency_or_generation")
             grp.attrs["efficiency_stage"] = eff.stage if nr else "not_applied"
+            grp.attrs["n_er_after_trigger"] = er_n_after_trigger
+            grp.attrs["n_negative_s1_nest_coincidence_flags"] = n_negative_s1
+            grp.attrs["n_after_s1_stage"] = n_after_s1_stage
+            grp.attrs["n_after_er_conditional"] = n_after_er_conditional
+            grp.attrs["er_trigger_acceptance"] = (
+                er_n_after_trigger / n_sampled if er_staged_active else
+                (1.0 if kind == "curve" or kind == "analytic" else 0.0))
+            grp.attrs["er_post_s1_conditional_acceptance"] = (
+                er_conditional_acceptance_numerator /
+                er_conditional_acceptance_denominator
+                if er_staged_active and er_conditional_acceptance_denominator > 0 else
+                (1.0 if not nr and kind != "accidentals" else 0.0))
+            grp.attrs["n_er_generated_outside_trigger_support"] = er_outside_b_generated
+            grp.attrs["n_er_generated_outside_g_support"] = er_outside_g_generated
+            grp.attrs["n_er_g15_plateau_extrapolated_in_sample"] = int(
+                np.count_nonzero(selected_energies > 15.0)
+                if er_staged_active and not nr and kind != "accidentals" else 0)
+            grp.attrs["n_er_g15_plateau_extrapolated_in_roi"] = (
+                int(np.count_nonzero(selected_energies[m] > 15.0))
+                if er_staged_active and not nr and kind != "accidentals" else 0)
+            grp.attrs["n_er_y_below_0p01_in_sample"] = er_low_y_generated
+            grp.attrs["n_er_y_below_0p01_after_s1"] = er_low_y_s1
             grp.attrs["efficiency_domain_kevnr"] = (
                 [float(eff.energy_kevnr[0]), float(eff.energy_kevnr[-1])]
                 if nr else [float("nan"), float("nan")])
+            grp.attrs["er_efficiency_domain_kevee"] = (
+                [float(er_b.energy_kevnr[0]), float(er_g_e[-1])]
+                if er_staged_active else [float("nan"), float("nan")])
             grp.attrs["pre_efficiency_acceptance"] = (
                 n_pre_eff / n_sampled if nr else 1.0)
             grp.attrs["pre_efficiency_binomial_sigma"] = (
                 np.sqrt((n_pre_eff / n_sampled)
                         * (1.0 - n_pre_eff / n_sampled) / n_sampled)
                 if nr else 0.0)
-            grp.attrs["roi_conditional_acceptance"] = n_kept / n_pre_eff
+            grp.attrs["roi_conditional_acceptance"] = n_kept / roi_denominator
             grp.attrs["overall_simulation_acceptance"] = n_kept / n_sampled
             grp.attrs["explicit_roi_applied"] = kind != "accidentals"
             grp.attrs["n_sampled_outside_efficiency_support"] = (
@@ -981,10 +1179,10 @@ def build_models(args, source_names=None):
                 n_sampled_outside_support / n_sampled
                 if kind != "accidentals" else 0.0)
             grp.attrs["n_selected_outside_efficiency_support"] = (
-                int(outside_support.sum()) if kind != "accidentals" else 0)
+                int(outside_support.sum()) if outside_support is not None else 0)
             grp.attrs["fraction_kept_outside_efficiency_support"] = (
                 float(outside_support[m].sum()) / n_kept
-                if kind != "accidentals" and nr else 0.0)
+                if outside_support is not None else 0.0)
             grp.attrs["spectrum"] = str(shape_key)
             grp.attrs["notes"] = SOURCE_NOTES[source]
             if shape_key == "nr_b8+nr_hep":

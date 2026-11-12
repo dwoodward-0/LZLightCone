@@ -4,6 +4,7 @@ decisions:
   statistics: both_with_crosscheck
   background_components: all_table1
   efficiency_treatment: input_pre_roi_curve
+  er_efficiency_treatment: staged_conditional
   response_model: nest_library
   halo_model: shm_standard
   nest_parameter_set: ws2024_nest240

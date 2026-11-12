@@ -80,9 +80,9 @@ def dump_metadata(value):
 
 
 def generate(args, mg_args, mode, output, statistics_factor=1,
-             source_names=None):
+             source_names=None, decision="efficiency_treatment"):
     options = vars(mg_args).copy()
-    options["efficiency_treatment"] = mode
+    options[decision] = mode
     options["output"] = str(output)
     for name in ("n_er", "n_nr", "n_b8"):
         options[name] *= statistics_factor
@@ -93,13 +93,15 @@ def generate(args, mg_args, mode, output, statistics_factor=1,
     return Path(output)
 
 
-def validate(args, model, mode, work, mg_args):
+def validate(args, model, mode, work, mg_args, er_mode=None):
     output = Path(work) / f"validation_{mode}.png"
     command = [sys.executable, args.validation_script,
                "--models", str(model), "--response", args.response,
                "--table1", mg_args.table1, "--reference", args.reference,
                "--output", str(output),
                "--efficiency-treatment", mode,
+               "--er-efficiency-treatment",
+               er_mode if er_mode is not None else mg_args.er_efficiency_treatment,
                "--background-components", mg_args.background_components,
                "--exposure-structure", mg_args.exposure_structure,
                "--nest-parameter-set", mg_args.nest_parameter_set,
@@ -177,7 +179,12 @@ def shape_counts(source, band, coordinate, edges):
     return result
 
 
-def record_shapes(archive, band, extra_root="", sources=NR_SOURCES):
+def record_shapes(archive, band, extra_root="", sources=NR_SOURCES, modes=None):
+    # Defaults retain the NR archive and plotting schema exactly. A different
+    # A/B can supply its own two mode labels while reusing the MC bookkeeping.
+    modes = list(MODES if modes is None else modes)
+    if len(modes) != 2:
+        raise ValueError("Shape comparison requires exactly two modes")
     result = {}
     for source in sources:
         result[source] = {}
@@ -185,9 +192,9 @@ def record_shapes(archive, band, extra_root="", sources=NR_SOURCES):
             result[source][coordinate] = {}
             all_counts = {mode: shape_counts(archive[f"{extra_root}{mode}/{source}"], band,
                                               coordinate, edges)
-                          for mode in MODES}
+                          for mode in modes}
             panel_fraction = {}
-            for mode in MODES:
+            for mode in modes:
                 full = archive[f"{extra_root}{mode}/{source}/hist_mc_counts"][:]
                 sx = archive[f"{extra_root}{mode}/{source}/hist_s1c_edges"][:]
                 n = int(full.sum())
@@ -203,10 +210,10 @@ def record_shapes(archive, band, extra_root="", sources=NR_SOURCES):
                     f"{extra_root}shapes/{source}/{coordinate}/{panel}")
                 group.create_dataset("edges", data=edges)
                 metrics = binomial_difference_metrics(
-                    all_counts["legacy_total"][panel],
-                    all_counts["corrected_pre_roi"][panel],
-                    int(archive[f"{extra_root}legacy_total/{source}/hist_mc_counts"][:].sum()),
-                    int(archive[f"{extra_root}corrected_pre_roi/{source}/hist_mc_counts"][:].sum()))
+                    all_counts[modes[0]][panel],
+                    all_counts[modes[1]][panel],
+                    int(archive[f"{extra_root}{modes[0]}/{source}/hist_mc_counts"][:].sum()),
+                    int(archive[f"{extra_root}{modes[1]}/{source}/hist_mc_counts"][:].sum()))
                 for name, values in metrics.items():
                     group.create_dataset(name, data=values)
                 result[source][coordinate][panel] = metrics

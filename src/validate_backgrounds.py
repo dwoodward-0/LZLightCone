@@ -116,11 +116,12 @@ def load_band(response_path):
     return band
 
 
-def load_models(path):
-    """{source: (s1c, log10_s2c, weight)} plus table1 means from attrs."""
+def load_models(path, root=""):
+    """{source: (s1c, log10_s2c, weight)}; optional grouped archive root."""
     models = {}
     with h5py.File(path) as f:
-        for src in f:
+        container = f[root] if root else f
+        for src in container:
             if src == "accidentals_fit":
                 continue
             g = f[src]
@@ -155,6 +156,9 @@ def main():
     ap.add_argument("--efficiency-treatment", required=True,
                     choices=["input_pre_roi_curve", "input_published_curve"],
                     help="Must match the efficiency recorded in the model.")
+    ap.add_argument("--er-efficiency-treatment", required=True,
+                    choices=["staged_conditional", "legacy_no_energy_efficiency"],
+                    help="Must match the ER mode recorded in the model.")
     args = ap.parse_args()
     assert args.background_components == "all_table1"
     assert args.exposure_structure == "combined_single"
@@ -165,6 +169,10 @@ def main():
         if actual_mode != args.efficiency_treatment:
             raise ValueError(
                 f"Requested {args.efficiency_treatment}, but model used {actual_mode}")
+        actual_er_mode = str(model_file.attrs["er_efficiency_treatment"])
+        if actual_er_mode != args.er_efficiency_treatment:
+            raise ValueError(
+                f"Requested ER {args.er_efficiency_treatment}, but model used {actual_er_mode}")
 
     table1 = read_table1(args.table1)
     ref = load_reference(args.reference)
@@ -445,6 +453,7 @@ def main():
 
     meta = {
         "efficiency_treatment": actual_mode,
+        "er_efficiency_treatment": actual_er_mode,
         "exclusive_categories": list(EXCLUSIVE_CATEGORY_KEYS),
         "exclusive_source_count": len(TOTAL_SOURCES),
         "total_counts": total_all,
