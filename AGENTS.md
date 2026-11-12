@@ -403,3 +403,93 @@ see the lightcone skill; never write into `results/` by hand.
     (incl. solar/212Pb/tritium) sits +0.287 dex above the drawn
     outline, exactly as expected from the omission finding.
 
+- **124Xe charge-yield follow-up and review plots (2026-11-11)** — the
+  user located the WS2024 fitted LL charge yield on p8: **0.70 ± 0.04**,
+  consistent across WIMP masses (radon tagging efficiency 62 ± 3%). This
+  is now a verified `lz_xe124_dec_model` evidence quote. It supersedes the
+  earlier conversational statement that no numerical fitted value was
+  published. The stored baseline remains q_LL = 0.65 (documented TI-model
+  lower bound); Validation 4's q = 0.78 is only an analytic Fig.-4
+  shape-RMS diagnostic, not LZ's fit, and has no fitted uncertainty.
+  The review figures now use the analytic q = 0.78 curve as the main red
+  model in both `results/bkg_review/bkg_xe124-dec.png` and the summed
+  `results/bkg_review/bkg_total.png`, with q = 0.70 retained as the green
+  LZ-fit comparison in the individual figure. The user explicitly chose
+  this presentation: q = 0.78 fairly exposes the tuned model's residual
+  relative to LZ and absorbs some other mismodeling effects. This does
+  NOT change the stored q_LL = 0.65 background production or the declared
+  Validation 4 result; the review curves remain analytic figure-matching
+  diagnostics, not likelihood fits or new NEST productions. The old
+  q = 0.65 and q = 0.87 individual review lines were removed by request.
+  `src/plot_background_total.py` sums all 12 sources, applies the q = 0.78
+  rescaling to xe124 alone, and digitizes Fig. 4's total uncertainty band
+  direct from its blue fill and following white lower-edge masking path;
+  it uses the full 18-bin -6..4 grid and reports MC-stat errors only for
+  this work. All review figures share Fig. 4's -6..4 horizontal range.
+  Unpublished S2-dependent/position-dependent selection effects remain a
+  possible, not demonstrated, contribution. The earlier review half-bin
+  bug was reference-center-as-edge; declared Validation 4 always used
+  correct left edges and was unaffected.
+
+- **NR pre-ROI efficiency correction (2026-11-12)** — default
+  `efficiency_treatment.input_pre_roi_curve`: sample recoil E, apply ONLY
+  the public Fig. 2 orange trigger + SS/data-analysis efficiency by
+  rejection, apply NEST, then the explicit corrected-space ROI once, then
+  Table I normalization. The black/HEPData total already includes the S2/S1
+  ROI; applying it before NEST and then the explicit ROI again is a
+  double-counted energy-weighted ROI. Keep `input_published_curve` only for
+  the declared old/new diagnostic. **Absolute WIMP yields must use pre-ROI
+  selection + one explicit ROI, with no Table-I-style normalization.** Do
+  not multiply or divide the two curves. `data/lz_ws2024_fig2_efficiency.csv`
+  and `src/digitize_efficiency_ws2024.py` come only from the pinned public
+  WS2024 PDF; black-vs-HEPData common-support max/RMS residual is
+  0.00136346/0.000160167 against a 0.01 max gate; total E50 = 5.393 keVnr.
+  - `nr_efficiency_comparison` reruns COMPLETE matched-budget 12-source
+    models (seed 44, n_ER 40000, n_NR 120000, n_B8 600000), not an
+    independent NR-only A/B, and stores both models, unit-area shapes and
+    both exclusive-total validations. Checks exact active-model
+    reproduction; non-NR samples/metadata identical across modes except the
+    intentional `efficiency_treatment` label. Same seeds are NOT exact
+    common random numbers after different rejection streams change later
+    RNG draws. No acceptance gate requires Fig. 4 agreement to improve.
+  - Pre-efficiency acceptances legacy -> corrected: atm 0.630742 ->
+    0.695083, B8+hep 0.000560 -> 0.00654333, detector neutrons 0.473200 ->
+    0.564925. Conditional post-NEST ROI: 0.934918 -> 0.884810, 0.175595 ->
+    0.0213958, 0.924345 -> 0.816451. Full-ROI MC counts atm 70763 -> 73802,
+    B8+hep 59 -> 84, detector 52488 -> 55348. These are MC acceptances and
+    shape controls, NOT physical-rate changes. Detector-neutron mean is zero
+    so compare its unit-area full-count shapes. No energetic NR out-of-
+    support event survives the ROI; retained-ROI B8 energies have support.
+  - B8 efficiency-folded spectral-integral fraction 0.887715578 ->
+    0.984966985. Use the same selected efficiency in the isotope integrals
+    and in rejection. The parent remains exactly 0.06 physical events; its
+    isotope ratio is not separately normalized as a physical measurement.
+    Independent fivefold B8+hep control, seed 1000047, gives 323 legacy and
+    370 corrected ROI events (from 1676/19379 pre-selections); no events in
+    the 40-80 phd panel. Fivefold max unit-area differences (per-mode
+    multinomial sigma, no ratios/z for zero-variance bins): S1c 0.087298
+    (2.74 sigma), log10 S2c 0.362296 (10.28), u 0.078286 (3.92). Base B8 u
+    max 0.160815 (2.69) is sparse-MC-sensitive. Atm top S1c/log10-S2c/u
+    maxima 0.011432/0.011537/0.008831 (7.92/9.73/4.81 sigma); detector
+    neutron u max 0.008101 (4.46). Persist even those that move negligibly
+    in the physical summed background.
+  - With exclusive totals both modes PASS all six Validation 4 gates:
+    total RMS 0.129199943 -> 0.129337987 dex (change +0.000138044),
+    sub-floor 3.960610966 -> 3.960276576 events; physical total always
+    1209.2. NB: previous 0.131-RMS values double-counted
+    `other_er_as_drawn` in `total_srcs`; that auxiliary outline is never a
+    physical contributor. Six explicit exclusive categories cover the 12
+    sources exactly once. Apart from these NR and bookkeeping corrections,
+    earlier 214Pb/ER/124Xe residual findings stand; no improvement is
+    claimed from the negligible total-shape change.
+  - Bookkeeping gotchas fixed: generic NR sources now use `n_nr`, not
+    `n_er`; full histogram lower edge is log10(493), not 2.69 (the latter
+    silently clips valid ROI events); `weight` is the 50000-capped DISPLAY
+    sample and must be renormalized to Table I after thinning, whereas
+    `hist_counts`/`hist_mc_counts`/`hist_mc_weight_variance` retain FULL
+    unthinned generation. The comparison checks both normalizations and
+    full-count ROI reconciliation. JSON residual RMS/max uses exactly the
+    printed finite-residual filter. `nr_efficiency_validation` reads the
+    HDF5 comparison, with independent fivefold B8 difference shown
+    separately; light/dark palettes and both renders inspected.
+

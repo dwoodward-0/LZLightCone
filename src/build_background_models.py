@@ -38,11 +38,15 @@ FitEF = 97 V/cm), uniform_1d (decision detector_effects.uniform_1d —
 generated observables are already corrected-space). ER events use the
 CH3T species (identical to the validated ER chain).
 
-Efficiency: the published NR data-selection efficiency curve
-(lz_efficiency_curve) is applied by rejection to the three NR components
-(neutrons, atm nu, 8B+hep nu), whose Table I counts include it. ER
-components get no efficiency folding (LZ's ER event-level cuts are not
-public); their normalization absorbs the efficiency.
+Efficiency: exactly one pre-response energy-space efficiency is applied by
+rejection to the three NR components (neutrons, atm nu, 8B+hep nu). The
+baseline uses the public Fig. 2 orange trigger + SS/data-analysis-cuts curve,
+then applies the explicit observable ROI. The HEPData total already includes
+the S2/S1 ROI and is retained only for the legacy comparison treatment; it
+must not be multiplied by the pre-ROI curve. ER components and observable-
+space accidentals receive no NR-efficiency folding; Table I normalization
+absorbs their selection efficiencies. The 8B/hep initial mixture uses the
+same selected pre-response efficiency in the spectral integrals.
 
 ROI (WS2024, corrected space, applied at analysis level): 3 < S1c < 80
 phd, log10(S2c) < 4.5, S2c >= 493 phd (= 14.5 extracted electrons x
@@ -76,7 +80,10 @@ ROI_S2C_MIN = 493.0
 
 # observable-space histogram grid stored per source
 HIST_S1C_EDGES = np.arange(3.0, 80.5, 1.0)
-HIST_Y_EDGES = np.arange(2.69, 4.51, 0.02)
+# Include the exact lower ROI edge: a rounded 2.69 would discard valid
+# samples in [log10(493), 2.69). The upper edge already encloses 4.5.
+HIST_Y_EDGES = np.concatenate(([np.log10(ROI_S2C_MIN)],
+                               np.arange(2.70, 4.51, 0.02)))
 
 # output sample cap per source (weighted samples are thinned to this)
 MAX_SAMPLES = 50_000
@@ -152,15 +159,15 @@ SOURCE_NOTES = {
                                "(LZ's construction) fitted to the WS2024 "
                                "Fig. 3 68%/95% quantile contours; "
                                "observable-space, no NEST response",
-    "atm_nu_nr": "Atm curve of LZ-2018 Fig. 5; published NR efficiency "
-                 "applied by rejection",
+    "atm_nu_nr": "Atm curve of LZ-2018 Fig. 5; selected pre-response NR "
+                 "efficiency applied by rejection (pre-ROI by default)",
     "b8_hep_nu_nr": "8B + hep curves of LZ-2018 Fig. 5, weighted by their "
-                    "efficiency-folded ROI integrals from the curves' own "
-                    "absolute normalization; published NR efficiency "
-                    "applied by rejection",
+                    "pre-response efficiency-folded spectral integrals from "
+                    "the curves' absolute normalization; the same selected "
+                    "efficiency is applied by rejection before one ROI",
     "detector_neutrons": "Det.+Sur.+Env. neutron spectrum "
-                         "(lz_neutron_spectrum_2018); published NR "
-                         "efficiency applied by rejection",
+                         "(lz_neutron_spectrum_2018); selected pre-response "
+                         "NR efficiency applied by rejection",
 }
 
 
@@ -396,22 +403,44 @@ def roi_mask(s1c, s2c):
             & (y < ROI_LOG10S2C_MAX) & (s2c >= ROI_S2C_MIN))
 
 
-def load_efficiency(path):
+def load_efficiency(path, stage=None):
+    """Read legacy two-column HEPData or staged Fig.-2 efficiencies.
+
+    Interpolation is deliberately left linear with constant endpoint values,
+    exactly as in the original HEPData-only implementation. The selected
+    support is attached to the callable so extrapolation can be reported.
+    """
     rows = []
     for line in Path(path).read_text().splitlines():
         line = line.strip()
-        if not line or line.startswith("#"):
+        if not line or line.startswith("#") or line.startswith("stage,"):
             continue
         parts = line.split(",")
         try:
-            rows.append((float(parts[0]), float(parts[1])))
+            if len(parts) >= 3:
+                if stage is None or parts[0] != stage:
+                    continue
+                rows.append((float(parts[1]), float(parts[2])))
+            else:
+                if stage is not None:
+                    raise ValueError(f"Two-column input has no stage {stage}")
+                rows.append((float(parts[0]), float(parts[1])))
         except ValueError:
             continue
     arr = np.array(rows)
-    assert np.all(np.diff(arr[:, 0]) > 0)
+    if len(arr) < 2:
+        raise ValueError(f"No efficiency samples for stage {stage!r} in {path}")
+    if np.any(np.diff(arr[:, 0]) <= 0):
+        raise ValueError("Efficiency energies must be strictly increasing")
+    if np.any((arr[:, 1] < 0) | (arr[:, 1] > 1)):
+        raise ValueError("Efficiencies must lie in [0, 1]")
 
     def eff(e):
         return np.interp(e, arr[:, 0], arr[:, 1])
+    eff.energy_kevnr = arr[:, 0].copy()
+    eff.values = arr[:, 1].copy()
+    eff.stage = stage or "total_fig2_hepdata_t4"
+    eff.source = str(path)
     return eff
 
 
@@ -634,13 +663,20 @@ def sample_from_marginals(rng, x, pdf_x, y, pdf_y, n):
     return s1, yy
 
 
-def main():
+def make_parser():
     ap = argparse.ArgumentParser()
     ap.add_argument("--output", required=True)
     ap.add_argument("--spectra", required=True,
                     help="lz2018_component_spectra.csv")
     ap.add_argument("--neutron-spectrum", required=True)
-    ap.add_argument("--efficiency", required=True)
+    ap.add_argument("--efficiency", required=True,
+                    help="HEPData total efficiency, including both ROI stages")
+    ap.add_argument("--fig2-efficiency", required=True,
+                    help="digitized staged Fig.-2 curves")
+    ap.add_argument("--efficiency-treatment", default="input_pre_roi_curve",
+                    choices=["input_pre_roi_curve", "input_published_curve"],
+                    help="pre-ROI selection (baseline), or total efficiency "
+                         "plus explicit ROI (legacy comparison only)")
     ap.add_argument("--table1", required=True)
     ap.add_argument("--contours", required=True)
     ap.add_argument("--sr1-marginals", required=True)
@@ -649,19 +685,37 @@ def main():
     ap.add_argument("--n-er", type=int, default=40_000,
                     help="generated events per ER source (pre-ROI)")
     ap.add_argument("--n-nr", type=int, default=120_000,
-                    help="generated events per NR source (pre-ROI)")
+                    help="generated events per non-8B/hep NR source")
     ap.add_argument("--n-b8", type=int, default=600_000,
-                    help="generated events for the combined 8B+hep source "
-                         "(its efficiency-folded ROI pass rate is ~1e-3, "
-                         "so it needs far more generated events than the "
-                         "other NR sources to fill its ROI histogram)")
+                    help="generated events for combined 8B+hep")
     ap.add_argument("--background-components", default="all_table1")
     ap.add_argument("--exposure-structure", default="combined_single")
     ap.add_argument("--nest-parameter-set", default="ws2024_nest240")
     ap.add_argument("--detector-effects", default="uniform_1d")
     ap.add_argument("--accidentals-model",
                     default="factorized_contour_constrained")
-    args = ap.parse_args()
+    return ap
+
+
+def main():
+    args = make_parser().parse_args()
+    return build_models(args)
+
+
+def build_models(args, source_names=None):
+    """Build sources with one pre-response efficiency and one explicit ROI.
+
+    source_names is optional and implementation-only. In particular it must
+    not be used for the matched full-model A/B, because rejecting a different
+    number of NR events changes subsequent random draws. All other arguments
+    are shared by both efficiency treatments.
+    """
+    args.output = str(args.output)
+    if source_names is not None:
+        unknown = set(source_names) - set(SOURCE_SPECS)
+        if unknown:
+            raise ValueError(f"Unknown source subset: {sorted(unknown)}")
+
     for name, val in (("background_components", args.background_components),
                       ("exposure_structure", args.exposure_structure),
                       ("nest_parameter_set", args.nest_parameter_set),
@@ -682,7 +736,12 @@ def main():
 
     table1 = read_table1(args.table1)
     spectra = load_component_spectra(args.spectra)
-    eff = load_efficiency(args.efficiency)
+    eff_total = load_efficiency(args.efficiency)
+    # Orange Fig. 2 is pre-S2/S1-ROI; it replaces, never multiplies, t4.
+    eff_pre_roi = load_efficiency(args.fig2_efficiency,
+                                  stage="pre_roi_ss_data_cuts")
+    eff = (eff_pre_roi if args.efficiency_treatment == "input_pre_roi_curve"
+           else eff_total)
     # neutron spectrum CSV: (e_lo, e_hi, log10_rate) bins
     neutron_bins = np.array(
         [[float(r[0]), float(r[1]), 10.0 ** float(r[2])]
@@ -710,14 +769,22 @@ def main():
             f"exposure_structure={args.exposure_structure}, "
             f"nest_parameter_set={args.nest_parameter_set}, "
             f"detector_effects={args.detector_effects}, "
-            f"accidentals_model={args.accidentals_model}"
+            f"accidentals_model={args.accidentals_model}, "
+            f"efficiency_treatment={args.efficiency_treatment}"
         )
-        f.attrs["n_generated"] = f"er={args.n_er}, nr={args.n_nr}"
+        f.attrs["n_generated"] = f"er={args.n_er}, nr={args.n_nr}, b8={args.n_b8}"
+        f.attrs["efficiency_treatment"] = args.efficiency_treatment
+        f.attrs["nr_preresponse_efficiency_stage"] = eff.stage
+        f.attrs["nr_preresponse_efficiency_source"] = eff.source
+        f.attrs["nr_preresponse_efficiency_domain_kevnr"] = (
+            float(eff.energy_kevnr[0]), float(eff.energy_kevnr[-1]))
+        f.attrs["efficiency_interpolation"] = "linear; constant endpoint extension"
 
         fit_diagnostics = f.create_group("accidentals_fit")
 
         for source, (kind, shape_key) in SOURCE_SPECS.items():
-            if source not in table1:
+            if source_names is not None and source not in source_names:
+                continue
                 print(f"FAIL: Table I reference lacks {source}",
                       file=sys.stderr)
                 return 1
@@ -725,6 +792,11 @@ def main():
             print(f"\n{source}: Table I {mean_count} +/- {sigma}")
 
             q_ec = None
+            isotope_labels = None
+            n_sampled = args.n_er
+            n_pre_eff = args.n_er
+            outside_support = None
+            n_sampled_outside_support = 0
             if kind == "accidentals":
                 # observable-space PDF; no response chain
                 if args.accidentals_model == "factorized_contour_constrained":
@@ -781,8 +853,8 @@ def main():
             else:
                 # energy-space sources
                 if shape_key == "nr_b8+nr_hep":
-                    # weight 8B vs hep by their efficiency-folded integrals
-                    # from the curves' own absolute normalization
+                    # Weight 8B vs hep by their pre-response efficiency-folded
+                    # spectral integrals, using the curves' absolute normalization.
                     # (both are 'bin' step histograms)
                     ints = {}
                     for comp in ("nr_b8", "nr_hep"):
@@ -796,6 +868,9 @@ def main():
                           f"{w_b8:.3f}:{1 - w_b8:.3f}")
                     n_b8 = int(round(args.n_b8 * w_b8))
                     parts = []
+                    isotope_labels = np.concatenate([
+                        np.full(n_b8, "b8"),
+                        np.full(args.n_b8 - n_b8, "hep")])
                     for comp, n_part in (("nr_b8", n_b8),
                                          ("nr_hep", args.n_b8 - n_b8)):
                         k2, arr2 = spectra[comp]
@@ -806,16 +881,33 @@ def main():
                 elif kind in ("curve", "nr_curve"):
                     k2, arr2 = spectra[shape_key]
                     sampler, _ = spectrum_pdf_sampler(k2, arr2, engine.rng)
-                    energies = sampler(args.n_er)
+                    n_source = args.n_nr if kind == "nr_curve" else args.n_er
+                    energies = sampler(n_source)
                 else:
                     energies = None  # analytic: sampled below
 
                 nr = kind == "nr_curve"
                 if nr:
-                    keep = engine.rng.uniform(0.0, 1.0, len(energies)) \
-                        < eff(energies)
+                    n_sampled = len(energies)
+                    outside_support = ((energies < eff.energy_kevnr[0])
+                                       | (energies > eff.energy_kevnr[-1]))
+                    n_sampled_outside_support = int(outside_support.sum())
+                    keep = (engine.rng.uniform(0.0, 1.0, len(energies))
+                            < eff(energies))
+                    # Keep the extrapolation diagnostics attached to the ROI
+                    # mask; n_sampled - n_pre_eff is the efficiency rejection
+                    # count, NOT the out-of-support count.
+                    outside_support = outside_support[keep]
+                    if isotope_labels is not None:
+                        isotope_labels = isotope_labels[keep]
                     energies = energies[keep]
-                    print(f"  efficiency: {keep.mean():.4%} of events pass")
+                    n_pre_eff = len(energies)
+                    print(f"  pre-response efficiency ({eff.stage}): "
+                          f"{n_pre_eff}/{n_sampled} = {keep.mean():.6g}; "
+                          f"binomial MC sigma="
+                          f"{np.sqrt(keep.mean() * (1 - keep.mean()) / n_sampled):.3g}")
+                else:
+                    outside_support = None
                 if energies is None:  # analytic spectra
                     if shape_key in ("xe124_lines", "xe127_ec"):
                         energies = np.full(args.n_er, float(
@@ -839,6 +931,8 @@ def main():
                     else:
                         raise ValueError(f"unhandled analytic {shape_key}")
 
+                if outside_support is None:
+                    outside_support = np.zeros(len(energies), dtype=bool)
                 s1c_all, s2c_all = engine.generate(energies, nr=nr,
                                                    q_ec=q_ec)
                 m = roi_mask(s1c_all, s2c_all)
@@ -864,24 +958,69 @@ def main():
             grp = f.create_group(source)
             grp.attrs["table1_mean"] = mean_count
             grp.attrs["table1_sigma"] = sigma
-            grp.attrs["n_generated"] = int(
-                args.n_er if kind in ("curve", "analytic", "accidentals")
-                else (args.n_b8 if shape_key == "nr_b8+nr_hep"
-                      else args.n_nr))
+            grp.attrs["n_generated"] = int(n_sampled)
+            grp.attrs["n_pre_efficiency"] = int(n_pre_eff)
             grp.attrs["n_in_roi"] = n_kept
+            grp.attrs["efficiency_treatment"] = args.efficiency_treatment
+            grp.attrs["efficiency_stage"] = eff.stage if nr else "not_applied"
+            grp.attrs["efficiency_domain_kevnr"] = (
+                [float(eff.energy_kevnr[0]), float(eff.energy_kevnr[-1])]
+                if nr else [float("nan"), float("nan")])
+            grp.attrs["pre_efficiency_acceptance"] = (
+                n_pre_eff / n_sampled if nr else 1.0)
+            grp.attrs["pre_efficiency_binomial_sigma"] = (
+                np.sqrt((n_pre_eff / n_sampled)
+                        * (1.0 - n_pre_eff / n_sampled) / n_sampled)
+                if nr else 0.0)
+            grp.attrs["roi_conditional_acceptance"] = n_kept / n_pre_eff
+            grp.attrs["overall_simulation_acceptance"] = n_kept / n_sampled
+            grp.attrs["explicit_roi_applied"] = kind != "accidentals"
+            grp.attrs["n_sampled_outside_efficiency_support"] = (
+                n_sampled_outside_support)
+            grp.attrs["fraction_sampled_outside_efficiency_support"] = (
+                n_sampled_outside_support / n_sampled
+                if kind != "accidentals" else 0.0)
+            grp.attrs["n_selected_outside_efficiency_support"] = (
+                int(outside_support.sum()) if kind != "accidentals" else 0)
+            grp.attrs["fraction_kept_outside_efficiency_support"] = (
+                float(outside_support[m].sum()) / n_kept
+                if kind != "accidentals" and nr else 0.0)
             grp.attrs["spectrum"] = str(shape_key)
             grp.attrs["notes"] = SOURCE_NOTES[source]
+            if shape_key == "nr_b8+nr_hep":
+                grp.attrs["b8_integral_weight"] = w_b8
+                grp.attrs["hep_integral_weight"] = 1.0 - w_b8
+                for isotope, label in (("b8", "b8"), ("hep", "hep")):
+                    mask_iso = isotope_labels == label
+                    grp.attrs[f"n_generated_{isotope}"] = (
+                        n_b8 if isotope == "b8" else args.n_b8 - n_b8)
+                    grp.attrs[f"n_pre_efficiency_{isotope}"] = int(mask_iso.sum())
+                    grp.attrs[f"n_in_roi_{isotope}"] = int(mask_iso[m].sum())
             grp.create_dataset("s1c", data=s1[sel])
             grp.create_dataset("log10_s2c", data=y[sel])
-            grp.create_dataset("weight", data=w[sel])
+            # Full histograms use the unthinned generation weights. The display
+            # sample is normalized independently so table-I physical integration
+            # is preserved even when n_kept exceeds MAX_SAMPLES. These are
+            # proportional counts (constant weight per source), not new physics.
+            stored_weights = w[sel].copy()
+            if stored_weights.sum() > 0:
+                stored_weights *= mean_count / stored_weights.sum()
+            grp.attrs["display_samples_renormalized_to_table1"] = True
+            grp.create_dataset("weight", data=stored_weights)
             H, _, _ = np.histogram2d(
                 s1, y, bins=[HIST_S1C_EDGES, HIST_Y_EDGES],
                 weights=w)
             grp.create_dataset("hist_counts", data=H)
+            Hmc, _, _ = np.histogram2d(
+                s1, y, bins=[HIST_S1C_EDGES, HIST_Y_EDGES])
+            grp.create_dataset("hist_mc_counts", data=Hmc)
+            Hw2, _, _ = np.histogram2d(
+                s1, y, bins=[HIST_S1C_EDGES, HIST_Y_EDGES], weights=w ** 2)
+            grp.create_dataset("hist_mc_weight_variance", data=Hw2)
             grp.create_dataset("hist_s1c_edges", data=HIST_S1C_EDGES)
             grp.create_dataset("hist_y_edges", data=HIST_Y_EDGES)
             print(f"  stored {len(sel)} samples; total weight "
-                  f"{w.sum():.2f}")
+                  f"{stored_weights.sum():.2f}")
 
     print(f"\nPASS: wrote {args.output}")
     return 0

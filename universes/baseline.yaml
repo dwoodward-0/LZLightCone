@@ -3,7 +3,7 @@ description: Default configuration using standard practices
 decisions:
   statistics: both_with_crosscheck
   background_components: all_table1
-  efficiency_treatment: input_published_curve
+  efficiency_treatment: input_pre_roi_curve
   response_model: nest_library
   halo_model: shm_standard
   nest_parameter_set: ws2024_nest240

@@ -2118,6 +2118,15 @@ prior_insights:
           suffix: "Uncertainties arise from the combined statistical error"
         location:
           page: 5
+      - id: ev2
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "Energy-dependent NR signal efficiency in WS2024 after the application, in sequence, of the S2 trigger (blue); SS reconstruction and analysis cuts (orange); S2 ROI (green) followed by the S1 ROI (black)."
+          prefix: "FIG. 2."
+          suffix: "The inset shows the low-"
+        location:
+          page: 5
   lz_nr_efficiency_50pct:
     id: lz_nr_efficiency_50pct
     label: "NR efficiency 50% at 5.4 keV"
@@ -2255,8 +2264,8 @@ prior_insights:
           page: 6
   lz_xe124_dec_model:
     id: lz_xe124_dec_model
-    label: "124Xe DEC model: abundance, branches, Qy bounds"
-    claim: "The 124Xe two-neutrino double-electron-capture background in the ROI is estimated from natural abundance 9.52e-4 with LL (10.00 keV) and LM (5.98 keV) branching ratios of 1.4% and 0.8%, with LM charge suppression modeled by the same 0.87 ratio and the LL-shell charge yield treated as a free parameter bounded between 0.65 and 0.87 via the Thomas-Imel box model."
+    label: "124Xe DEC model: abundance, branches, Qy bounds and fitted LL value"
+    claim: "The 124Xe two-neutrino double-electron-capture background in the ROI is estimated from natural abundance 9.52e-4 with LL (10.00 keV) and LM (5.98 keV) branching ratios of 1.4% and 0.8%, with LM charge suppression modeled by the same 0.87 ratio and the LL-shell charge yield treated as a free parameter bounded between 0.65 and 0.87 via the Thomas-Imel box model. The WS2024 fit reports Qy_LL/Qy_beta = 0.70 +/- 0.04, consistent across all WIMP masses (and radon tagging efficiency 62 +/- 3%)."
     created_at: "2026-11-09T12:00:00Z"
     evidence:
       - id: ev1
@@ -2268,6 +2277,15 @@ prior_insights:
           suffix: "The LM charge suppression is modeled with the same ratio"
         location:
           page: 6
+      - id: ev2
+        doi: "10.48550/arXiv.2410.17036"
+        version: 3
+        quote:
+          exact: "The fitted values of the radon tagging efficiency and the 124Xe QLL y /Qβ y are consistent across all masses, at 62 ± 3% and 0.70 ± 0.04, respectively, in agreement with the pre-fit expectations."
+          prefix: "with the inclusion of the modified 124Xe response. "
+          suffix: " Figure 5 shows the 90% confidence level upper limit on the "
+        location:
+          page: 8
   lz_neutron_sideband_insitu:
     id: lz_neutron_sideband_insitu
     label: "Detector neutrons constrained in situ via sideband"
@@ -2821,6 +2839,44 @@ prior_insights:
           suffix: "duced by more than 6 orders of magnitude"
         location:
           page: 10
+findings:
+  nr_pre_roi_chain:
+    id: nr_pre_roi_chain
+    label: "Corrected NR efficiency chain and measured acceptances"
+    claim: "The correction replaces the ROI-inclusive total efficiency with the public Fig. 2 pre-ROI stage before NEST and applies the corrected-observable ROI exactly once. In the complete matched-budget A/B, atmospheric-neutrino pre-efficiency acceptance changes from 0.630742 to 0.695083, detector-neutron acceptance from 0.473200 to 0.564925, and B8+hep acceptance from 0.000560 to 0.006543; the corresponding conditional ROI acceptances are 0.934918 -> 0.884810, 0.924345 -> 0.816451, and 0.175595 -> 0.021396. Fixed Table I central physical means are unchanged."
+    created_at: "2026-11-12T00:00:00Z"
+    scope: "WS2024 response, corrected space, seed 44, n_er=40000, n_nr=120000, n_b8=600000. The independent black/HEPData efficiency input check has maximum residual 0.00136346. These are simulation acceptances, not changes to the Table I physical event rates."
+    notes: "The controlled comparison reproduces the active declared model exactly, and non-NR arrays and metadata agree except for the intentional efficiency_treatment label. Full unthinned histograms and thinned display samples are separately normalized to Table I. The black total-mode behavior is diagnostic only and is not allowed for absolute WIMP yields."
+    evidence:
+      - id: ev1
+        artifact: nr_efficiency_comparison
+      - id: ev2
+        artifact: efficiency_passthrough
+  nr_efficiency_shape_changes:
+    id: nr_efficiency_shape_changes
+    label: "Resolved NR shape changes and finite-MC control"
+    claim: "The efficiency correction changes observable NR shapes even after Table I normalization. In the 3-40 phd panel, maximum binwise unit-area S1c differences are 0.011432 (7.92 sigma) for atmospheric neutrinos and 0.012561 (6.96 sigma) for detector neutrons; the B8+hep log10-S2c maximum difference is 0.362296 (10.28 sigma) in the independent fivefold study. The efficiency-folded B8 spectral-integral fraction changes from 0.887716 to 0.984967. These are shape and mixture effects, not changes to imposed physical parent rates."
+    created_at: "2026-11-12T00:00:00Z"
+    scope: "Unit-area full-histogram projections conditional on the common explicit ROI. Sigmas are per-mode multinomial uncertainties added in quadrature, without claiming matched-seed covariance cancellation; zero-variance empty bins are not used. Detector-neutron central physical weight is zero, so only its unit-area shape is compared."
+    notes: "Atmospheric-neutrino top-panel maxima are 0.011537 (9.73 sigma) in log10 S2c and 0.008831 (4.81 sigma) in u; the detector-neutron u maximum is 0.008101 (4.46 sigma). Sparse base B8+hep ROI counts are 59 legacy and 84 corrected. The independent seed 1000047 fivefold study gives 323 and 370 ROI events respectively, with u maximum difference 0.078286 (3.92 sigma), S1c maximum difference 0.087298 (2.74 sigma), and log10-S2c maximum difference 0.362296 (10.28 sigma); no B8+hep events enter the 40-80 phd panel in either fivefold mode. Isotope-specific finite samples describe the simulation mixture and are not independently constrained physical subcomponent rates."
+    evidence:
+      - id: ev1
+        artifact: nr_efficiency_comparison
+      - id: ev2
+        artifact: nr_efficiency_validation
+  nr_efficiency_validation4_effect:
+    id: nr_efficiency_validation4_effect
+    label: "Efficiency correction has negligible total Fig. 4 effect"
+    claim: "With the same exclusive 12-source total and six-gate validator, both legacy and corrected models pass Validation 4. Total background shape RMS changes from 0.129199943 to 0.129337987 dex (change +0.000138044), and the sub-floor absolute residual changes from 3.960610966 to 3.960276576 events. This is a negligible total-projection effect because the NR contributions have small physical weight, not a demonstrated improvement in agreement with LZ."
+    created_at: "2026-11-12T00:00:00Z"
+    scope: "WS2024 Fig. 4 projection and exclusive-total bookkeeping correction; 214Pb, other ER and 124Xe residuals remain the dominant, documented model comparisons."
+    notes: "Total physical ROI counts remain 1209.2 in both modes. The correction sums 12 exclusive sources exactly once; other_er_as_drawn is only an auxiliary outline comparison and never enters a physical total. Earlier total-RMS values included the duplicated auxiliary category and are superseded by these matched-validator values. No property was tuned to change Fig. 4 agreement."
+    evidence:
+      - id: ev1
+        artifact: nr_efficiency_comparison
+      - id: ev2
+        artifact: background_projection_validation
+
 decisions:
   statistics:
     id: statistics
@@ -2861,12 +2917,16 @@ decisions:
   efficiency_treatment:
     id: efficiency_treatment
     label: "Signal analysis efficiency"
-    rationale: "The published analysis efficiency folds in event-level cuts whose details are not public; recreating it would couple validation to unmodelable details. Decision: take the published curve as an input."
-    default: input_published_curve
+    rationale: "Event-level cut details are not public, so LZ's published Fig. 2 efficiency is an input. The chain must nevertheless respect the Fig. 2 staging: the pre-ROI curve is applied in recoil-energy space, NEST maps retained recoils to corrected observables, and the observable ROI is applied once. The HEPData t4 black curve already includes both ROI stages, so using it before the same explicit ROI is retained only as a legacy comparison."
+    default: input_pre_roi_curve
     options:
+      input_pre_roi_curve:
+        label: "Pre-ROI input curve then explicit observable ROI"
+        description: "Apply the public Fig. 2 orange curve (S2 trigger followed by SS reconstruction and data-analysis cuts) in recoil-energy space, then NEST, then the explicit corrected-observable ROI once. Use this same selected pre-response curve for the 8B/hep spectral-integral mixture. The total black curve is never multiplied in or obtained by curve division. Background shapes are then normalized to Table I; absolute WIMP signal yields do not receive that normalization."
+        insights: [lz_data_release_efficiency_curve, lz_efficiency_50pct_kev, lz_nr_efficiency_fig2, lz_nr_efficiency_50pct, lz_s1_ss_efficiency, lz_ws2024_roi_definition, lz_nest_header_hepdata]
       input_published_curve:
-        label: "Published efficiency curve as input"
-        description: "Take LZ's published total analysis efficiency (from the data release) as a declared input, applied identically to signal and background components."
+        label: "Legacy total curve plus explicit ROI"
+        description: "Superseded diagnostic behavior: apply HEPData t4's black cumulative total analysis efficiency (including S2 and S1 ROI) in recoil-energy space, then NEST and the explicit observable ROI. This double-counts an energy-weighted ROI treatment and must not be used for absolute signal yields; it remains selectable for the declared matched old/new comparison."
         insights: [lz_data_release_efficiency_curve, lz_roi_definition, lz_efficiency_50pct_kev, lz_nr_efficiency_fig2, lz_nr_efficiency_50pct, lz_s1_ss_efficiency, lz_nest_header_hepdata]
       recreate_from_cuts:
         label: "Recreate efficiency from modeled cuts"
@@ -3036,7 +3096,12 @@ inputs:
     type: data
     label: "LZ WS2024 NR efficiency curve"
     source: data/lz_ws2024_efficiency.csv
-    description: "Cumulative NR data-selection efficiency vs nuclear recoil energy, from the HEPData Efficiency table of the LZ WS2024 record (ins2841863, table DOI 10.17182/hepdata.155182.v2/t4). This is the published analysis efficiency taken as an input per decision efficiency_treatment.input_published_curve; reaches 50% at ~5.4 keVnr (insight lz_nr_efficiency_50pct)."
+    description: "Cumulative NR data-selection efficiency vs nuclear recoil energy, from the HEPData Efficiency table of the LZ WS2024 record (ins2841863, table DOI 10.17182/hepdata.155182.v2/t4). This is the black Fig. 2 cumulative total, including the S2-ROI and S1-ROI stages. It reaches 50% at ~5.4 keVnr (insight lz_nr_efficiency_50pct). Under efficiency_treatment.input_pre_roi_curve it is a cross-check/legacy-diagnostic input; the energy-space pre-response selection is lz_fig2_efficiency, followed by the explicit observable ROI."
+  - id: lz_fig2_efficiency
+    type: data
+    label: "LZ WS2024 staged Fig. 2 NR efficiency curves (digitized)"
+    source: data/lz_ws2024_fig2_efficiency.csv
+    description: "Long-form (stage, energy_kevnr, efficiency) authored public input extracted by src/digitize_efficiency_ws2024.py from the SHA256-pinned public WS2024 paper lz_ws2024_paper (arXiv:2410.17036v3, Fig. 2 page 5). The main-panel orange pre_roi_ss_data_cuts stage is S2 trigger + SS reconstruction and analysis cuts, before S2 and S1 ROI (insight lz_nr_efficiency_fig2, verified caption evidence ev2); this is the energy-space efficiency under efficiency_treatment.input_pre_roi_curve, not multiplied by the HEPData black curve and not obtained by dividing curves. The independent total_fig2 black-stage digitization is a cross-check only: maximum absolute residual to every common-support HEPData t4 point 0.00136346 (RMS 0.000160167), inside the predeclared 0.01 absolute gate; axis fits, unique continuous paths (45/98 line items), and efficiencies in [0,1] are enforced. Main plotted support is approximately 0-76.377 keVnr; the loader linearly interpolates and holds endpoints outside support (fractions recorded in model metadata). Inset and legend paths are excluded. No orange uncertainty band/covariance is published; the PDF stroke-width/interpolation uncertainty and the high-energy endpoint extension are limitations."
   - id: lz_si_sensitivity_reference
     type: data
     label: "LZ WS2024 SI limit + sensitivity reference"
@@ -3117,6 +3182,21 @@ inputs:
     label: "LZ WS2024 Fig. 4 background projection (digitized)"
     source: data/lz_ws2024_fig4_projection.csv
     description: "The WS2024 data/model comparison curves of Fig. 4 of arXiv:2410.17036v3 (p7, right column), digitized programmatically from the vector graphics by src/digitize_fig4_projection.py (sha256-pinned PDF; axes calibrated from tick marks — minus glyphs are not PDF words, so negative labels are checked positionally; y axes from the 10^k exponent pairs). Rows: per-category additive step levels (events/bin) in the band-projected coordinate u = (log10(S2c) - mu_ER(S1c)) / sigma_ER(S1c) over shared 0.556-wide bins, in two S1c panels (top 3-40 phd, bottom 40-80 phd), plus the black data markers. Series: total_bkg, pb214_betas, other_er_betas, xe124_dec, xe127_125_ec, accidentals, b8, wimp_40gev, data. IMPORTANT provenance finding (verified by exact ratio, Total/214Pb = 1.628 = 1210/743, other/214Pb = 0.293 = (kr85+136Xe)/743): LZ's drawn 'Other ER betas' outline holds ONLY kr85 + 136Xe — solar-nu, 212Pb and tritium/14C (223 events, 18.4%) appear in the Total Bkg curve but are absent from the outlines; the bottom-panel accidentals outline lies entirely below the figure's 10^-2 floor and is therefore absent from the CSV. SHAPE reference for background_projection_validation; LZ's drawn curves come from their full position-dependent simulation, so the deep low-charge tail (|u| >~ 3) carries the uniform_1d limitation."
+  - id: efficiency_passthrough_script
+    type: data
+    label: "Staged efficiency validation script"
+    source: src/plot_efficiency.py
+    description: "Recipe script for efficiency_passthrough; declared to make its curve staging, HEPData E50 check and black/HEPData consistency gate cascade to the output."
+  - id: nr_efficiency_comparison_script
+    type: data
+    label: "Matched NR efficiency comparison script"
+    source: src/compare_nr_efficiency.py
+    description: "Recipe script for nr_efficiency_comparison. It calls the declared background generator for both modes with all 12 sources, identical seeds and budgets; the explicit ROI and NEST response are shared. It archives retained samples, generation histograms/MC variances, per-source diagnostics and corrected-exclusive-total validation metrics."
+  - id: nr_efficiency_plot_script
+    type: data
+    label: "NR efficiency comparison figure script"
+    source: src/plot_nr_efficiency.py
+    description: "Recipe script for nr_efficiency_validation; reads only the declared HDF5 comparison archive and renders the efficiency-curves, stage acceptance and MC-aware NR shape comparison."
   - id: background_projection_script
     type: data
     label: "Background projection validator script"
@@ -3171,36 +3251,54 @@ outputs:
   - id: efficiency_passthrough
     type: figure
     format: png
-    label: "Validation 3: efficiency curve passthrough"
-    description: "Sanity check that the published efficiency input is ingested faithfully: the declared lz_efficiency_curve plotted against LZ's Fig. 2 presentation (50% at 5.4 keVnr). ACCEPTANCE: plotted curve identical to the input file; 50% point at 5.4 +/- 0.1 keVnr. No analysis content — it guards the input path."
-    inputs: [lz_efficiency_curve]
+    label: "Validation 3: staged efficiency curve passthrough"
+    description: "Sanity check that the staged public efficiency inputs are ingested faithfully: overlay the pre-ROI orange Fig. 2 stage (S2 trigger + SS reconstruction/data-analysis cuts) and the HEPData black cumulative total (then adds S2 ROI and S1 ROI). Under input_pre_roi_curve only the orange curve is applied before NEST; the explicit observable ROI is applied once. ACCEPTANCE: values are taken directly from the declared input files; independently digitized Fig. 2 black versus HEPData t4 max absolute residual <=0.01 on common support; HEPData total E50 at 5.4 +/- 0.1 keVnr. No E50 condition is imposed on the pre-ROI curve. The plot does not derive a pre-ROI curve by dividing cumulative efficiencies."
+    inputs: [lz_efficiency_curve, lz_fig2_efficiency, efficiency_passthrough_script]
     decisions: [efficiency_treatment]
     recipe:
-      command: "python src/plot_efficiency.py --input {inputs.lz_efficiency_curve} --output {output}"
+      command: "python src/plot_efficiency.py --input {inputs.lz_efficiency_curve} --staged-input {inputs.lz_fig2_efficiency} --efficiency-treatment {decisions.efficiency_treatment} --output {output}"
   - id: background_models
     type: data
     format: hdf5
     label: "Per-component background models"
-    description: "Every Table I background source (decision background_components.all_table1) propagated through the calibrated response into a 2D distribution in (S1c, log10 S2c) in the WS2024 ROI, normalized to its Table I pre-fit count for the combined single exposure (decision exposure_structure.combined_single). Response is the validated GetYields -> GetQuanta -> GetS1/GetS2 nestpy chain from the WS2024 HEPData header (lz_nest_header_ws2024; g2 gate 34.0 +/- 0.2 from CalculateG2), uniform_1d (decision detector_effects.uniform_1d) in corrected space. Energy spectra: 9 sources as digitized 2018-paper curves (lz2018_component_spectra, neutron shape from lz_neutron_spectrum_2018), tritium+14C as an 8:1 weighted mixture of analytic beta spectra, 124Xe as a 2-line EC model (10.00/5.98 keV by branch ratio) and 127Xe/125Xe as the 5.2 keV EC line (REVIEW ITEM — the composite Qy uses the published EC recombination enhancement Qy^L/Qy^beta = 0.87 +/- 0.03), both pushed through the response with the quanta-boundary EC charge suppression (S2 from q_ec x Ne via GetS2, recombination photons added to S1c as a Gaussian — exact in the mean, subdominant to the +/-0.03 published uncertainty on q). NR sources (atm nu, 8B+hep by efficiency-folded 0.888:0.112 weighting, detector neutrons) additionally folded with the published efficiency curve (lz_efficiency_curve) by rejection; detector_neutrons has Table I mean 0.0 and carries zero weight (shape still stored). The accidentals component is modeled in observable space from the factorized-contour reconstruction under decision accidentals_model.factorized_contour_constrained: P(S1c, log10 S2c) = f1(S1c) x f2(log10 S2c) with the marginals fitted to the WS2024 Fig. 3 68%/95% contours (level-set system with gauge and a c68-c95 = 1 gap anchor; sharpening exponent set by bisection so the enclosed volume is 68%; contour rms 0.293 dex, data-side — the figure's contours are not exactly factorized level sets; 95% enclosed volume 0.965 as the consistency check; fitted S1c marginal agrees with the SR1 Fig. 12 marginal to 0.09 dex median / 0.49 max over the matched support; tail beyond S1c = 60 extrapolated with floored log-slope). Edge-clipped contour points are dropped from the fit. Accidentals and detector-neutron sources are modeled from their published descriptions (data-driven in LZ)."
-    inputs: [lz_nest_header_ws2024, lz_efficiency_curve, lz_table1_counts_reference, lz2018_component_spectra, lz_neutron_spectrum_2018, lz_ws2024_accidentals_contours, lz_accidentals_marginals_sr1, background_models_script]
-    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model]
+    description: "Every Table I background source (decision background_components.all_table1) propagated through the calibrated response into a 2D distribution in (S1c, log10 S2c) in the WS2024 ROI, normalized to its Table I pre-fit count for the combined single exposure (decision exposure_structure.combined_single). Response is the validated GetYields -> GetQuanta -> GetS1/GetS2 nestpy chain from the WS2024 HEPData header (lz_nest_header_ws2024; g2 gate 34.0 +/- 0.2 from CalculateG2), uniform_1d (decision detector_effects.uniform_1d) in corrected space. Energy spectra: 9 sources as digitized 2018-paper curves (lz2018_component_spectra, neutron shape from lz_neutron_spectrum_2018), tritium+14C as an 8:1 weighted mixture of analytic beta spectra, 124Xe as a 2-line EC model (10.00/5.98 keV by branch ratio) and 127Xe/125Xe as the 5.2 keV EC line (REVIEW ITEM — the composite Qy uses the published EC recombination enhancement Qy^L/Qy^beta = 0.87 +/- 0.03), both pushed through the response with the quanta-boundary EC charge suppression (S2 from q_ec x Ne via GetS2, recombination photons added to S1c as a Gaussian — exact in the mean, subdominant to the +/-0.03 published uncertainty on q). NR sources (atm nu, 8B+hep by pre-response efficiency-folded spectral-integral weighting, detector neutrons) use the selected efficiency_treatment input before response by rejection, followed by NEST and the explicit corrected-space ROI once. Under input_pre_roi_curve this is the orange Fig. 2 trigger + SS/data-analysis stage (lz_fig2_efficiency), not the total black curve (lz_efficiency_curve); the legacy alternative is for the declared matched A/B only. Both modes retain the 8B:hep mixture fraction, per-isotope stage counts, and generation/ROI acceptances. Display samples are proportionally renormalized to Table I after any thinning; full unthinned generation histograms and their MC variances are retained separately for shape control; detector_neutrons has Table I mean 0.0 and carries zero physical weight, so its shape comparisons are unit-area. The accidentals component is modeled in observable space from the factorized-contour reconstruction under decision accidentals_model.factorized_contour_constrained: P(S1c, log10 S2c) = f1(S1c) x f2(log10 S2c) with the marginals fitted to the WS2024 Fig. 3 68%/95% contours (level-set system with gauge and a c68-c95 = 1 gap anchor; sharpening exponent set by bisection so the enclosed volume is 68%; contour rms 0.293 dex, data-side — the figure's contours are not exactly factorized level sets; 95% enclosed volume 0.965 as the consistency check; fitted S1c marginal agrees with the SR1 Fig. 12 marginal to 0.09 dex median / 0.49 max over the matched support; tail beyond S1c = 60 extrapolated with floored log-slope). Edge-clipped contour points are dropped from the fit. Accidentals and detector-neutron sources are modeled from their published descriptions (data-driven in LZ)."
+    inputs: [lz_nest_header_ws2024, lz_efficiency_curve, lz_fig2_efficiency, lz_table1_counts_reference, lz2018_component_spectra, lz_neutron_spectrum_2018, lz_ws2024_accidentals_contours, lz_accidentals_marginals_sr1, background_models_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment]
     recipe:
-      command: "python src/build_background_models.py --output {output} --spectra {inputs.lz2018_component_spectra} --neutron-spectrum {inputs.lz_neutron_spectrum_2018} --efficiency {inputs.lz_efficiency_curve} --table1 {inputs.lz_table1_counts_reference} --contours {inputs.lz_ws2024_accidentals_contours} --sr1-marginals {inputs.lz_accidentals_marginals_sr1} --nest-header {inputs.lz_nest_header_ws2024} --background-components {decisions.background_components} --exposure-structure {decisions.exposure_structure} --nest-parameter-set {decisions.nest_parameter_set} --detector-effects {decisions.detector_effects} --accidentals-model {decisions.accidentals_model}"
+      command: "python src/build_background_models.py --output {output} --spectra {inputs.lz2018_component_spectra} --neutron-spectrum {inputs.lz_neutron_spectrum_2018} --efficiency {inputs.lz_efficiency_curve} --fig2-efficiency {inputs.lz_fig2_efficiency} --efficiency-treatment {decisions.efficiency_treatment} --table1 {inputs.lz_table1_counts_reference} --contours {inputs.lz_ws2024_accidentals_contours} --sr1-marginals {inputs.lz_accidentals_marginals_sr1} --nest-header {inputs.lz_nest_header_ws2024} --background-components {decisions.background_components} --exposure-structure {decisions.exposure_structure} --nest-parameter-set {decisions.nest_parameter_set} --detector-effects {decisions.detector_effects} --accidentals-model {decisions.accidentals_model}"
   - id: background_projection_validation
     type: figure
     format: png
     label: "Validation 4: background spectra vs LZ"
     description: "Validation of the background stage: our combined background model projected in LZ Fig. 4's band-projected coordinate u = (log10(S2c) - mu_ER(S1c)) / sigma_ER(S1c) (mu/sigma from the response_model_calibration ER band quantiles, themselves validated against LZ's published bands) and compared per category against the digitized Fig. 4 outlines (lz_ws2024_fig4_projection), over both S1c panels (3-40 and 40-80 phd). Category mapping: pb214 <- 214Pb; other ER as drawn <- kr85 + 136Xe (LZ's drawn outline holds only these two — solar-nu/212Pb/tritium appear only in their Total); xe124; xe127+125; accidentals; b8 <- 8B+hep+atm+neutrons; the full other-ER sum is also computed and expected to sit ~+0.1-0.3 dex above the drawn outline. ACCEPTANCE: (1) total ROI counts consistent with 1210 +/- 91; (2) per-component totals equal their Table I means; (3) panel-integrated totals within 20% of the digitized sums (a genuine prediction — the S1c split is not in Table I); (4) total-curve shape within rms 0.15 dex over bins with LZ level >= 1 event/bin (below that the drawn line's own thickness against the 10^-2 floor dominates and the bins carry <= 0.1% each); (5) per-category rms <= 0.25 dex over the same bins, with 124Xe evaluated at the best Qy_LL/Qy_beta within LZ's published floating prior [0.65, 0.87] (our pre-fit value is the TI box model 0.65; the drawn pre-fit figure implies ~0.7-0.8 — reported, and a natural knob for the later background-variation studies); (6) the total curve's absolute sub-floor tail within 8 events (~0.7% of the model; the deep low-charge tail is where LZ's full position-dependent simulation diverges from uniform_1d, the same attribution as the WS2024 NR mid-range width residual, covered by the simplified_position escalation universe). Sidecar JSON carries the full numeric comparison."
     inputs: [background_models, response_model_calibration, lz_table1_counts_reference, lz_ws2024_fig4_projection, background_projection_script]
-    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment]
     recipe:
-      command: "python src/validate_backgrounds.py --models {inputs.background_models} --response {inputs.response_model_calibration} --table1 {inputs.lz_table1_counts_reference} --reference {inputs.lz_ws2024_fig4_projection} --output {output} --background-components {decisions.background_components} --exposure-structure {decisions.exposure_structure} --nest-parameter-set {decisions.nest_parameter_set} --detector-effects {decisions.detector_effects}"
+      command: "python src/validate_backgrounds.py --models {inputs.background_models} --response {inputs.response_model_calibration} --table1 {inputs.lz_table1_counts_reference} --reference {inputs.lz_ws2024_fig4_projection} --output {output} --efficiency-treatment {decisions.efficiency_treatment} --background-components {decisions.background_components} --exposure-structure {decisions.exposure_structure} --nest-parameter-set {decisions.nest_parameter_set} --detector-effects {decisions.detector_effects}"
+  - id: nr_efficiency_comparison
+    type: data
+    format: hdf5
+    label: "Matched NR efficiency correction comparison"
+    description: "Before/after comparison of the pre-response NR efficiency treatment. Regenerates the complete matched-seed 12-source models in private temporary storage under both legacy total-curve and corrected pre-ROI selections, using the same response, actual sampling budgets and one explicit corrected-space ROI. Checks byte-for-byte that the active temporary model matches background_models, that all non-NR source arrays and metadata match across modes except for the intentional per-source efficiency_treatment mode label, and that full-count generation histograms reconcile with ROI multiplicities and Table I normalization. Archives retained event samples and weights, full histograms and MC variances, stage acceptances, efficiency curves, all Validation 4 JSON metrics, unit-area S1c/log10-S2c/u shapes, and an independent-seed fivefold-budget B8+hep comparison. Conditional unit-area shape differences use per-mode multinomial MC variances, without claiming exact cancellation after matched-seed rejection streams diverge. Physical Table I means are fixed; detector-neutron zero-weight shapes are compared unit-area. No acceptance gate requires Fig. 4 agreement to improve; the reconstructed corrected model must pass the same six exclusive-total Validation 4 gates."
+    inputs: [background_models, response_model_calibration, lz_nest_header_ws2024, lz_efficiency_curve, lz_fig2_efficiency, lz_table1_counts_reference, lz2018_component_spectra, lz_neutron_spectrum_2018, lz_ws2024_accidentals_contours, lz_accidentals_marginals_sr1, background_models_script, lz_ws2024_fig4_projection, background_projection_script, nr_efficiency_comparison_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment]
+    recipe:
+      command: "python src/compare_nr_efficiency.py --output {output} --background-models {inputs.background_models} --response {inputs.response_model_calibration} --validation-script {inputs.background_projection_script} --reference {inputs.lz_ws2024_fig4_projection} --spectra {inputs.lz2018_component_spectra} --neutron-spectrum {inputs.lz_neutron_spectrum_2018} --efficiency {inputs.lz_efficiency_curve} --fig2-efficiency {inputs.lz_fig2_efficiency} --efficiency-treatment {decisions.efficiency_treatment} --table1 {inputs.lz_table1_counts_reference} --contours {inputs.lz_ws2024_accidentals_contours} --sr1-marginals {inputs.lz_accidentals_marginals_sr1} --nest-header {inputs.lz_nest_header_ws2024} --background-components {decisions.background_components} --exposure-structure {decisions.exposure_structure} --nest-parameter-set {decisions.nest_parameter_set} --detector-effects {decisions.detector_effects} --accidentals-model {decisions.accidentals_model}"
+  - id: nr_efficiency_validation
+    type: figure
+    format: png
+    label: "Validation: NR pre-ROI efficiency correction"
+    description: "Visualization and acceptance summary of nr_efficiency_comparison: pre-ROI and total efficiency curves with their exact staged meanings, pre-efficiency and conditional-ROI acceptances, and MC-aware corrected-minus-legacy unit-area NR shapes. Includes the independent-seed fivefold-statistics B8+hep comparison and Validation 4 gates for both modes. Legacy shapes are diagnostic only; the corrected chain is recoil-energy sampling -> Fig. 2 pre-ROI selection -> NEST -> one explicit ROI -> Table I normalization. Physical central counts do not change under this correction."
+    inputs: [nr_efficiency_comparison, nr_efficiency_plot_script]
+    decisions: [efficiency_treatment]
+    recipe:
+      command: "python src/plot_nr_efficiency.py --input {inputs.nr_efficiency_comparison} --efficiency-treatment {decisions.efficiency_treatment} --output {output}"
   - id: wimp_signal_models
     type: data
     format: hdf5
     label: "WIMP signal models per mass"
-    description: "SI WIMP recoil spectra for the mass grid, drawn from the standard halo model (decision halo_model.shm_standard, parameters fixed not profiled), propagated through the response and folded with the published efficiency input. One (S1c, log10 S2c) distribution per mass, normalized to unit cross section (per-event expectation at the analysis exposure)."
-    inputs: [response_model_calibration, lz_efficiency_curve]
+    description: "SI WIMP recoil spectra for the mass grid, drawn from the standard halo model (decision halo_model.shm_standard, parameters fixed not profiled). Under efficiency_treatment.input_pre_roi_curve, apply the pre-ROI Fig. 2 stage in recoil-energy space, propagate through NEST, then apply the explicit observable ROI once; one (S1c, log10 S2c) distribution per mass, normalized to unit cross section at the analysis exposure without a Table-I-style renormalization. The total efficiency already contains an ROI and must not precede a second explicit ROI."
+    inputs: [response_model_calibration, lz_efficiency_curve, lz_fig2_efficiency]
     decisions: [halo_model, efficiency_treatment, exposure_structure, nest_parameter_set, detector_effects]
   - id: plr_sensitivity_curve
     type: table

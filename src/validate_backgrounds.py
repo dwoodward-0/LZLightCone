@@ -81,6 +81,14 @@ CATEGORY_MAP = {
     "b8": ["b8_hep_nu_nr", "atm_nu_nr", "detector_neutrons"],
 }
 CATEGORY_MAP["other_er_as_drawn"] = ["kr85_ar39_det_gammas", "xe136_2nubb"]
+# Aux comparison groups must never be flattened into the physical total.
+# These six exclusive categories cover all 12 Table I sources exactly once.
+EXCLUSIVE_CATEGORY_KEYS = (
+    "pb214_betas", "other_er_betas", "xe124_dec", "xe127_125_ec",
+    "accidentals", "b8",
+)
+TOTAL_SOURCES = [s for key in EXCLUSIVE_CATEGORY_KEYS for s in CATEGORY_MAP[key]]
+assert len(TOTAL_SOURCES) == len(set(TOTAL_SOURCES)) == 12
 
 
 def load_reference(path):
@@ -144,11 +152,19 @@ def main():
     ap.add_argument("--exposure-structure", default="combined_single")
     ap.add_argument("--nest-parameter-set", default="ws2024_nest240")
     ap.add_argument("--detector-effects", default="uniform_1d")
+    ap.add_argument("--efficiency-treatment", required=True,
+                    choices=["input_pre_roi_curve", "input_published_curve"],
+                    help="Must match the efficiency recorded in the model.")
     args = ap.parse_args()
     assert args.background_components == "all_table1"
     assert args.exposure_structure == "combined_single"
     assert args.nest_parameter_set == "ws2024_nest240"
     assert args.detector_effects == "uniform_1d"
+    with h5py.File(args.models) as model_file:
+        actual_mode = str(model_file.attrs["efficiency_treatment"])
+        if actual_mode != args.efficiency_treatment:
+            raise ValueError(
+                f"Requested {args.efficiency_treatment}, but model used {actual_mode}")
 
     table1 = read_table1(args.table1)
     ref = load_reference(args.reference)
@@ -191,14 +207,10 @@ def main():
     for panel in PANEL_S1C:
         lz = ref[(panel, "total_bkg")][:, 3]
         lz_sum = float(np.sum(10 ** lz))
-        our_sum = float(ours["pb214_betas"][panel].sum()
-                        + ours["other_er_betas"][panel].sum()
-                        + ours["xe124_dec"][panel].sum()
-                        + ours["xe127_125_ec"][panel].sum()
-                        + ours["accidentals"][panel].sum()
-                        + ours["b8"][panel].sum())
-        rel = our_sum / lz_sum - 1.0
-        print(f"{panel} panel total: ours {our_sum:.1f} vs digitized "
+        my_sum = float(sum(ours[cat][panel].sum()
+                           for cat in EXCLUSIVE_CATEGORY_KEYS))
+        rel = my_sum / lz_sum - 1.0
+        print(f"{panel} panel total: ours {my_sum:.1f} vs digitized "
               f"{lz_sum:.1f} ({rel:+.1%})")
         if abs(rel) > 0.20:
             a3 = False
@@ -239,7 +251,7 @@ def main():
             out[panel] = (cs, res, tail_abs)
         return out
 
-    total_srcs = [s for ss in CATEGORY_MAP.values() for s in ss]
+    total_srcs = TOTAL_SOURCES
     results = {}
     for cat, series in [("total", "total_bkg"),
                         ("pb214", "pb214_betas"),
@@ -420,21 +432,30 @@ def main():
     # persist the numeric comparison as metadata
     import json
 
+    def residual_summary(cat):
+        # Use the exact finite-residual selection of the printed acceptance
+        # calculation. Do not let an empty model bin turn a finite printed
+        # RMS into a NaN in the machine-readable archive.
+        r = np.concatenate([results[cat][p][1] for p in PANEL_S1C])
+        r = r[np.isfinite(r)]
+        if len(r) == 0:
+            return {}
+        return {"rms": float(np.sqrt(np.mean(r ** 2))),
+                "max": float(np.abs(r).max())}
+
     meta = {
+        "efficiency_treatment": actual_mode,
+        "exclusive_categories": list(EXCLUSIVE_CATEGORY_KEYS),
+        "exclusive_source_count": len(TOTAL_SOURCES),
         "total_counts": total_all,
         "table1_total": t1_total,
         "panel_totals": {
             p: {"ours": float(sum(ours[c][p].sum()
-                                  for c in CATEGORY_MAP)),
+                                  for c in EXCLUSIVE_CATEGORY_KEYS)),
                 "lz_digitized": float(np.sum(
                     10 ** ref[(p, "total_bkg")][:, 3]))}
             for p in PANEL_S1C},
-        "residuals_dex": {
-            cat: (lambda r: {} if len(r) == 0 else
-                  {"rms": float(np.sqrt(np.mean(r ** 2))),
-                   "max": float(np.abs(r).max())})(
-                np.concatenate([results[cat][p][1] for p in PANEL_S1C]))
-            for cat in results},
+        "residuals_dex": {cat: residual_summary(cat) for cat in results},
         "tail_abs_events": {cat: float(sum(results[cat][p][2]
                                            for p in PANEL_S1C))
                             for cat in results},
