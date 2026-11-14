@@ -240,7 +240,7 @@ def render(data, out_path, dark=False):
         lower.set_ylim(-extent, extent)
         lower.text(0.02, 0.06, f"±{extent:.3g} events/bin; MC band only",
                    transform=lower.transAxes, fontsize=8, color=c["muted"])
-    axes[0, 0].legend(loc="lower left", fontsize=8.5, facecolor=c["surface"],
+    axes[0, 0].legend(loc="center right", fontsize=8.5, facecolor=c["surface"],
                       edgecolor=c["grid"], labelcolor=c["fg"], framealpha=0.9)
     fig.suptitle("WIMP model check: LZ WS2024 Fig. 4 projection, 40 GeV/c²",
                  color=c["fg"], fontsize=15, y=0.975)

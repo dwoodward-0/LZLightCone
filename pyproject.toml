@@ -14,4 +14,4 @@ dependencies = [
 required-version = ">=0.12"
 
 [tool.uv.sources]
-nestpy = { path = "vendor/nestpy", editable = false }
+nestpy = { git = "file:///Users/dwoodward1/Documents/LZ-lightcone/.git", subdirectory = "vendor/nestpy", rev = "b6f943ac3ed9e5576ca66311a5a2e7f8c0bdc6a7" }
