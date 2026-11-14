@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "output_id": "wimp_fig4_validation",
+  "universe_id": "baseline",
+  "recipe": "python src/validate_wimp_signal.py --models results/baseline/wimp_signal_models.hdf5 --response results/baseline/response_model_calibration.hdf5 --fig4-reference data/lz_ws2024_fig4_projection.csv --sensitivity data/lz_ws2024_si_sensitivity.csv --output results/baseline/wimp_fig4_validation.png --require-full-grid --response-model nest_library --time-mode representative_day --support-treatment native_drate_extension --efficiency-treatment input_pre_roi_curve --exposure-structure combined_single --nest-parameter-set ws2024_nest240 --detector-effects uniform_1d --halo-model shm_standard",
+  "definition_version": "sha256:326337b0dfd8de73b81977892a3fe504744c1a5e5762d7494d0a2430ccb802ce",
+  "env_version": "sha256:a9da338ac504678126a9754f50151bf8f5967363745f77510189ca425512d000",
+  "data_version": "sha256:df9e831c191434c4bc4cb927dfe09c4fd1945670424768640d0cb35b2958110d",
+  "decisions": {
+    "response_model": "nest_library",
+    "halo_model": "shm_standard",
+    "wimp_time_treatment": "representative_day",
+    "wimp_native_support": "native_drate_extension",
+    "efficiency_treatment": "input_pre_roi_curve",
+    "exposure_structure": "combined_single",
+    "nest_parameter_set": "ws2024_nest240",
+    "detector_effects": "uniform_1d"
+  },
+  "input_versions": {
+    "wimp_signal_models": "sha256:78d1c063f86b4c9f800d9a6e223ae11abd39c7b43820bde81cc210f34848f5ed",
+    "response_model_calibration": "sha256:7a1a9f3d85035a93e45e42b8ea4a242730f8895a24179a2a9decfbae9e89cce8",
+    "lz_si_sensitivity_reference": "sha256:10a18b02ed136e110fc69cfe862384dff375f1ce19945a437c5aceb639a5bc04",
+    "lz_ws2024_fig4_projection": "sha256:3925d20a10daa24f650eb6215c353a6994188aea5f1590bb36185f32270548a0",
+    "background_projection_script": "sha256:65bb4671e15c336a9d6f09c4b41922a0164bf0c980f47368fbe1327949d19866",
+    "wimp_signal_validation_script": "sha256:063be0b2ed9e742e55151e2ceb9520bacc5bd287de97c09517368da055c83a9b"
+  },
+  "git_sha": "f7fafe7ef7ccd1ecea181e141a2168559a6570f2",
+  "git_remote": "",
+  "lc_version": "0.5.0",
+  "hermeticity": {
+    "mechanism": "seatbelt",
+    "fs": "declared",
+    "network": "allowed",
+    "landlock_abi": null,
+    "exec_allowlist_version": 1
+  },
+  "started_at": "2026-11-14T01:41:50.674+00:00",
+  "finished_at": "2026-11-14T01:41:53.838+00:00",
+  "uv_version": "0.13.7",
+  "image": null
+}
