@@ -4,8 +4,8 @@
   "universe_id": "baseline",
   "recipe": "python src/build_background_models.py --output results/baseline/background_models.hdf5 --spectra data/lz2018_component_spectra.csv --neutron-spectrum data/lz_neutron_spectrum_2018.csv --efficiency data/lz_ws2024_efficiency.csv --fig2-efficiency data/lz_ws2024_fig2_efficiency.csv --efficiency-treatment input_pre_roi_curve --er-staged-efficiency data/lz_ws2024_er_staged_efficiency.csv --er-1d-efficiency data/lz_ws2024_er_1d_efficiency.csv --er-efficiency-treatment staged_conditional --table1 data/lz_ws2024_table1_counts.csv --contours data/lz_ws2024_accidentals_contours.csv --sr1-marginals data/lz_accidentals_marginals_sr1.csv --nest-header data/lz_ws2024_nest_header.hh --background-components all_table1 --exposure-structure combined_single --nest-parameter-set ws2024_nest240 --detector-effects uniform_1d --accidentals-model factorized_contour_constrained",
   "definition_version": "sha256:2e18554a37f1c074372f38363a2022f10ab105191723f320c17828fdcffd569f",
-  "env_version": "sha256:7c0beb4a6c9729006f13b818e2a5e8b79be88f5d4c846bda140894a4c315a3a4",
-  "data_version": "sha256:87bbbcc6a2dfdce2af9a21fd35bca916b0c669f33f9364f00f895ceeceddaf26",
+  "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
+  "data_version": "sha256:b97675cdad582f69fe9e35a056473fce8a6849d8aac53527c313cbbce5e50915",
   "decisions": {
     "background_components": "all_table1",
     "exposure_structure": "combined_single",
@@ -24,12 +24,12 @@
     "lz_neutron_spectrum_2018": "sha256:aff84e2122008ca603d108d1589e959b177b8a4545b1dbb706f8aec79f13ebf1",
     "lz_ws2024_accidentals_contours": "sha256:8d7af8c07c18a6f42fb42e7fe8a971d8a0a48f3c6089df8fa3264ea0597501be",
     "lz_accidentals_marginals_sr1": "sha256:d676f725b34894081a93513473d1823679dd7d84406451b69b71a70e7f6c394d",
-    "background_models_script": "sha256:83d7cdf7c794b48c85f37b850497ee72ec8e9e4c6dd49c55416800f35e1ece29",
+    "background_models_script": "sha256:730f16d94dfaf5b38945a277c77e2a1502bba6a6e76e25971f29e5fb6c107746",
     "lz_ws2024_er_staged_efficiency": "sha256:7fbd404dff021df890c39c0b55a425fefb127569740bc2e558c007c13769968a",
     "lz_ws2024_er_1d_efficiency": "sha256:30b0fd8cda003ee07afeab8eb91aa80e1576f8139958eb0a3853600403ad6d4d",
     "er_efficiency_loader_script": "sha256:698054646b966afb79e74aa9009e2407764e99c383397bdda0b4b8f9170f84d2"
   },
-  "git_sha": "454688e5c0bd04236b8ef58db135c128ca94c035",
+  "git_sha": "189ca5159fd001b9db586b16f14c479c8bd2741a",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -39,8 +39,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-12T19:49:13.218+00:00",
-  "finished_at": "2026-11-12T19:49:24.888+00:00",
+  "started_at": "2026-11-18T00:26:12.353+00:00",
+  "finished_at": "2026-11-18T02:27:36.611+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
