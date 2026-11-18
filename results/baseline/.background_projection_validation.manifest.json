@@ -4,8 +4,8 @@
   "universe_id": "baseline",
   "recipe": "python src/validate_backgrounds.py --models results/baseline/background_models.hdf5 --response results/baseline/response_model_calibration.hdf5 --table1 data/lz_ws2024_table1_counts.csv --reference data/lz_ws2024_fig4_projection.csv --output results/baseline/background_projection_validation.png --efficiency-treatment input_pre_roi_curve --er-efficiency-treatment staged_conditional --background-components all_table1 --exposure-structure combined_single --nest-parameter-set ws2024_nest240 --detector-effects uniform_1d",
   "definition_version": "sha256:04fb4f022db47225fdb7ee1ab9ce0bdbe9c6c855ec4fca7ba9af5f0fc4f55493",
-  "env_version": "sha256:7c0beb4a6c9729006f13b818e2a5e8b79be88f5d4c846bda140894a4c315a3a4",
-  "data_version": "sha256:afb48a3f0a9c8d7754a87f8053c6c9d0eaa8aa4ea46af0580012c2954bbf76ce",
+  "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
+  "data_version": "sha256:827c9b888a67c3b0df950745df8191cc3c15570eb3dcffd6bf9a13973c0516dd",
   "decisions": {
     "background_components": "all_table1",
     "exposure_structure": "combined_single",
@@ -16,13 +16,13 @@
     "er_efficiency_treatment": "staged_conditional"
   },
   "input_versions": {
-    "background_models": "sha256:87bbbcc6a2dfdce2af9a21fd35bca916b0c669f33f9364f00f895ceeceddaf26",
+    "background_models": "sha256:b97675cdad582f69fe9e35a056473fce8a6849d8aac53527c313cbbce5e50915",
     "response_model_calibration": "sha256:7a1a9f3d85035a93e45e42b8ea4a242730f8895a24179a2a9decfbae9e89cce8",
     "lz_table1_counts_reference": "sha256:7f9eaab6ccdc934f8f6d1101125db59a0e499922939ed96f745b0b3959371510",
     "lz_ws2024_fig4_projection": "sha256:3925d20a10daa24f650eb6215c353a6994188aea5f1590bb36185f32270548a0",
     "background_projection_script": "sha256:65bb4671e15c336a9d6f09c4b41922a0164bf0c980f47368fbe1327949d19866"
   },
-  "git_sha": "454688e5c0bd04236b8ef58db135c128ca94c035",
+  "git_sha": "189ca5159fd001b9db586b16f14c479c8bd2741a",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -32,8 +32,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-12T19:49:24.916+00:00",
-  "finished_at": "2026-11-12T19:49:28.784+00:00",
+  "started_at": "2026-11-18T02:27:36.653+00:00",
+  "finished_at": "2026-11-18T02:27:41.811+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
