@@ -4,7 +4,7 @@
   "universe_id": "baseline",
   "recipe": "python src/build_wimp_signal_models.py --header data/lz_ws2024_nest_header.hh --efficiency data/lz_ws2024_fig2_efficiency.csv --response results/baseline/response_model_calibration.hdf5 --sensitivity data/lz_ws2024_si_sensitivity.csv --fig4-reference data/lz_ws2024_fig4_projection.csv --output results/baseline/wimp_signal_models.hdf5 --annual-comparison --response-model nest_library --time-mode representative_day --support-treatment native_drate_extension --efficiency-treatment input_pre_roi_curve --exposure-structure combined_single --nest-parameter-set ws2024_nest240 --detector-effects uniform_1d --halo-model shm_standard",
   "definition_version": "sha256:5be12075a456e4783ade90c7bf1158fae7e901493b78ec1473fc933d17f3eb55",
-  "env_version": "sha256:a9da338ac504678126a9754f50151bf8f5967363745f77510189ca425512d000",
+  "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
   "data_version": "sha256:78d1c063f86b4c9f800d9a6e223ae11abd39c7b43820bde81cc210f34848f5ed",
   "decisions": {
     "response_model": "nest_library",
@@ -22,7 +22,7 @@
     "lz_fig2_efficiency": "sha256:3fe8d85a2f79ad9e4f88bee90689f4e0c84a86c489230e2daaf2d78efb481e34",
     "lz_si_sensitivity_reference": "sha256:10a18b02ed136e110fc69cfe862384dff375f1ce19945a437c5aceb639a5bc04",
     "lz_ws2024_fig4_projection": "sha256:3925d20a10daa24f650eb6215c353a6994188aea5f1590bb36185f32270548a0",
-    "background_models_script": "sha256:83d7cdf7c794b48c85f37b850497ee72ec8e9e4c6dd49c55416800f35e1ece29",
+    "background_models_script": "sha256:9e48fa61c889e2c1e8d14212d6f684efb0f6785ac068bdc6e18cf5ad2cc039fd",
     "background_projection_script": "sha256:65bb4671e15c336a9d6f09c4b41922a0164bf0c980f47368fbe1327949d19866",
     "wimp_native_adapter": "sha256:e3c9937ad2e1fc9217220a8bd307975716e9c3de7693c4c51b4dde09567bf34a",
     "wimp_signal_builder_script": "sha256:ed0df59a23952577e9b613ef4f886a322de85f2175a622562963c29aca103d86",
@@ -33,7 +33,7 @@
     "nestpy_wimp_provenance": "sha256:29959ad6fead73350d8f2b4c72ebe736d1867538790f41745044bb4370287106",
     "nestpy_local_package_definition": "sha256:88e8c41fdf7ff5c4ae134c0840877d3734f6896f185229018402c20b62706ef5"
   },
-  "git_sha": "5956fbdc6721df234c1fb66385dfee32897828af",
+  "git_sha": "ec146e9435f25699f122ea40e9c9a9bc7ad94f16",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -43,8 +43,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-14T01:39:30.512+00:00",
-  "finished_at": "2026-11-14T01:40:15.142+00:00",
+  "started_at": "2026-11-18T23:47:33.545+00:00",
+  "finished_at": "2026-11-18T23:48:27.715+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
