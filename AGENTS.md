@@ -709,3 +709,14 @@ see the lightcone skill; never write into `results/` by hand.
   Optimum still at n_med = 0 (13-19 GeV: n_med = 1). Caveat: 3.3 vs
   4.2 t-y exposure; fixed B. `plot_fc_region_scan.py` 214Pb weight label
   is now computed from the archive (was hardcoded 0.365).
+- **100x production materialized (2026-11-17)**: `background_models` is now
+  the recipe default `--n-er 4000000`, committed as 1372d3e. Its histograms are
+  identical to the /tmp x100 archive the FC scan used.
+  `background_projection_validation` (0d74a1b) PASSES all six gates with
+  better numbers than at 40k: total-curve RMS 0.122 -> 0.098 dex, pb214
+  0.166 -> 0.106, other-ER-as-drawn 0.099, xe124 0.280 at q=0.65 / 0.044
+  at best q=0.78, sub-floor tail 3.01 events, panels +1.0% / +4.1%. Part
+  of the earlier "structural" pb214 residual was therefore finite ER MC.
+  `nr_/er_efficiency_comparison` and their figures were deliberately left at
+  the 40k budget (user decision); they will report stale. Their
+  conclusions stand as 40k-budget results.
