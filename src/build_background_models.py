@@ -725,7 +725,7 @@ def make_parser():
                     help="generated events per ER source (pre-ROI)")
     ap.add_argument("--n-nr", type=int, default=120_000,
                     help="generated events per non-8B/hep NR source")
-    ap.add_argument("--n-b8", type=int, default=600_000,
+    ap.add_argument("--n-b8", type=int, default=60_000_000,
                     help="generated events for combined 8B+hep")
     ap.add_argument("--background-components", default="all_table1")
     ap.add_argument("--exposure-structure", default="combined_single")
