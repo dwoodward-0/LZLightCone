@@ -14,7 +14,9 @@ a first-pass counting cross-check). At 40 GeV/c2 the optimum sits where the
 sparse heavy-weight ER MC (214Pb etc.) has no events; see AGENTS.md.
 
 Read-only on unchanged archives; no NEST, no regeneration, no results/ writes.
-Writes scan.json and fc_sensitivity_scan.csv into an existing scratch dir.
+Writes the sensitivity CSV to --output-csv (the declared fc_sensitivity_curve when
+run as a recipe) and scan.json detail to --outdir (a private temporary dir if
+omitted). Without --output-csv the CSV goes to --outdir/fc_sensitivity_scan.csv.
 """
 from __future__ import annotations
 
@@ -23,6 +25,7 @@ import json
 import math
 from pathlib import Path
 import sys
+import tempfile
 import time
 import warnings
 
@@ -34,6 +37,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from validate_backgrounds import TOTAL_SOURCES, load_band
 from fc_counting_pilot import EXPECTED_FC_SHA256, sha256
+from stat_decisions import add_decision_args, decisions_of
 
 REFERENCE_SIGMA_CM2 = 1e-36
 ALPHA = 0.1
@@ -158,11 +162,16 @@ def median_jumps(b_max):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    for a in ("--signal", "--background", "--response", "--fc-source", "--outdir"):
+    for a in ("--signal", "--background", "--response", "--fc-source"):
         p.add_argument(a, required=True, type=Path)
+    p.add_argument("--outdir", type=Path, help="scratch dir for scan.json (default: private temp dir)")
+    p.add_argument("--output-csv", type=Path, help="sensitivity CSV path, opened exactly as given")
     p.add_argument("--exposure-scale", type=float, default=1.0,
                    help="multiply WS2024 (220 live days) signal and background expectations by this")
+    add_decision_args(p, ["statistics", "background_components", "exposure_structure", "median_sensitivity_definition", "power_constraint", "test_statistic_sidedness"], "fc")
     args = p.parse_args()
+    if args.outdir is None:
+        args.outdir = Path(tempfile.mkdtemp(prefix="fc_region_scan_"))
     if not (args.outdir.is_absolute() and args.outdir.is_dir()):
         raise ValueError("--outdir must be an existing absolute scratch directory")
     t0 = time.perf_counter()
@@ -212,12 +221,13 @@ def main():
 
     header = ("mass_gev,median_pc_cm2,minus2sigma_pc_cm2,minus1sigma_pc_cm2,plus1sigma_pc_cm2,plus2sigma_pc_cm2,"
               "median_unconstrained_cm2,background_events,signal_fraction_of_roi,n_med,n_bins")
-    csv = args.outdir / "fc_sensitivity_scan.csv"
+    csv = args.output_csv or args.outdir / "fc_sensitivity_scan.csv"
     csv.write_text(header + "\n" + "\n".join(",".join(f"{x:.10g}" for x in r) for r in rows) + "\n")
 
     report = {
-        "scope": "FC counting-region scan over the 26-mass grid, WS2024 3.3 t-y; scratch output, not a declared result.",
+        "scope": "FC counting-region scan over the 26-mass grid (WS2024 3.3 t-y x exposure_scale); per-mass detail behind the CSV.",
         "exposure_scale": args.exposure_scale,
+        "decisions": decisions_of(args, ["statistics", "background_components", "exposure_structure", "median_sensitivity_definition", "power_constraint", "test_statistic_sidedness"]),
         "alpha": ALPHA, "b_cap_events": B_CAP, "near_optimum_factor": NEAR_OPTIMUM,
         "ranking": "raw s_i/b_i desc (b_i = 0 first), ties by s_i desc; bins with s_i = 0 never added; no MC-sparsity guard (user decision).",
         "median_definition": "exact: FC_ints at Poisson(B) median count (monotonicity asserted)",

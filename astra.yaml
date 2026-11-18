@@ -3404,7 +3404,7 @@ inputs:
     type: data
     label: "Progressive-voxel FC counting-region scan over the WIMP mass grid"
     source: src/fc_region_scan.py
-    description: "Exploratory first-pass FC counting sensitivity, not yet a declared output recipe. For each of the 26 masses, ranks the existing 77x91 physical (S1c, log10 S2c) bins by raw s_i/b_i (no MC-sparsity guard, user decision 2026-11-17: counting is a first-pass cross-check), adds them in order, and at each step evaluates the exact background-only median FC limit FC_ints(n_med(B_k), B_k) at alpha=0.1; the region minimizing sigma_med is chosen. Bands are FC limits at Poisson count quantiles; power constraint is max(limit, exp(Phi^-1(0.1)) x median). Writes scan.json + fc_sensitivity_scan.csv to /tmp scratch only."
+    description: "First-pass FC counting sensitivity; the recipe script of fc_sensitivity_curve and fc_sensitivity_curve_1000d. For each of the 26 masses, ranks the existing 77x91 physical (S1c, log10 S2c) bins by raw s_i/b_i (no MC-sparsity guard, user decision 2026-11-17: counting is a first-pass cross-check), adds them in order, and at each step evaluates the exact background-only median FC limit FC_ints(n_med(B_k), B_k) at alpha=0.1; the region minimizing sigma_med is chosen. Bands are FC limits at Poisson count quantiles; power constraint is max(limit, exp(Phi^-1(0.1)) x median). Writes the sensitivity CSV to --output-csv (the declared output) and scan.json detail to a private scratch dir. --exposure-scale k multiplies signal, Table-I means and their widths by k (fixed fractional uncertainty)."
   - id: fc_region_scan_plot_script
     type: data
     label: "Validation figures for the FC region scan"
@@ -3439,7 +3439,27 @@ inputs:
     type: data
     label: "2D-PLR median sensitivity scan over the mass grid"
     source: src/plr_scan.py
-    description: "Runs the plr_pilot construction for all 26 masses with one worker pool (mass i seeded SeedSequence([seed, i])); writes per-mass JSON and plr_sensitivity_scan.csv to /tmp scratch. Preliminary; not yet the plr_sensitivity_curve recipe."
+    description: "Runs the plr_pilot construction for all 26 masses with one worker pool (mass i seeded SeedSequence([seed, i])); writes the sensitivity CSV (median PC, bootstrap sigma, unconstrained median and +-1/2 sigma band edges, exposure_scale) to --output-csv and per-mass JSON detail to a private scratch dir. Recipe script of plr_sensitivity_curve and plr_sensitivity_curve_1000d."
+  - id: stat_decisions_script
+    type: data
+    label: "Decision flags for the statistics recipes"
+    source: src/stat_decisions.py
+    description: "Shared CLI decision flags for the PLR/FC scans and their figures. Each script accepts only the options it implements and refuses the rest, so a universe selecting an unimplemented option fails loudly instead of silently running the default."
+  - id: plot_plr_scan_script
+    type: data
+    label: "Validation 5 figure and acceptance: PLR vs LZ WS2024-only"
+    source: src/plot_plr_scan.py
+    description: "Plots the PLR median (PC) with unconstrained toy bands vs the slide-24 WS2024-only median and +-1 sigma band, with a ratio panel; evaluates and prints acceptance A1 (40 GeV/c2, |ours - LZ| <= 2 bootstrap sigma) and A2 (PC median inside LZ's +-1 sigma wherever published) and writes the verdict on the figure."
+  - id: plot_fc_plr_crosscheck_script
+    type: data
+    label: "Validation 6 figure and acceptance: FC vs PLR"
+    source: src/plot_fc_plr_crosscheck.py
+    description: "Plots the PLR and FC counting medians with their bands and the PLR/FC ratio; acceptance |ln(PLR/FC)| <= sqrt(w_PLR^2 + w_FC^2) at every mass, w = ln(plus1sigma/median) of each method; reports the FC regions' retained signal fraction."
+  - id: plot_plr_exposure_script
+    type: data
+    label: "PLR vs FC counting at two exposures"
+    source: src/plot_plr_exposure.py
+    description: "Plots PLR and FC medians for each --run LABEL,PLR_CSV,FC_CSV with the PLR unconstrained +-1 sigma band, and the PLR/FC median ratio per exposure. No LZ reference exists for the extended exposure."
 outputs:
   - id: response_model_calibration
     type: data
@@ -3580,27 +3600,66 @@ outputs:
     type: table
     format: csv
     label: "2D PLR median sensitivity curve"
-    description: "Primary sensitivity result: the binned 2D profile likelihood in (S1c, log10 S2c) with background-rate nuisance parameters, raster-scanned over WIMP mass. Columns: WIMP mass, median expected limit from background-only toys (decision median_sensitivity_definition.median_of_toy_limits), +/-1 and +/-2 sigma band edges, with the power constraint applied (decision power_constraint.applied_1sigma) and two-sided test statistic (decision test_statistic_sidedness.two_sided). ACCEPTANCE: compared against the LZ reference in sensitivity_vs_lz_validation."
-    inputs: [background_models, wimp_signal_models]
+    description: "Primary sensitivity result: the binned 2D profile likelihood in (S1c, log10 S2c) with background-rate nuisance parameters, raster-scanned over WIMP mass. Columns: WIMP mass, median expected limit from background-only toys (decision median_sensitivity_definition.median_of_toy_limits), +/-1 and +/-2 sigma band edges, with the power constraint applied (decision power_constraint.applied_1sigma) and two-sided test statistic (decision test_statistic_sidedness.two_sided). Toy settings: 25 geometric mu points 0.5-40 signal events, 2000 signal toys per mu, 1000 background-only toys, seed 20261118. Also stores the bootstrap sigma of the median and the UNCONSTRAINED median and band edges (LZ's band convention; the PC -2 sigma edge repeats -1 sigma). Exposure is the WS2024 3.3 t-y of the signal archive and Table I. ACCEPTANCE: compared against the LZ WS2024-only reference in sensitivity_vs_lz_validation."
+    inputs: [background_models, wimp_signal_models, plr_scan_script, plr_pilot_script, plr_core_script, background_projection_script, stat_decisions_script]
     decisions: [statistics, background_components, exposure_structure, median_sensitivity_definition, power_constraint, test_statistic_sidedness]
+    recipe:
+      command: "python src/plr_scan.py --signal {inputs.wimp_signal_models} --background {inputs.background_models} --mu-min 0.5 --mu-max 40 --mu-points 25 --toys-per-mu 2000 --bkg-toys 1000 --workers 8 --seed 20261118 --output-csv {output} --statistics {decisions.statistics} --background-components {decisions.background_components} --exposure-structure {decisions.exposure_structure} --median-sensitivity-definition {decisions.median_sensitivity_definition} --power-constraint {decisions.power_constraint} --test-statistic-sidedness {decisions.test_statistic_sidedness}"
+      resources:
+        cpus: 8
   - id: fc_sensitivity_curve
     type: table
     format: csv
     label: "Cut-and-count FC sensitivity curve"
-    description: "Cross-check result: cut-and-count in the (S1c, log10 S2c) ROI using direct FC_ints(n,b,alpha=0.1) calls from colleague_feldman_cousins_script. For each selected region, the fixed expected background is the sum of full physical background hist_counts and an observed toy is N~Poisson(mu_signal+B), with background-only toys N~Poisson(B). The FC interval is in signal-event units on the source's native 0.005-event grid; do not confuse it with scipy.stats.poisson.ppf, a count quantile. Median sensitivity is the median of background-only signal-event limits (decision median_sensitivity_definition.median_of_toy_limits). For counting this is computed exactly without toys: the FC upper limit is non-decreasing in n at fixed B (assert it), so the median limit equals FC_ints at the Poisson(B) median count (smallest n with CDF >= 0.5), and band edges are FC_ints at the corresponding Poisson count quantiles. Toys would only add Monte Carlo noise; the 2D PLR, whose test statistic is not a function of one count, still needs toys. Convert using sigma_UL=1e-36*mu_UL/mu_WIMP(region;1e-36 cm2), where mu_WIMP is the sum of the absolute signal hist_counts selected in that region at 3.3 WS2024 tonne-years. The absolute production efficiency, exposure and ROI are already included exactly once in that yield; do not apply another efficiency/exposure factor or Table-I-style normalization. Apply the one-sigma power constraint at result assembly (decision power_constraint.applied_1sigma). Columns as in plr_sensitivity_curve. The current project source and bounded 40 GeV/c2 pilot are integration inputs only; no production recipe or full mass campaign has been established yet."
-    inputs: [background_models, wimp_signal_models, colleague_feldman_cousins_script]
-    decisions: [statistics, background_components, exposure_structure, median_sensitivity_definition, test_statistic_sidedness, power_constraint]
+    description: "Cross-check result: cut-and-count in the (S1c, log10 S2c) ROI using direct FC_ints(n,b,alpha=0.1) calls from colleague_feldman_cousins_script. For each selected region, the fixed expected background is the sum of full physical background hist_counts and an observed toy is N~Poisson(mu_signal+B), with background-only toys N~Poisson(B). The FC interval is in signal-event units on the source's native 0.005-event grid; do not confuse it with scipy.stats.poisson.ppf, a count quantile. Median sensitivity is the median of background-only signal-event limits (decision median_sensitivity_definition.median_of_toy_limits). For counting this is computed exactly without toys: the FC upper limit is non-decreasing in n at fixed B (assert it), so the median limit equals FC_ints at the Poisson(B) median count (smallest n with CDF >= 0.5), and band edges are FC_ints at the corresponding Poisson count quantiles. Toys would only add Monte Carlo noise; the 2D PLR, whose test statistic is not a function of one count, still needs toys. Convert using sigma_UL=1e-36*mu_UL/mu_WIMP(region;1e-36 cm2), where mu_WIMP is the sum of the absolute signal hist_counts selected in that region at 3.3 WS2024 tonne-years. The absolute production efficiency, exposure and ROI are already included exactly once in that yield; do not apply another efficiency/exposure factor or Table-I-style normalization. Apply the one-sigma power constraint at result assembly (decision power_constraint.applied_1sigma). Region per mass: progressive voxel ranking by s_i/b_i (fc_region_scan_script), the region minimizing the median PC limit is chosen. Columns: mass, PC median and +-1/2 sigma edges, unconstrained median, region background, retained signal fraction, n_med, region bin count. Exposure is WS2024 3.3 t-y."
+    inputs: [background_models, wimp_signal_models, response_model_calibration, colleague_feldman_cousins_script, fc_region_scan_script, fc_counting_pilot_script, background_projection_script, stat_decisions_script]
+    decisions: [statistics, background_components, exposure_structure, median_sensitivity_definition, power_constraint, test_statistic_sidedness]
+    recipe:
+      command: "python src/fc_region_scan.py --signal {inputs.wimp_signal_models} --background {inputs.background_models} --response {inputs.response_model_calibration} --fc-source {inputs.colleague_feldman_cousins_script} --output-csv {output} --statistics {decisions.statistics} --background-components {decisions.background_components} --exposure-structure {decisions.exposure_structure} --median-sensitivity-definition {decisions.median_sensitivity_definition} --power-constraint {decisions.power_constraint} --test-statistic-sidedness {decisions.test_statistic_sidedness}"
   - id: sensitivity_vs_lz_validation
     type: figure
     format: png
-    label: "Validation 5: median sensitivity vs LZ"
-    description: "The headline validation: our PLR median sensitivity curve (+/-1 and +/-2 sigma bands) overlaid on the LZ published curves from lz_si_sensitivity_reference. ACCEPTANCE: our median curve's minimum matches LZ's 5.1e-48 cm2 at 40 GeV/c2 within the statistical resolution of the toy ensemble, and the curve agrees with LZ's median across the mass range within the published 1-sigma band."
-    inputs: [plr_sensitivity_curve, lz_si_sensitivity_reference]
-    decisions: [statistics, median_sensitivity_definition, power_constraint]
+    label: "Validation 5: median sensitivity vs LZ WS2024-only"
+    description: "The headline validation, like-for-like: our PLR median sensitivity curve (unconstrained +/-1 and +/-2 sigma toy bands, PC median) overlaid on LZ's WS2024-only (3.3 t-y) curves from slide 24 (lz_ws2024_only_sensitivity_reference), the right target for our WS2024 exposure; the combined 4.2 t-y 5.1e-48 (lz_si_sensitivity_reference) is NOT the target (user decision 2026-11-18). The FC counting median is overlaid for reference. ACCEPTANCE: A1 - at 40 GeV/c2 our PC median matches LZ's WS2024-only median (5.76e-48) within the toy ensemble's statistical resolution, |ours - LZ| <= 2 x bootstrap sigma of the median (this ignores the uncertainty of LZ's curve and of its digitization); A2 - at every mass where LZ's +/-1 sigma band is published (finite; 13-10000 GeV/c2), our PC median lies inside it. Both verdicts are printed and written on the figure."
+    inputs: [plr_sensitivity_curve, fc_sensitivity_curve, lz_ws2024_only_sensitivity_reference, plot_plr_scan_script, stat_decisions_script]
+    decisions: [statistics, median_sensitivity_definition, power_constraint, test_statistic_sidedness]
+    recipe:
+      command: "python src/plot_plr_scan.py --scan {inputs.plr_sensitivity_curve} --fc {inputs.fc_sensitivity_curve} --reference {inputs.lz_ws2024_only_sensitivity_reference} --output {output} --statistics {decisions.statistics} --median-sensitivity-definition {decisions.median_sensitivity_definition} --power-constraint {decisions.power_constraint} --test-statistic-sidedness {decisions.test_statistic_sidedness}"
   - id: fc_plr_crosscheck
     type: figure
     format: png
     label: "Validation 6: FC cross-check vs PLR"
-    description: "Internal statistical validation: the FC cut-and-count sensitivity curve overlaid on the 2D PLR curve. ACCEPTANCE: the two curves agree within their combined band widths over the mass range where the ROI cut-and-count retains efficiency; systematic disagreement localizes to the likelihood approximation, not the microphysics."
-    inputs: [plr_sensitivity_curve, fc_sensitivity_curve]
-    decisions: [statistics, test_statistic_sidedness, power_constraint]
+    description: "Internal statistical validation: the FC cut-and-count sensitivity curve overlaid on the 2D PLR curve. ACCEPTANCE: the two curves agree within their combined band widths over the mass range where the ROI cut-and-count retains efficiency; systematic disagreement localizes to the likelihood approximation, not the microphysics. Operationalized: at every mass |ln(PLR/FC)| <= sqrt(w_PLR^2 + w_FC^2), w = ln(plus1sigma/median) of each method (upper edges, because the power constraint and the n_med = 0 counting regime pin the lower edges to the median); the FC retained signal fraction is reported."
+    inputs: [plr_sensitivity_curve, fc_sensitivity_curve, plot_fc_plr_crosscheck_script, stat_decisions_script]
+    decisions: [statistics, median_sensitivity_definition, power_constraint, test_statistic_sidedness]
+    recipe:
+      command: "python src/plot_fc_plr_crosscheck.py --plr {inputs.plr_sensitivity_curve} --fc {inputs.fc_sensitivity_curve} --output {output} --statistics {decisions.statistics} --median-sensitivity-definition {decisions.median_sensitivity_definition} --power-constraint {decisions.power_constraint} --test-statistic-sidedness {decisions.test_statistic_sidedness}"
+  - id: plr_sensitivity_curve_1000d
+    type: table
+    format: csv
+    label: "Extension: 2D PLR median sensitivity at 1000 live days"
+    description: "Exposure extension (no LZ reference): the plr_sensitivity_curve construction with signal and every Table-I mean scaled by k = 1000/220 = 4.545454545454546 (WS2024's 220 live days -> 1000), and each Table-I constraint width scaled by the same k (fixed fractional uncertainty, the conservative choice). Same signal/background templates, so the same response, efficiency and ROI. 28 geometric mu points 0.5-60 signal events (the band moves up in signal events with exposure), 2000 toys per mu, 1000 background-only toys, seed 20261118. Columns as in plr_sensitivity_curve, exposure_scale = k."
+    inputs: [background_models, wimp_signal_models, plr_scan_script, plr_pilot_script, plr_core_script, background_projection_script, stat_decisions_script]
+    decisions: [statistics, background_components, exposure_structure, median_sensitivity_definition, power_constraint, test_statistic_sidedness]
+    recipe:
+      command: "python src/plr_scan.py --signal {inputs.wimp_signal_models} --background {inputs.background_models} --exposure-scale 4.545454545454546 --mu-min 0.5 --mu-max 60 --mu-points 28 --toys-per-mu 2000 --bkg-toys 1000 --workers 8 --seed 20261118 --output-csv {output} --statistics {decisions.statistics} --background-components {decisions.background_components} --exposure-structure {decisions.exposure_structure} --median-sensitivity-definition {decisions.median_sensitivity_definition} --power-constraint {decisions.power_constraint} --test-statistic-sidedness {decisions.test_statistic_sidedness}"
+      resources:
+        cpus: 8
+  - id: fc_sensitivity_curve_1000d
+    type: table
+    format: csv
+    label: "Extension: FC counting median sensitivity at 1000 live days"
+    description: "Exposure extension (no LZ reference): the fc_sensitivity_curve construction with signal and background expectations scaled by k = 1000/220 = 4.545454545454546; the counting region is re-optimized per mass at the scaled expectations. Columns as in fc_sensitivity_curve."
+    inputs: [background_models, wimp_signal_models, response_model_calibration, colleague_feldman_cousins_script, fc_region_scan_script, fc_counting_pilot_script, background_projection_script, stat_decisions_script]
+    decisions: [statistics, background_components, exposure_structure, median_sensitivity_definition, power_constraint, test_statistic_sidedness]
+    recipe:
+      command: "python src/fc_region_scan.py --signal {inputs.wimp_signal_models} --background {inputs.background_models} --response {inputs.response_model_calibration} --fc-source {inputs.colleague_feldman_cousins_script} --exposure-scale 4.545454545454546 --output-csv {output} --statistics {decisions.statistics} --background-components {decisions.background_components} --exposure-structure {decisions.exposure_structure} --median-sensitivity-definition {decisions.median_sensitivity_definition} --power-constraint {decisions.power_constraint} --test-statistic-sidedness {decisions.test_statistic_sidedness}"
+  - id: plr_fc_exposure_comparison
+    type: figure
+    format: png
+    label: "Extension: does the likelihood beat cut-and-count as exposure grows?"
+    description: "PLR and FC counting medians at 220 and 1000 live days with the PLR unconstrained +-1 sigma band, and the PLR/FC median ratio per exposure. Descriptive, no acceptance gate and no LZ reference. Expectation recorded from the scratch study (2026-11-18): PLR/FC ~0.95-1.05 at 220 d; 0.81-0.93 above ~19 GeV/c2 at 1000 d, where the FC optimum still sits at n_med = 0 and gives up signal fraction while the PLR uses the whole plane."
+    inputs: [plr_sensitivity_curve, fc_sensitivity_curve, plr_sensitivity_curve_1000d, fc_sensitivity_curve_1000d, plot_plr_exposure_script, stat_decisions_script]
+    decisions: [statistics, median_sensitivity_definition, power_constraint, test_statistic_sidedness]
+    recipe:
+      command: "python src/plot_plr_exposure.py --run '220 live days,{inputs.plr_sensitivity_curve},{inputs.fc_sensitivity_curve}' --run '1000 live days,{inputs.plr_sensitivity_curve_1000d},{inputs.fc_sensitivity_curve_1000d}' --output {output} --statistics {decisions.statistics} --median-sensitivity-definition {decisions.median_sensitivity_definition} --power-constraint {decisions.power_constraint} --test-statistic-sidedness {decisions.test_statistic_sidedness}"

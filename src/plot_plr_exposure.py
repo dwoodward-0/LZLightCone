@@ -5,7 +5,9 @@ Top: power-constrained medians of the binned 2D PLR (solid, with the UNCONSTRAIN
 Bottom: PLR / FC median ratio per exposure, with the PLR bootstrap median
 uncertainty. No LZ reference (the extended exposure has none). Scratch output only.
 
-Each --run is LABEL,PLR_CSV,FC_CSV; the per-mass PLR JSON sit beside PLR_CSV.
+Each --run is LABEL,PLR_CSV,FC_CSV. The unconstrained band edges come from the PLR
+CSV's minus1sigma_cm2/plus1sigma_cm2 columns (older CSVs without them fall back to
+the per-mass JSON beside PLR_CSV).
 """
 from __future__ import annotations
 
@@ -17,6 +19,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from stat_decisions import add_decision_args
 
 COLORS = ["#1b1b1b", "#2a5db0", "#c0504d"]
 
@@ -32,6 +38,8 @@ def load_run(spec):
     m = plr["mass_gev"]
     if not np.array_equal(m, fc["mass_gev"]):
         raise ValueError(f"{label}: PLR and FC mass grids differ")
+    if "minus1sigma_cm2" in plr.dtype.names:
+        return label, m, plr, fc, plr["minus1sigma_cm2"], plr["plus1sigma_cm2"]
     lo, hi = [], []
     for mm in m:
         j = json.loads((Path(plr_csv).parent / f"mass_{mm:g}gev.json").read_text())
@@ -46,6 +54,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--run", action="append", required=True, help="LABEL,PLR_CSV,FC_CSV (repeatable)")
     ap.add_argument("--output", required=True, type=Path)
+    add_decision_args(ap, ["statistics", "median_sensitivity_definition", "power_constraint", "test_statistic_sidedness"], "both")
     args = ap.parse_args()
     runs = [load_run(s) for s in args.run]
 
