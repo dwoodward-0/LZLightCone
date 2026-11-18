@@ -720,3 +720,35 @@ see the lightcone skill; never write into `results/` by hand.
   `nr_/er_efficiency_comparison` and their figures were deliberately left at
   the 40k budget (user decision); they will report stale. Their
   conclusions stand as 40k-budget results.
+
+- **100x B8 production + PLR Stage A + 40 GeV/c2 pilot (2026-11-18)**:
+  - `background_models` rematerialized with n_b8 60M (f775240) and
+    Validation 4 re-PASSES (0bc3b90; total RMS 0.098 dex, unchanged).
+    Only `b8_hep_nu_nr` changed (ROI MC 65 -> 7279); the other 11
+    sources' hist_counts are bit-identical to the pre-B8 archive.
+  - Slide-24 WS2024-only reference (`src/digitize_ws2024_only_limit.py`,
+    TeVPA talk; not yet a declared input). This is the right target for our
+    3.3 t-y exposure, NOT the combined 5.1e-48: median 40 GeV 5.76e-48,
+    -1/+1 sigma 2.33e-48/1.03e-47, observed min 2.31e-48 @ 42 GeV (slide
+    2.3e-48). The band starts at 11.2 GeV, so 9/11 GeV are NaN. +1/+2 sigma
+    are NaN below 17 GeV (occluded by overlaid curves). The last 25 px
+    before the right frame are dropped and log-log extrapolated.
+  - `src/plr_core.py`: binned Poisson over 6626 support bins, mu in signal
+    events (unit signal shape), 12 Table-I Gaussian-constrained theta >= 0
+    (detector-neutron shape from MC counts), two-sided q with mu_hat >= 0,
+    L-BFGS-B with analytic gradients. `src/test_plr_core.py` PASSES:
+    gradients, Asimov recovery, and the one-bin exact Neyman construction
+    reproduces FC_ints EXACTLY on its 0.005 grid ((9,3.7) 11.595,
+    (0,0.688) 1.785, (3,2) 5.42, (1,0.5) 3.855). Fits take 2.9 ms free /
+    1.85 ms conditional; restarts agree to 1e-10 in q. L-BFGS-B
+    success=False (~0.06%) occurs AT the optimum (NLL excess vs restarts
+    2e-13): harmless.
+  - `src/plr_pilot.py` 40 GeV pilot (20 geometric mu points 0.5-20 events,
+    1000 toys/mu, 500 B-only toys, 8 workers, 26 s wall;
+    `/tmp/lz-plr-pilot-40gev/pilot.json`): **PC median 5.33e-48 +- 0.39e-48
+    (bootstrap) vs LZ WS2024-only 5.76e-48 (ratio 0.93)**; -1/+1 sigma
+    2.79e-48/9.41e-48 vs LZ 2.33e-48/1.03e-47. q_crit rises from 1.37
+    (mu = 0.5, ~50% of toys at mu_hat = 0) to ~2.6-3.0 (chi2_1 2.71) above
+    2 events; per-point order-statistic noise is 0.05-0.22. Of the B-only
+    toys, 69% have mu_hat = 0, and none land beyond the grid. Not a
+    declared output; nothing committed.

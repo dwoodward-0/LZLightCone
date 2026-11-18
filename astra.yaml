@@ -3410,6 +3410,36 @@ inputs:
     label: "Validation figures for the FC region scan"
     source: src/plot_fc_region_scan.py
     description: "Five light-format review figures from the scan JSON plus the unchanged archives: detail figures at one mass (default 40 GeV/c2) for the scan curve with Poisson-median jumps, the region map with ER/NR bands, and background MC support with a per-source breakdown; the FC median sensitivity curve and bands vs the LZ WS2024 median and bands (lz_si_sensitivity_reference) with a ratio panel; and a per-mass summary table. Scratch output under /tmp only."
+  - id: lz_ws2024_only_sensitivity_reference
+    type: data
+    label: "LZ WS2024-only (3.3 t-y) SI median sensitivity, TeVPA slide 24"
+    source: data/lz_ws2024_only_sensitivity_slide24.csv
+    description: "90% CL SI WS2024-only curves (median, +/-1 and +/-2 sigma, power-constrained observed) digitized by raster color segmentation from slide 24 of the pinned TeVPA talk (lz_ws2024_tevpa_talk.pdf) on the 26-mass grid. This is the comparison target for our WS2024-only 3.3 t-y exposure, rather than the combined 4.2 t-y HEPData curves. Median 5.76e-48 cm2 at 40 GeV/c2; the observed minimum reads 2.31e-48 at 42 GeV/c2, against the slide's stated 2.3e-48 at 43. NaN at 9/11 GeV (the band starts at 11.2 GeV) and for +1/+2 sigma below 17 GeV (occluded by overlaid curves)."
+  - id: ws2024_only_digitizer_script
+    type: data
+    label: "Slide-24 WS2024-only limit digitizer"
+    source: src/digitize_ws2024_only_limit.py
+    description: "Produces lz_ws2024_only_sensitivity_reference from the pinned talk: tick-calibrated log-log axes, green/yellow band segmentation, dashed median and thick observed traces, a wide running-median outlier rejection, right-frame edge trimming with log-log extension, and an optional overlay for visual checking."
+  - id: plr_core_script
+    type: data
+    label: "Binned 2D profile-likelihood core"
+    source: src/plr_core.py
+    description: "Binned Poisson likelihood over the (S1c, log10 S2c) support bins: mu in signal events (unit signal shape) plus 12 Table-I Gaussian-constrained source normalizations (theta >= 0). Two-sided q_mu with mu_hat >= 0; L-BFGS-B with analytic gradients; toy generation with fluctuated global observables; Neyman upper-limit crossing."
+  - id: plr_core_test_script
+    type: data
+    label: "PLR core unit tests"
+    source: src/test_plr_core.py
+    description: "Gradient vs finite-difference, Asimov recovery, and one-bin exact Neyman construction reproducing the colleague FC_ints upper limits on the 0.005-event grid; optional fit-time benchmark on the real 40 GeV/c2 templates."
+  - id: plr_pilot_script
+    type: data
+    label: "Per-mass PLR toy-MC construction"
+    source: src/plr_pilot.py
+    description: "Toy-MC Neyman construction at one mass: q_crit(mu) as the 90% quantile of signal toys on a geometric mu grid, background-only toy limits, median/band quantiles, and the power constraint at the -1 sigma quantile. Also the 40 GeV/c2 pilot entry point (2026-11-18: PC median 5.33e-48 +- 0.39e-48 vs slide-24 5.76e-48). Scratch output only."
+  - id: plr_scan_script
+    type: data
+    label: "2D-PLR median sensitivity scan over the mass grid"
+    source: src/plr_scan.py
+    description: "Runs the plr_pilot construction for all 26 masses with one worker pool (mass i seeded SeedSequence([seed, i])); writes per-mass JSON and plr_sensitivity_scan.csv to /tmp scratch. Preliminary; not yet the plr_sensitivity_curve recipe."
 outputs:
   - id: response_model_calibration
     type: data
