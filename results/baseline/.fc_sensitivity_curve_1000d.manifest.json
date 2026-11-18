@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "output_id": "fc_sensitivity_curve_1000d",
+  "universe_id": "baseline",
+  "recipe": "python src/fc_region_scan.py --signal results/baseline/wimp_signal_models.hdf5 --background results/baseline/background_models.hdf5 --response results/baseline/response_model_calibration.hdf5 --fc-source data/colleague_feldman_cousins/FeldmanCousins.py --exposure-scale 4.545454545454546 --output-csv results/baseline/fc_sensitivity_curve_1000d.csv --statistics both_with_crosscheck --background-components all_table1 --exposure-structure combined_single --median-sensitivity-definition median_of_toy_limits --power-constraint applied_1sigma --test-statistic-sidedness two_sided",
+  "definition_version": "sha256:c1616f71428c63f8855d1cd36a8843cb977683acec3f02d43837189c8ffca53e",
+  "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
+  "data_version": "sha256:b3a458d09e26ca85880611ee3dcfc13239ce9bc8d809d8ad1c797517f167671d",
+  "decisions": {
+    "statistics": "both_with_crosscheck",
+    "background_components": "all_table1",
+    "exposure_structure": "combined_single",
+    "median_sensitivity_definition": "median_of_toy_limits",
+    "power_constraint": "applied_1sigma",
+    "test_statistic_sidedness": "two_sided"
+  },
+  "input_versions": {
+    "background_models": "sha256:482c981a163bc19616e285dc2d364d1d772714b3acd473f1bb38f6bd965dc2ee",
+    "wimp_signal_models": "sha256:78d1c063f86b4c9f800d9a6e223ae11abd39c7b43820bde81cc210f34848f5ed",
+    "response_model_calibration": "sha256:7a1a9f3d85035a93e45e42b8ea4a242730f8895a24179a2a9decfbae9e89cce8",
+    "colleague_feldman_cousins_script": "sha256:2e8a566d3940d0e19550afecf335bc94164d26436545b1b2a00c164023f7296d",
+    "fc_region_scan_script": "sha256:46ed9367f9dca51bdcb19688dea217aec70a2b8557c39166ec3fcb19e261a6f4",
+    "fc_counting_pilot_script": "sha256:2d87e23eacdbf40629810a8ba52b22c238bdd412a8c8927c1e7f5ab6853d5fd3",
+    "background_projection_script": "sha256:65bb4671e15c336a9d6f09c4b41922a0164bf0c980f47368fbe1327949d19866",
+    "stat_decisions_script": "sha256:9420b1baad5380213570616c7f455b775e150ba060c653a97cd98117d91feb8b"
+  },
+  "git_sha": "ec146e9435f25699f122ea40e9c9a9bc7ad94f16",
+  "git_remote": "",
+  "lc_version": "0.5.0",
+  "hermeticity": {
+    "mechanism": "seatbelt",
+    "fs": "declared",
+    "network": "allowed",
+    "landlock_abi": null,
+    "exec_allowlist_version": 1
+  },
+  "started_at": "2026-11-18T23:48:27.799+00:00",
+  "finished_at": "2026-11-18T23:51:07.738+00:00",
+  "uv_version": "0.13.7",
+  "image": null
+}
