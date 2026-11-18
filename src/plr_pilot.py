@@ -36,15 +36,18 @@ QUANT = {"minus2sigma": norm.cdf(-2), "minus1sigma": norm.cdf(-1), "median": 0.5
          "plus1sigma": norm.cdf(1), "plus2sigma": norm.cdf(2)}
 
 _PATHS = None
+_SCALE = 1.0
 _LKS = {}
 
 
-def build(signal_path, background_path, mass_key):
+def build(signal_path, background_path, mass_key, exposure_scale=1.0):
+    """Likelihood at WS2024 exposure x exposure_scale: signal, Table-I means and constraint widths
+    all scale by the factor (fixed fractional uncertainty); shapes are unchanged."""
     with h5py.File(signal_path, "r") as f:
         g = f[f"ws2024/{mass_key}"]
         if g.attrs["reference_sigma_cm2"] != REFERENCE_SIGMA_CM2:
             raise ValueError("unexpected reference sigma")
-        s = g["hist_counts"][:]
+        s = g["hist_counts"][:] * exposure_scale
         mass = float(g.attrs["mass_gev"])
     shapes, means, sigmas = [], [], []
     with h5py.File(background_path, "r") as f:
@@ -52,22 +55,22 @@ def build(signal_path, background_path, mass_key):
             g = f[name]
             h = g["hist_counts"][:]
             shapes.append((h if h.sum() > 0 else g["hist_mc_counts"][:].astype(float)).ravel())
-            means.append(float(g.attrs["table1_mean"]))
-            sigmas.append(float(g.attrs["table1_sigma"]))
+            means.append(float(g.attrs["table1_mean"]) * exposure_scale)
+            sigmas.append(float(g.attrs["table1_sigma"]) * exposure_scale)
     lk = BinnedLikelihood(s, np.array(shapes), means, sigmas, mu_scale=5.0)
     return lk, float(s.sum()), mass
 
 
-def _init(signal_path, background_path):
-    global _PATHS
+def _init(signal_path, background_path, exposure_scale=1.0):
+    global _PATHS, _SCALE
     os.environ.setdefault("OMP_NUM_THREADS", "1")
-    _PATHS = (signal_path, background_path)
+    _PATHS, _SCALE = (signal_path, background_path), exposure_scale
 
 
 def _lk(mass_key):
     if mass_key not in _LKS:
         _LKS.clear()
-        _LKS[mass_key] = build(*_PATHS, mass_key)[0]
+        _LKS[mass_key] = build(*_PATHS, mass_key, _SCALE)[0]
     return _LKS[mass_key]
 
 
@@ -109,7 +112,7 @@ def run_mass(pool, args, mass_key, mass_index):
 
     mass_index=None seeds with args.seed alone (the 2026-11-18 pilot's stream)."""
     t0 = time.perf_counter()
-    lk, s_ref, mass = build(args.signal, args.background, mass_key)
+    lk, s_ref, mass = build(args.signal, args.background, mass_key, args.exposure_scale)
     to_sigma = REFERENCE_SIGMA_CM2 / s_ref
     mu_grid = np.geomspace(args.mu_min, args.mu_max, args.mu_points)
 
@@ -163,7 +166,7 @@ def run_mass(pool, args, mass_key, mass_index):
     report = {
         "scope": "PLR toy-MC Neyman construction at one mass, WS2024 3.3 t-y templates; scratch output, not a declared result.",
         "mass_key": mass_key,
-        "mass_gev": mass, "signal_events_at_reference_sigma": s_ref,
+        "mass_gev": mass, "signal_events_at_reference_sigma": s_ref, "exposure_scale": args.exposure_scale,
         "analysis_bins": int(lk.support.sum()),
         "settings": {k: (str(v) if isinstance(v, Path) else v) for k, v in vars(args).items()}, "seed_entropy": entropy,
         "mu_grid_events": mu_grid.tolist(),
@@ -201,6 +204,8 @@ def add_common_args(ap):
     ap.add_argument("--bkg-toys", type=int, default=500)
     ap.add_argument("--workers", type=int, default=os.cpu_count())
     ap.add_argument("--seed", type=int, default=20261118)
+    ap.add_argument("--exposure-scale", type=float, default=1.0,
+                    help="multiply WS2024 (220 live days) signal, Table-I means and widths by this")
 
 
 def check_scratch(path):
@@ -216,7 +221,7 @@ def main():
     args = ap.parse_args()
     check_scratch(args.output)
     ctx = mp.get_context("spawn")
-    with ctx.Pool(args.workers, initializer=_init, initargs=(args.signal, args.background)) as pool:
+    with ctx.Pool(args.workers, initializer=_init, initargs=(args.signal, args.background, args.exposure_scale)) as pool:
         report = run_mass(pool, args, args.mass_key, mass_index=None)
     args.output.write_text(json.dumps(report, indent=1) + "\n")
 

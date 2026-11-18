@@ -38,7 +38,7 @@ def main():
     t0 = time.perf_counter()
     rows = []
     ctx = mp.get_context("spawn")
-    with ctx.Pool(args.workers, initializer=_init, initargs=(args.signal, args.background)) as pool:
+    with ctx.Pool(args.workers, initializer=_init, initargs=(args.signal, args.background, args.exposure_scale)) as pool:
         for i, k in enumerate(sorted(masses, key=masses.get)):
             if k not in keys:
                 continue

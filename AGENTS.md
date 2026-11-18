@@ -784,3 +784,37 @@ see the lightcone skill; never write into `results/` by hand.
   - Caveats for the comparison: binned vs LZ's unbinned likelihood, and
     single combined sample. Low-mass excess (13-17 GeV ~1.18) and the
     high-mass deficit (~0.85-0.9) are not yet investigated.
+
+- **1000-live-day extension: PLR vs FC counting (2026-11-18, scratch)**:
+  `--exposure-scale k` (k = 1000/220) added to `plr_pilot.py`,
+  `plr_scan.py` and `fc_region_scan.py`. Signal and all Table-I means
+  scale by k, and constraint sigmas also scale by k (fixed fractional
+  uncertainty, the conservative choice). Outputs:
+  `/tmp/lz-fc-scan-{220d,1000d}/`, `/tmp/lz-plr-scan-1000d/` (0.5-60
+  events, 28 mu points, 2000 toys/mu, 1000 B-only toys, about 60 min),
+  figure `plr_vs_fc_exposure.png` via `src/plot_plr_exposure.py`.
+  - **plr_core fit bug found and fixed**: at k = 4.5 about 15% of free fits
+    failed. The crude start mu0 = n_tot - sum(a) was hundreds of events off,
+    because global observables fluctuate by k*sigma. L-BFGS-B then exited
+    ABNORMAL and scipy returned the last TRIAL value as `res.fun` (about
+    1e35), so q clipped to 0 and the limit went beyond the grid. Fix:
+    always recompute the NLL at `res.x`; on failure, restart from a mu = 0
+    start and from the stalled point, keeping the best. Now 0/300
+    unconverged at k = 1 and k = 4.5, and all fits are within 1.4e-9 NLL of
+    9 restarts. Converged fits are unchanged. The 220d campaign ran on the
+    old core, where k = 1 had 0/300 failures, so its results stand.
+  - Results, PLR/FC median ratio: at 220d it is about 0.95-1.05 at nearly
+    every mass. At 1000d it is 0.81-0.93 from 19 GeV to 10 TeV (40 GeV
+    1.98e-48 vs FC 2.34e-48, ratio 0.84) and about 1.0 below 18 GeV. FC
+    still optimizes to n_med = 0 (B about 0.68) above 20 GeV, giving up
+    signal fraction (0.26 at 40 GeV). The PLR uses the whole plane. Point
+    scatter (about 5%) exceeds the plotted bootstrap bars, because q_crit
+    order-statistic noise and FC's integer n_med steps are not included.
+  - Runtime 3301 s vs 1766 s at 220d (1.87x). Of that, 1.12x comes from
+    28 vs 25 mu points. The rest is optimizer iterations: the cost of one
+    NLL+gradient is unchanged (about 300 us; the bin count is fixed), but the
+    mean nfev grows about 1.5x (free 17 -> 26, conditional 8.5 -> 12.6, 40
+    GeV bench). With k-times more events the data constrain the nearly
+    degenerate ER shapes far more tightly than the fractional Table-I
+    priors, so the problem is worse conditioned in the sigma-scaled
+    coordinates. Failure restarts (about 25 per mass) are negligible.

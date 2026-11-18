@@ -112,15 +112,34 @@ class BinnedLikelihood:
         if len(z0) == 0:  # mu fixed and no nuisances
             nu = np.maximum(self.expected(mu_fixed, np.zeros(0)), NU_FLOOR)
             return FitResult(float(nu.sum() - n @ np.log(nu)), float(mu_fixed), np.zeros(0), True, 1)
-        res = minimize(self._nll_grad, z0, args=(n, a, mu_fixed), jac=True, method="L-BFGS-B",
-                       bounds=bounds, options={"maxiter": 2000, "ftol": 1e-13, "gtol": 1e-9})
-        if not np.isfinite(res.fun):
+        def run(z):
+            r = minimize(self._nll_grad, z, args=(n, a, mu_fixed), jac=True, method="L-BFGS-B",
+                         bounds=bounds, options={"maxiter": 2000, "ftol": 1e-13, "gtol": 1e-9})
+            # On ABNORMAL line-search exits scipy's r.fun can be the last TRIAL value, not f(r.x).
+            return r, self._nll_grad(r.x, n, a, mu_fixed)[0]
+
+        res, fun = run(z0)
+        nfev, success = res.nfev, res.success
+        if not success:
+            # Restarts: a mu = 0 start from the global observables (the crude excess start can sit
+            # hundreds of events off when constraint widths are large), and a warm restart from
+            # the stalled point. Keep the lowest NLL; success if any attempt converged.
+            alts = [res.x]
+            if mu_fixed is None:
+                alts.append(np.concatenate([[0.0], np.maximum(a, THETA_START_FLOOR * self.sigmas) / self.sigmas]))
+            for z in alts:
+                r2, f2 = run(z)
+                nfev += r2.nfev
+                success = success or r2.success
+                if f2 < fun:
+                    res, fun = r2, f2
+        if not np.isfinite(fun):
             raise FloatingPointError(f"non-finite NLL after fit (mu_fixed={mu_fixed})")
         if mu_fixed is None:
             mu, theta = self._unpack(res.x)
         else:
             mu, theta = float(mu_fixed), res.x * self.sigmas
-        return FitResult(float(res.fun), float(mu), theta, bool(res.success), int(res.nfev))
+        return FitResult(float(fun), float(mu), theta, bool(success), int(nfev))
 
     def q_mu(self, n, mu, a=None, free=None):
         """Two-sided profile-likelihood-ratio statistic (>= 0) and the free fit used."""

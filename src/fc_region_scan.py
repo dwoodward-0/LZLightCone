@@ -160,6 +160,8 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     for a in ("--signal", "--background", "--response", "--fc-source", "--outdir"):
         p.add_argument(a, required=True, type=Path)
+    p.add_argument("--exposure-scale", type=float, default=1.0,
+                   help="multiply WS2024 (220 live days) signal and background expectations by this")
     args = p.parse_args()
     if not (args.outdir.is_absolute() and args.outdir.is_dir()):
         raise ValueError("--outdir must be an existing absolute scratch directory")
@@ -176,7 +178,12 @@ def main():
             raise ValueError("WIMP archive is not marked complete")
         keys = sorted(sf["ws2024"].keys(), key=lambda k: float(sf[f"ws2024/{k}"].attrs["mass_gev"]))
         signals = [load_signal(sf, k) for k in keys]
+    for sig in signals:
+        sig["s"] = sig["s"] * args.exposure_scale
+        sig["s_var"] = sig["s_var"] * args.exposure_scale ** 2
     src, s1, u = load_background(args.background, args.response, signals[0]["edges"])
+    for r in src.values():  # MC-stat variance scales as weight^2
+        r["h"], r["v"] = r["h"] * args.exposure_scale, r["v"] * args.exposure_scale ** 2
     b_hist = sum(r["h"] for r in src.values())
 
     per_mass, rows = {}, []
@@ -210,6 +217,7 @@ def main():
 
     report = {
         "scope": "FC counting-region scan over the 26-mass grid, WS2024 3.3 t-y; scratch output, not a declared result.",
+        "exposure_scale": args.exposure_scale,
         "alpha": ALPHA, "b_cap_events": B_CAP, "near_optimum_factor": NEAR_OPTIMUM,
         "ranking": "raw s_i/b_i desc (b_i = 0 first), ties by s_i desc; bins with s_i = 0 never added; no MC-sparsity guard (user decision).",
         "median_definition": "exact: FC_ints at Poisson(B) median count (monotonicity asserted)",
