@@ -3389,6 +3389,27 @@ inputs:
     source: vendor/nestpy/pyproject.toml
     description: "The local versioned 2.1.3+lz.wimp1 package definition for the publicly pinned and hashed NEST source, used by the uv lockfile rather than an untracked installed state."
 
+  - id: colleague_feldman_cousins_script
+    type: data
+    label: "User-supplied Feldman-Cousins counting utility"
+    source: data/colleague_feldman_cousins/FeldmanCousins.py
+    description: "Unchanged project-managed copy of the file supplied by the user from a colleague, with original attribution/comments preserved. Original path /Users/dwoodward1/Downloads/FeldmanCousins.py; source, preserved copy and tested staged copy all have SHA256 2e8a566d3940d0e19550afecf335bc94164d26436545b1b2a00c164023f7296d. For fixed-background counting N~Poisson(mu_signal+b), call FC_ints(integer_n, float_b, alpha=0.1): returned endpoints are signal-event units on its native 0.005-event search grid, not cross-sections. The two bounded integration cases returned (1.490,11.595) at n=9,b=3.7 and (0,2.435) at n=0,b=0; this is a capability/integration check, not an independent coverage or complete FC-algorithm validation. Direct calls are required for the initial pilot; the optional lookup with defaults b<=50,n<=50 and extrapolation is not being adopted. Cross-section normalization remains in our absolute-yield bookkeeping."
+  - id: fc_counting_pilot_script
+    type: data
+    label: "Bounded 40 GeV/c2 FC integration pilot script"
+    source: src/fc_counting_pilot.py
+    description: "Exploratory fixed-region integration/normalization checkpoint, not a declared sensitivity output or an optimized analysis region. Reads the unchanged full physical signal/background histograms, uses the predeclared 3<S1c<20 phd,u<-2 region with u evaluated from the validated ER band at each stored histogram-bin center, computes the background-only median and +-1/2 sigma limits exactly without toys (FC upper limit is non-decreasing in n, asserted, so each limit quantile is FC_ints at the corresponding Poisson(B) count quantile), calls the source-pinned FC_ints directly at alpha=0.1, and converts signal-event limits using the selected region's absolute reference WIMP yield. Its numerical report is written only to /tmp."
+
+  - id: fc_region_scan_script
+    type: data
+    label: "Progressive-voxel FC counting-region scan over the WIMP mass grid"
+    source: src/fc_region_scan.py
+    description: "Exploratory first-pass FC counting sensitivity, not yet a declared output recipe. For each of the 26 masses, ranks the existing 77x91 physical (S1c, log10 S2c) bins by raw s_i/b_i (no MC-sparsity guard, user decision 2026-11-17: counting is a first-pass cross-check), adds them in order, and at each step evaluates the exact background-only median FC limit FC_ints(n_med(B_k), B_k) at alpha=0.1; the region minimizing sigma_med is chosen. Bands are FC limits at Poisson count quantiles; power constraint is max(limit, exp(Phi^-1(0.1)) x median). Writes scan.json + fc_sensitivity_scan.csv to /tmp scratch only."
+  - id: fc_region_scan_plot_script
+    type: data
+    label: "Validation figures for the FC region scan"
+    source: src/plot_fc_region_scan.py
+    description: "Five light-format review figures from the scan JSON plus the unchanged archives: detail figures at one mass (default 40 GeV/c2) for the scan curve with Poisson-median jumps, the region map with ER/NR bands, and background MC support with a per-source breakdown; the FC median sensitivity curve and bands vs the LZ WS2024 median and bands (lz_si_sensitivity_reference) with a ratio panel; and a per-mass summary table. Scratch output under /tmp only."
 outputs:
   - id: response_model_calibration
     type: data
@@ -3536,9 +3557,9 @@ outputs:
     type: table
     format: csv
     label: "Cut-and-count FC sensitivity curve"
-    description: "Cross-check result: cut-and-count in the (S1c, log10 S2c) ROI with Feldman-Cousins 90% CL confidence belt on signal counts, converted to cross-section limits via the efficiency input and exposure. Columns as in plr_sensitivity_curve."
-    inputs: [background_models, wimp_signal_models]
-    decisions: [statistics, background_components, exposure_structure, test_statistic_sidedness, power_constraint]
+    description: "Cross-check result: cut-and-count in the (S1c, log10 S2c) ROI using direct FC_ints(n,b,alpha=0.1) calls from colleague_feldman_cousins_script. For each selected region, the fixed expected background is the sum of full physical background hist_counts and an observed toy is N~Poisson(mu_signal+B), with background-only toys N~Poisson(B). The FC interval is in signal-event units on the source's native 0.005-event grid; do not confuse it with scipy.stats.poisson.ppf, a count quantile. Median sensitivity is the median of background-only signal-event limits (decision median_sensitivity_definition.median_of_toy_limits). For counting this is computed exactly without toys: the FC upper limit is non-decreasing in n at fixed B (assert it), so the median limit equals FC_ints at the Poisson(B) median count (smallest n with CDF >= 0.5), and band edges are FC_ints at the corresponding Poisson count quantiles. Toys would only add Monte Carlo noise; the 2D PLR, whose test statistic is not a function of one count, still needs toys. Convert using sigma_UL=1e-36*mu_UL/mu_WIMP(region;1e-36 cm2), where mu_WIMP is the sum of the absolute signal hist_counts selected in that region at 3.3 WS2024 tonne-years. The absolute production efficiency, exposure and ROI are already included exactly once in that yield; do not apply another efficiency/exposure factor or Table-I-style normalization. Apply the one-sigma power constraint at result assembly (decision power_constraint.applied_1sigma). Columns as in plr_sensitivity_curve. The current project source and bounded 40 GeV/c2 pilot are integration inputs only; no production recipe or full mass campaign has been established yet."
+    inputs: [background_models, wimp_signal_models, colleague_feldman_cousins_script]
+    decisions: [statistics, background_components, exposure_structure, median_sensitivity_definition, test_statistic_sidedness, power_constraint]
   - id: sensitivity_vs_lz_validation
     type: figure
     format: png

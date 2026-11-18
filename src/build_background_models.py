@@ -721,7 +721,7 @@ def make_parser():
     ap.add_argument("--sr1-marginals", required=True)
     ap.add_argument("--nest-header", required=True)
     ap.add_argument("--seed", type=int, default=44)
-    ap.add_argument("--n-er", type=int, default=40_000,
+    ap.add_argument("--n-er", type=int, default=4_000_000,
                     help="generated events per ER source (pre-ROI)")
     ap.add_argument("--n-nr", type=int, default=120_000,
                     help="generated events per non-8B/hep NR source")

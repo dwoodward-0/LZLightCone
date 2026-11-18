@@ -587,3 +587,125 @@ see the lightcone skill; never write into `results/` by hand.
     pre-seeding numbers; the measured NR block above has been refreshed and
     agrees with the updated ASTRA findings.
 
+- **FC source preservation and 40 GeV/c2 integration pilot (2026-11-13)** —
+  the user-supplied colleague implementation is copied unchanged into
+  `data/colleague_feldman_cousins/FeldmanCousins.py` (declared
+  `colleague_feldman_cousins_script`), SHA256
+  `2e8a566d3940d0e19550afecf335bc94164d26436545b1b2a00c164023f7296d`;
+  original attribution/comments are retained. `scipy==1.17.1` is the required
+  added dependency. Direct `FC_ints(n,b,alpha=0.1)` gives signal-event intervals
+  on its native 0.005-event grid. Tested controls reproduce (1.490,11.595) at
+  (9,3.7) and (0,2.435) at (0,0). These are integration checks, not independent
+  FC coverage/algorithm validation. Do not use `scipy.stats.poisson.ppf` as an
+  FC lookup, and do not use the optional default b<=50,n<=50 interpolator for
+  the pilot. ROOT was not run for FC and is set aside.
+  - `src/fc_counting_pilot.py` (declared `fc_counting_pilot_script`) completed a
+    bounded, read-only 200-toy pilot through Lightcone, output only
+    `/tmp/lz-fc-40gev-fixed-region-pilot.json`. Fixed BEFORE evaluating counts:
+    existing histogram-bin centers with 3<S1c<20 phd and u<-2, using the
+    validated ER-band u. This is a diagnostic, non-optimized counting region;
+    no voxel optimization, 26-mass campaign, PLR production, signal/background
+    regeneration, or sensitivity tuning was performed.
+  - Full 12-source physical background B=8.152820573166032 events. Absolute
+    40 GeV/c2 signal in-region at sigma_ref=1e-36 cm2 is 466156963189.387
+    events (3.3 t-y); thus 1 signal-event limit corresponds to
+    2.14520017712087e-48 cm2 and 1e-48 cm2 gives 0.466156963189387 signal
+    events. Full physical hist_counts were used, not capped display weights;
+    no extra exposure, efficiency, Table-I or figure normalization was applied.
+  - **Superseded 200-toy result corrected (2026-11-17, user's point)**: no
+    toys are needed for the counting median. FC upper limits are
+    non-decreasing in n at fixed b (driver asserts it), and median f(N) =
+    f(median N) for non-decreasing f, so the median limit is exactly
+    FC_ints(n_med, b) with n_med the Poisson(B) median (smallest n with
+    CDF >= 0.5); bands use Poisson count quantiles at Phi(+-1), Phi(+-2);
+    the PC max(limit, floor) is also non-decreasing, so it commutes too.
+    The old note "never FC at a rounded median count" was wrong. The 200-toy
+    pilot landed on n = 7 (4.45 events, 9.55e-48), roughly a 2-sigma toy
+    fluctuation since CDF(7; 8.15) = 0.432. Exact result
+    (`/tmp/lz-fc-40gev-fixed-region-exact.json`): n_med = 8 (CDF 0.571),
+    **5.835 signal events -> 1.2517e-47 cm2**; -2/-1/+1/+2 sigma counts
+    3/5/11/14 -> 1.38/2.495/9.655/13.345 events = 2.96e-48/5.35e-48/
+    2.07e-47/2.86e-47 cm2. PC floor 0.2776 x median = 3.475e-48; binds only
+    for n <= 3 (background-only probability 0.038), so it lifts only the
+    -2 sigma edge. The median is a step function of B because n is an
+    integer, so expect jumps during region design. Toys remain necessary
+    for the 2D PLR. This is still a non-optimized integration checkpoint,
+    not an LZ comparison.
+  - Physical Table-I expectations remain separate from toy Poisson fluctuations
+    and from generated-MC variances (the background archive's hist_mc_weight_variance
+    is raw-w^2 convention). Signal/background/response SHA256 match their existing
+    Lightcone manifests: 78d1c063f86b4c9f800d9a6e223ae11abd39c7b43820bde81cc210f34848f5ed,
+    87bbbcc6a2dfdce2af9a21fd35bca916b0c669f33f9364f00f895ceeceddaf26,
+    7a1a9f3d85035a93e45e42b8ea4a242730f8895a24179a2a9decfbae9e89cce8.
+    One driver-only floating-point sigma-to-mu round-trip assertion was fixed by
+    applying the PC max in signal units and converting once; this was not an FC
+    numerical failure. ASTRA schema+semantic validation passed. The local
+    allocation was released. Changes are uncommitted pending user authorization.
+    Next AFTER REVIEW: bounded progressive voxel-region design/evaluation, then
+    independent sampling precision review, the 26-mass FC curve, and separately
+    the primary 2D PLR and declared cross-check.
+
+
+- **FC progressive-voxel region scan, 40 GeV/c2 (2026-11-17)** —
+  `src/fc_region_scan.py` + `src/plot_fc_region_scan.py` (declared inputs
+  `fc_region_scan_script`, `fc_region_scan_plot_script`); scratch output
+  `/tmp/lz-fc-40gev-region-scan/` (scan.json + fig1-4). Ranks bins by
+  s_i/max(b_i, b_floor), adds them in order, and evaluates the exact median
+  FC limit at each step (15 s, 2097 FC calls). Per-source MC weights are
+  exactly uniform (Table I / N_ROI_MC): 214Pb 0.365, 136Xe 0.383, Kr85
+  0.082, solar ER 0.034, 212Pb 0.026, 3H/14C 0.0019, 124Xe 5.2e-4, 8B
+  9.2e-4, 127Xe 8.5e-5, accidentals 7e-5, atm 1.6e-6.
+  - **The agreed guard is a no-op**: the smallest-weight source with MC below
+    the band is atm-nu NR (1.6e-6), so guard_min_weight is identical to
+    unguarded. Only 10 signal bins have b = 0 (0.017% of signal).
+  - Unguarded optimum: 544 bins, B = 0.688 (just below the first
+    Poisson-median jump at 0.693), n_med = 0, mu_med = 1.785, 63.4% of
+    signal, **sigma_med = 4.29e-48** (+1/+2 sigma 8.81e-48/1.62e-47). **But
+    it is an MC-hole artifact**: the region contains ZERO MC events from
+    214Pb, Kr85, solar ER, 212Pb, or 136Xe. It hugs the underside of 214Pb's
+    sparse MC support (2034 ROI MC events for 743 physical). The reported
+    MC-stat sigma on B (0.013) is misleading because empty bins carry zero
+    raw-w^2 variance. Do NOT quote 4.29e-48 as a sensitivity.
+  - Diagnostic guard_dominant (floor = 214Pb weight 0.365): this ranks by s
+    alone in almost every bin, a poor ordering: 74 bins, 28% of signal,
+    sigma_med 9.75e-48, and still sits on 1-2 MC-event solar/212Pb bins.
+    Neither floor fixes the root cause. The root cause is ER background MC
+    sparsity below the band (25 MC events of 214Pb for u < -2, S1c < 40).
+  - Old fixed pilot region (B = 8.15): sigma_med 1.25e-47, for reference.
+  - Open decision for the user: a smooth below-band ER background model
+    (more ER MC, or a template from high-statistics ER shapes) before the
+    region optimization is trusted.
+- **User decision (2026-11-17): unguarded ranking is accepted** for the FC
+  counting cross-check. It is a first-pass sensitivity, and counting is
+  already suboptimal. The guard variants and the old pilot region are dropped
+  from plots. The MC-hole caveat above stands as a documented limitation.
+- **26-mass FC scan done** (`/tmp/lz-fc-mass-scan/`: scan.json,
+  fc_sensitivity_scan.csv, fig1-3 detail at 40 GeV, fig4 sensitivity vs LZ,
+  fig5 per-mass table; 138 s, 27638 FC calls). Every optimum sits just below
+  a Poisson-median jump: n_med = 0 at B ≈ 0.68-0.69 for all masses except
+  13/16/17 GeV (n_med = 1, B ≈ 1.67-1.68). Median PC limits: 40 GeV 4.29e-48
+  (LZ 5.06e-48, ratio 0.85); minimum ≈ 4.24e-48 at 46 GeV; ratio to LZ
+  median 0.59 (9 GeV), 1.15-1.41 (11-21 GeV), 0.82-0.95 (26-46 GeV), and a
+  flat 0.73-0.77 above 65 GeV. All inside LZ's ±1σ band. Caveats on the
+  comparison: our exposure is WS2024 3.3 t-y vs LZ's combined 4.2 t-y
+  unbinned PLR; fixed-B FC with no background uncertainty; regions sit in
+  heavy-ER MC holes (B likely underestimated). With n_med = 0, the -1σ and
+  -2σ counts are also 0, so the lower band edges equal the median.
+  Agreement is therefore partly coincidental and not a validation.
+- **100x ER-statistics rerun of the FC scan (2026-11-17, scratch only)**:
+  `/tmp/lz-bkg-x100/background_models_x100.hdf5` = the baseline recipe
+  with `--n-er 4000000` (all 8 ER sources + accidentals; NR unchanged;
+  886 s, ~25-30k ER events/s through NEST). Physical Table-I totals are
+  identical; ROI MC: 214Pb 2034 -> 207338, Kr85 1980 -> 197415, solar ER
+  2970 -> 296662, 212Pb 2413 -> 248235, 136Xe 145 -> 15247. The results/
+  archive is unchanged and has NOT been rematerialized. Scan in
+  `/tmp/lz-fc-mass-scan-x100/`. The MC-hole bias was real: limits rise by
+  1.30-1.34x at >= 32 GeV and 1.02-1.2x below. New ratios to the LZ median
+  are 1.07-1.45 at 11-46 GeV (40 GeV: **5.69e-48**, 1.12x), ~0.97-1.02 at
+  >= 65 GeV, and 0.60 at 9 GeV. All are inside LZ's ±1σ band. The 40 GeV
+  region now has B = 0.678, with heavy ER sources present (214Pb 0.082
+  from 23 MC events, Kr85 0.040, solar 0.021, 212Pb 0.015). Accidentals
+  are still dominant at 0.426, and the MC-stat sigma on B is 0.019.
+  Optimum still at n_med = 0 (13-19 GeV: n_med = 1). Caveat: 3.3 vs
+  4.2 t-y exposure; fixed B. `plot_fc_region_scan.py` 214Pb weight label
+  is now computed from the archive (was hardcoded 0.365).
