@@ -25,7 +25,9 @@ from dataclasses import dataclass
 import numpy as np
 from scipy.optimize import minimize
 
-NU_FLOOR = 1e-300
+NU_FLOOR = 1e-30  # keeps n/nu finite when a bin's only source sits at theta = 0
+THETA_START_FLOOR = 0.1  # starts theta >= 0.1 sigma: a negative global observable must not start a
+                         # source at exactly 0 while the toy has counts in bins only it populates
 
 
 @dataclass
@@ -97,7 +99,7 @@ class BinnedLikelihood:
     def fit(self, n, a=None, mu_fixed=None, start=None):
         a = self.means if a is None else np.asarray(a, float)
         n = np.asarray(n, float)
-        theta0 = np.maximum(a if start is None else start[1], 0.0)
+        theta0 = np.maximum(a if start is None else start[1], THETA_START_FLOOR * self.sigmas)
         if mu_fixed is None:
             mu0 = 0.0 if start is None else max(start[0], 0.0)
             if start is None:  # crude excess-over-background start
@@ -112,6 +114,8 @@ class BinnedLikelihood:
             return FitResult(float(nu.sum() - n @ np.log(nu)), float(mu_fixed), np.zeros(0), True, 1)
         res = minimize(self._nll_grad, z0, args=(n, a, mu_fixed), jac=True, method="L-BFGS-B",
                        bounds=bounds, options={"maxiter": 2000, "ftol": 1e-13, "gtol": 1e-9})
+        if not np.isfinite(res.fun):
+            raise FloatingPointError(f"non-finite NLL after fit (mu_fixed={mu_fixed})")
         if mu_fixed is None:
             mu, theta = self._unpack(res.x)
         else:

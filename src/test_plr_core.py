@@ -89,6 +89,17 @@ def test_asimov(rng):
     print("PASS Asimov recovery")
 
 
+def test_negative_global_observable():
+    """Regression (2026-11-18, 17 GeV campaign NaN): a mean-0 source whose fluctuated global
+    observable is negative, with toy counts in a bin only that source populates."""
+    shapes = np.array([[10.0, 10.0, 0.0], [0.0, 0.0, 1.0]])
+    lk = BinnedLikelihood([1.0, 2.0, 0.0], shapes, means=[100.0, 0.0], sigmas=[10.0, 0.2])
+    n, a = np.array([50.0, 45.0, 1.0]), np.array([100.0, -0.035])
+    q, free = lk.q_mu(n, 1.0, a)
+    assert np.isfinite(q) and np.isfinite(free.nll) and free.theta[1] > 0, (q, free)
+    print("PASS negative global observable / exclusive-support bin")
+
+
 def benchmark(signal_path, background_path, n_toys, rng):
     import h5py
     sys.path.insert(0, str(HERE))
@@ -139,6 +150,7 @@ def main():
     test_gradients(rng)
     test_asimov(rng)
     test_one_bin_fc(FeldmanCousins)
+    test_negative_global_observable()
     if args.signal and args.background:
         benchmark(args.signal, args.background, args.bench_toys, rng)
 
