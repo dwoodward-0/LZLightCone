@@ -752,3 +752,35 @@ see the lightcone skill; never write into `results/` by hand.
     2 events; per-point order-statistic noise is 0.05-0.22. Of the B-only
     toys, 69% have mu_hat = 0, and none land beyond the grid. Not a
     declared output; nothing committed.
+- **First full 2D-PLR campaign (2026-11-18)**, `/tmp/lz-plr-scan/`
+  (per-mass JSON, plr_sensitivity_scan.csv, plr_sensitivity_vs_lz.png via
+  `src/plot_plr_scan.py`). Settings: 25 geometric mu points 0.5-40 events,
+  2000 toys/mu, 1000 B-only toys, 8 workers, 1768 s total. Run through
+  `lc run` at 6a26837.
+  - **A first attempt was killed at 17 GeV: NaN fits.** Detector neutrons
+    have mean 0; a negative toy global observable started theta at 0, and
+    toy counts in bins only that source populates gave n/nu overflow ->
+    NaN -> q_crit NaN -> 30% infinite limits. Fixed in 6a26837 (theta
+    start >= 0.1 sigma, nu floor 1e-30, raise on non-finite NLL;
+    regression test). 9-16 GeV were bit-identical in the rerun.
+  - **Median (PC) / LZ WS2024-only slide 24**: 1.18-1.19 at 13-17 GeV,
+    1.02-1.08 at 19-32, 0.94-0.96 at 36-46 (40 GeV: **5.39e-48 +-
+    0.11e-48** vs 5.76e-48), 0.85-0.94 from 65 GeV up. The bootstrap error
+    is 2-4%. 9 GeV 1.54e-46 (no LZ point). Only 1 of 26000 B-only limits
+    fell beyond the grid (36 GeV).
+  - **Bands**: compare our UNCONSTRAINED toy quantiles with LZ's bands. Our
+    PC -2 sigma equals -1 sigma by construction, which reads as a spurious
+    ~2.2x. Unconstrained ratios: -2 sigma 1.0-1.5, -1 sigma 0.93-1.33,
+    +1 sigma 0.81-1.15, +2 sigma 0.86-1.14. Our band is somewhat narrower
+    than LZ's at high mass and sits higher at low mass.
+  - **The PLR barely beats FC counting** (x100 ER scan): ratios track each
+    other within ~5% at almost every mass. This is open for discussion.
+    The counting regions sit at B ~ 0.7 (n_med = 0), already a
+    near-background-free regime, so the 2D shape may add little. LZ's
+    unbinned six-sample likelihood would gain more.
+  - Fit flags: 825 L-BFGS-B success=False of ~3.3M fits (2.5e-4).
+    Not re-verified for this run; the pilot showed these sit at the
+    optimum.
+  - Caveats for the comparison: binned vs LZ's unbinned likelihood, and
+    single combined sample. Low-mass excess (13-17 GeV ~1.18) and the
+    high-mass deficit (~0.85-0.9) are not yet investigated.
