@@ -3427,6 +3427,16 @@ inputs:
     label: "WIMP normalization and full-selection focused tests"
     source: src/test_wimp_signal.py
     description: "Unit and small-response controls for the unchanged native sample stream, scalar timing, exact normalization, native-tail linear density and weights, selection-weight indexing, full-histogram/event reconciliation and reproducibility. Run through lc run local before production; it is a code input, not a separate materialized result."
+  - id: plot_wimp_fig3_script
+    type: data
+    label: "40 GeV/c2 WIMP vs WS2024 Fig. 3 region comparison"
+    source: src/plot_wimp_fig3_comparison.py
+    description: "Extracts LZ's purple 68%/95% 40 GeV/c2 WIMP regions exactly from the vector fill paths of WS2024 Fig. 3 (All Data) and compares them with the declared 40 GeV/c2 signal model: unbinned containment on the archive's uniform display subsample, and our own smoothed 68%/95% contours. One file per invocation (.png figure or .json metrics). Declared as an input so edits cascade."
+  - id: digitize_accidentals_ws2024_script
+    type: data
+    label: "WS2024 Fig. 3 digitizer (axis calibration helper)"
+    source: src/digitize_accidentals_ws2024.py
+    description: "Digitizer of the WS2024 Fig. 3 accidentals contours; provides the pinned paper SHA256 and the tick-label axis calibration that plot_wimp_fig3_script imports. Declared as an input so edits cascade."
   - id: nestpy_wimp_connector_binding
     type: data
     label: "Binding-only exposure of NEST WIMP rate and preparation metadata"
@@ -3763,6 +3773,24 @@ outputs:
     decisions: [response_model, halo_model, wimp_time_treatment, wimp_native_support, efficiency_treatment, exposure_structure, nest_parameter_set, detector_effects]
     recipe:
       command: "python src/validate_wimp_signal.py --models {inputs.wimp_signal_models} --response {inputs.response_model_calibration} --fig4-reference {inputs.lz_ws2024_fig4_projection} --sensitivity {inputs.lz_si_sensitivity_reference} --output {output} --require-full-grid --response-model {decisions.response_model} --time-mode {decisions.wimp_time_treatment} --support-treatment {decisions.wimp_native_support} --efficiency-treatment {decisions.efficiency_treatment} --exposure-structure {decisions.exposure_structure} --nest-parameter-set {decisions.nest_parameter_set} --detector-effects {decisions.detector_effects} --halo-model {decisions.halo_model}"
+  - id: wimp_fig3_validation
+    type: figure
+    format: png
+    label: "WIMP checkpoint: 40 GeV/c2 signal region vs LZ Fig. 3"
+    description: "Validation beyond the original six: the 40 GeV/c2 WIMP's 2D morphology in (S1c, log10 S2c) against the purple 68%/95% regions of WS2024 Fig. 3 (All Data, arXiv:2410.17036v3), extracted exactly from the pinned paper's vector paths. Left: our full 59,852-event ROI MC histogram (archive grid, 1 phd x 0.02 dex) under LZ's regions. Right: our own 68%/95% highest-density contours of a display-only smoothed copy (1.1 phd, 0.040 dex) against LZ's, with the containment of our ROI sample inside LZ's regions (unbinned, on the uniform 50,000-event display subsample; measured 65.9% +/- 0.2% in the 68% region and 94.4% +/- 0.1% in the 95% region). Complements wimp_fig4_validation (1D band projection, absolute yield) with the 2D shape. Descriptive checkpoint, no acceptance gate: published regions are not a 2D PDF and LZ's contour uncertainty is unavailable, so containment is not a goodness-of-fit test. No refit, renormalization or new production; ROI 3 < S1c < 80 phd, S2c >= 493 phd, log10 S2c < 4.5."
+    inputs: [wimp_signal_models, lz_ws2024_paper, plot_wimp_fig3_script, digitize_accidentals_ws2024_script]
+    decisions: [response_model, halo_model, wimp_time_treatment, wimp_native_support, efficiency_treatment, exposure_structure, nest_parameter_set, detector_effects]
+    recipe:
+      command: "python src/plot_wimp_fig3_comparison.py --models {inputs.wimp_signal_models} --paper {inputs.lz_ws2024_paper} --output {output}"
+  - id: wimp_fig3_validation_metrics
+    type: data
+    format: json
+    label: "Numerical 40 GeV/c2 Fig.-3 region comparison"
+    description: "One-file JSON companion to wimp_fig3_validation: LZ polygon vertices and bounds, containment fractions with binomial MC sigma, fractions at S1c > 40 and log10 S2c < 2.75, central quantiles, our contour levels and smoothing, the 2026-11-13 event-level scratch values (66.00% / 94.37%) for reference, and cautions."
+    inputs: [wimp_signal_models, lz_ws2024_paper, plot_wimp_fig3_script, digitize_accidentals_ws2024_script]
+    decisions: [response_model, halo_model, wimp_time_treatment, wimp_native_support, efficiency_treatment, exposure_structure, nest_parameter_set, detector_effects]
+    recipe:
+      command: "python src/plot_wimp_fig3_comparison.py --models {inputs.wimp_signal_models} --paper {inputs.lz_ws2024_paper} --output {output}"
   - id: plr_sensitivity_curve
     type: table
     format: csv
