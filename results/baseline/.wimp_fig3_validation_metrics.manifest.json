@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "output_id": "wimp_fig3_validation_metrics",
+  "universe_id": "baseline",
+  "recipe": "python src/plot_wimp_fig3_comparison.py --models results/baseline/wimp_signal_models.hdf5 --paper data/lz_ws2024_paper.pdf --output results/baseline/wimp_fig3_validation_metrics.json",
+  "definition_version": "sha256:cf7e92a684edc93a09ea42ff2cf0f55b0b2ad6aec833080760df17d4270b64b8",
+  "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
+  "data_version": "sha256:a2ff46fe377f23c32f15314376f3a6d42c6a5766be3e0a62720e008401c57235",
+  "decisions": {
+    "response_model": "nest_library",
+    "halo_model": "shm_standard",
+    "wimp_time_treatment": "representative_day",
+    "wimp_native_support": "native_drate_extension",
+    "efficiency_treatment": "input_pre_roi_curve",
+    "exposure_structure": "combined_single",
+    "nest_parameter_set": "ws2024_nest240",
+    "detector_effects": "uniform_1d"
+  },
+  "input_versions": {
+    "wimp_signal_models": "sha256:78d1c063f86b4c9f800d9a6e223ae11abd39c7b43820bde81cc210f34848f5ed",
+    "lz_ws2024_paper": "sha256:d358bffbaed7eaddd431f9b540790673d650f00d0964282a089a15c84b2f9544",
+    "plot_wimp_fig3_script": "sha256:24dbe21c0396c3c7b8435d59c7b3512c4124f004e49b8d222cd2772240b0c5d1",
+    "digitize_accidentals_ws2024_script": "sha256:dc5f623d4a7c5eb7acc5f065661d7922169ed3eac5787429dcc5260874967a70"
+  },
+  "git_sha": "b77d285a3a3432f347c8c91010b168f75419e63d",
+  "git_remote": "",
+  "lc_version": "0.5.0",
+  "hermeticity": {
+    "mechanism": "seatbelt",
+    "fs": "declared",
+    "network": "allowed",
+    "landlock_abi": null,
+    "exec_allowlist_version": 1
+  },
+  "started_at": "2026-11-19T20:52:46.698+00:00",
+  "finished_at": "2026-11-19T20:52:48.840+00:00",
+  "uv_version": "0.13.7",
+  "image": null
+}
