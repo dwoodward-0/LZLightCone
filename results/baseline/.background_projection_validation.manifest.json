@@ -2,10 +2,10 @@
   "schema_version": 1,
   "output_id": "background_projection_validation",
   "universe_id": "baseline",
-  "recipe": "python src/validate_backgrounds.py --models results/baseline/background_models.hdf5 --response results/baseline/response_model_calibration.hdf5 --table1 data/lz_ws2024_table1_counts.csv --reference data/lz_ws2024_fig4_projection.csv --output results/baseline/background_projection_validation.png --efficiency-treatment input_pre_roi_curve --er-efficiency-treatment staged_conditional --background-components all_table1 --exposure-structure combined_single --nest-parameter-set ws2024_nest240 --detector-effects uniform_1d",
-  "definition_version": "sha256:04fb4f022db47225fdb7ee1ab9ce0bdbe9c6c855ec4fca7ba9af5f0fc4f55493",
+  "recipe": "python src/validate_backgrounds.py --models results/baseline/background_models.hdf5 --response results/baseline/response_model_calibration.hdf5 --table1 data/lz_ws2024_table1_counts.csv --reference data/lz_ws2024_fig4_projection.csv --output results/baseline/background_projection_validation.png --efficiency-treatment input_pre_roi_curve --er-efficiency-treatment staged_conditional --background-components all_table1 --exposure-structure combined_single --nest-parameter-set ws2024_nest240 --detector-effects uniform_1d && python src/plot_validation4.py --models results/baseline/background_models.hdf5 --response results/baseline/response_model_calibration.hdf5 --paper data/lz_ws2024_paper.pdf --output results/baseline/background_projection_validation.png",
+  "definition_version": "sha256:e9884033a37209b6dc4790acb61a7a0748e8f995aff9d1dee9dbd050f5c9b699",
   "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
-  "data_version": "sha256:827c9b888a67c3b0df950745df8191cc3c15570eb3dcffd6bf9a13973c0516dd",
+  "data_version": "sha256:d9075149441e8ddc39511b242c91a20cfac23f819be70441b46b575d98a6fefa",
   "decisions": {
     "background_components": "all_table1",
     "exposure_structure": "combined_single",
@@ -20,9 +20,14 @@
     "response_model_calibration": "sha256:7a1a9f3d85035a93e45e42b8ea4a242730f8895a24179a2a9decfbae9e89cce8",
     "lz_table1_counts_reference": "sha256:7f9eaab6ccdc934f8f6d1101125db59a0e499922939ed96f745b0b3959371510",
     "lz_ws2024_fig4_projection": "sha256:3925d20a10daa24f650eb6215c353a6994188aea5f1590bb36185f32270548a0",
-    "background_projection_script": "sha256:65bb4671e15c336a9d6f09c4b41922a0164bf0c980f47368fbe1327949d19866"
+    "background_projection_script": "sha256:65bb4671e15c336a9d6f09c4b41922a0164bf0c980f47368fbe1327949d19866",
+    "plot_validation4_script": "sha256:d93cd87fa5441a00f34413bf22fa5a4d1d6652d4fda6f2fe485a44427a57f08d",
+    "plot_background_total_script": "sha256:88a2c9c465c3d38fe12444a1f8eb53473080027bb711d1466d9f0cabc7bf2918",
+    "plot_backgrounds_per_source_script": "sha256:cced1dbac8cbbc0b674f171e4f4eebb0e8190852187a4c049be5ef8571ede31c",
+    "digitize_fig4_projection_script": "sha256:d0b8c95e7619ad79517edc797219c1513a4deabe977695d950528f672b1b1b99",
+    "lz_ws2024_paper": "sha256:d358bffbaed7eaddd431f9b540790673d650f00d0964282a089a15c84b2f9544"
   },
-  "git_sha": "c6ec16804c4645550c3b6e17ced7d73d3bfb5b1e",
+  "git_sha": "d93d51ccc3b1f1f2ffa3e556f573f949aef5e08c",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -32,8 +37,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-18T17:51:30.081+00:00",
-  "finished_at": "2026-11-18T17:51:33.178+00:00",
+  "started_at": "2026-11-19T20:28:43.002+00:00",
+  "finished_at": "2026-11-19T20:28:47.518+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
