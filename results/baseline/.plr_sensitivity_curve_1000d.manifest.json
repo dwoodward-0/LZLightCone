@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "output_id": "plr_sensitivity_curve_1000d",
+  "universe_id": "baseline",
+  "recipe": "python src/plr_scan.py --signal results/baseline/wimp_signal_models.hdf5 --background results/baseline/background_models.hdf5 --exposure-scale 4.545454545454546 --mu-min 0.5 --mu-max 60 --mu-points 28 --toys-per-mu 2000 --bkg-toys 1000 --workers 8 --seed 20261118 --output-csv results/baseline/plr_sensitivity_curve_1000d.csv --statistics both_with_crosscheck --background-components all_table1 --exposure-structure combined_single --median-sensitivity-definition median_of_toy_limits --power-constraint applied_1sigma --test-statistic-sidedness two_sided",
+  "definition_version": "sha256:0cc5ce88aba2e992df1d5f84c585a1f64110f3aa26bdfd5d8adb995447dce2b9",
+  "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
+  "data_version": "sha256:7bbb23a99f8f3d5c33052f14378d4c15190ccca8fb050b1ab99378ee13d9d9fb",
+  "decisions": {
+    "statistics": "both_with_crosscheck",
+    "background_components": "all_table1",
+    "exposure_structure": "combined_single",
+    "median_sensitivity_definition": "median_of_toy_limits",
+    "power_constraint": "applied_1sigma",
+    "test_statistic_sidedness": "two_sided"
+  },
+  "input_versions": {
+    "background_models": "sha256:482c981a163bc19616e285dc2d364d1d772714b3acd473f1bb38f6bd965dc2ee",
+    "wimp_signal_models": "sha256:78d1c063f86b4c9f800d9a6e223ae11abd39c7b43820bde81cc210f34848f5ed",
+    "plr_scan_script": "sha256:2d0daf207f69ce4051394f1e84fb93c8b9bc2f9a0265abce87ce7523f7832898",
+    "plr_pilot_script": "sha256:ce11e2a471b87afd308ca69c996dd13c1b6d59c51d646d9b43317c8318fafa12",
+    "plr_core_script": "sha256:362772f100ab287777d5b79953b5fee1eb78dfe84c2ff5db3df28628b373fca6",
+    "background_projection_script": "sha256:65bb4671e15c336a9d6f09c4b41922a0164bf0c980f47368fbe1327949d19866",
+    "stat_decisions_script": "sha256:9420b1baad5380213570616c7f455b775e150ba060c653a97cd98117d91feb8b"
+  },
+  "git_sha": "0c722a46860011cdfcaf2d87256d4831c9a32611",
+  "git_remote": "",
+  "lc_version": "0.5.0",
+  "hermeticity": {
+    "mechanism": "seatbelt",
+    "fs": "declared",
+    "network": "allowed",
+    "landlock_abi": null,
+    "exec_allowlist_version": 1
+  },
+  "started_at": "2026-11-19T02:20:42.397+00:00",
+  "finished_at": "2026-11-19T03:14:56.592+00:00",
+  "uv_version": "0.13.7",
+  "image": null
+}
