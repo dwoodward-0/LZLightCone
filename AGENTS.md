@@ -818,3 +818,30 @@ see the lightcone skill; never write into `results/` by hand.
     degenerate ER shapes far more tightly than the fractional Table-I
     priors, so the problem is worse conditioned in the sigma-scaled
     coordinates. Failure restarts (about 25 per mass) are negligible.
+
+- **Statistics outputs wired and the whole spec current (2026-11-18)**: all
+  22 declared outputs are `current` and `lc materialize --check` passes.
+  - Recipes now exist for `plr_sensitivity_curve`, `fc_sensitivity_curve`,
+    `sensitivity_vs_lz_validation` (V5) and `fc_plr_crosscheck` (V6).
+    Decision flags go through `src/stat_decisions.py`, which accepts only
+    the implemented options.
+  - V5 now targets the like-for-like WS2024-only slide-24 curve
+    (`lz_ws2024_only_sensitivity_reference`), not the combined 5.1e-48.
+    **A1 FAILS**: 40 GeV 5.39e-48 vs 5.76e-48, ratio 0.935, pull -3.5
+    against our bootstrap error alone, because the reference uncertainty is
+    not in the gate. **A2 PASSES** 22/22 masses, ratio 0.85-1.18. Open:
+    widen the gate to include the reference uncertainty, or accept A1 as a
+    documented residual.
+  - V6 PASSES 26/26: PLR/FC 0.91-1.12.
+  - The 1000-day extension is now part of the spec:
+    `plr_sensitivity_curve_1000d`, `fc_sensitivity_curve_1000d` and
+    `plr_fc_exposure_comparison`. Both curves are bit-identical to the
+    scratch runs. The 1000d PLR/FC ratio is 0.81-0.93 above 19 GeV and
+    0.96-1.09 below; at 40 GeV it is 1.975e-48 vs FC 2.339e-48.
+  - lc gotchas:
+    - `lc materialize` refuses to run with any untracked file, so viewing
+      copies go in `.git/info/exclude`.
+    - If the lc client dies (e.g. laptop sleep), the worker task is
+      orphaned and nothing commits. Recover with
+      `lc compute down <clu_ id>`, relaunch, and rerun.
+    - Launch long runs with `nohup caffeinate -i lc materialize ... &`.
