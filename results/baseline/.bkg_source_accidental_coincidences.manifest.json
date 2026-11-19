@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "output_id": "bkg_source_accidental_coincidences",
+  "universe_id": "baseline",
+  "recipe": "python src/plot_backgrounds_per_source.py --models results/baseline/background_models.hdf5 --response results/baseline/response_model_calibration.hdf5 --reference data/lz_ws2024_fig4_projection.csv --table1 data/lz_ws2024_table1_counts.csv --source accidental_coincidences --output results/baseline/bkg_source_accidental_coincidences.png",
+  "definition_version": "sha256:dfde58c00505dfe5e3460282998d1c90edd7dbbd36da8711eb2156baa0c868a1",
+  "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
+  "data_version": "sha256:b14bf180d91cba3c24f06a89f79053a1889d5456e7caaf99098fb06474da77d8",
+  "decisions": {
+    "background_components": "all_table1",
+    "exposure_structure": "combined_single",
+    "nest_parameter_set": "ws2024_nest240",
+    "detector_effects": "uniform_1d",
+    "accidentals_model": "factorized_contour_constrained",
+    "efficiency_treatment": "input_pre_roi_curve",
+    "er_efficiency_treatment": "staged_conditional"
+  },
+  "input_versions": {
+    "background_models": "sha256:482c981a163bc19616e285dc2d364d1d772714b3acd473f1bb38f6bd965dc2ee",
+    "response_model_calibration": "sha256:7a1a9f3d85035a93e45e42b8ea4a242730f8895a24179a2a9decfbae9e89cce8",
+    "lz_ws2024_fig4_projection": "sha256:3925d20a10daa24f650eb6215c353a6994188aea5f1590bb36185f32270548a0",
+    "lz_table1_counts_reference": "sha256:7f9eaab6ccdc934f8f6d1101125db59a0e499922939ed96f745b0b3959371510",
+    "plot_backgrounds_per_source_script": "sha256:25fdcae7e51d3ab67fca5bd5345c808e36dea66b7d0b4a246dedf172ea3c8308"
+  },
+  "git_sha": "c555f031ceab2246bb073239c2066f032f357463",
+  "git_remote": "",
+  "lc_version": "0.5.0",
+  "hermeticity": {
+    "mechanism": "seatbelt",
+    "fs": "declared",
+    "network": "allowed",
+    "landlock_abi": null,
+    "exec_allowlist_version": 1
+  },
+  "started_at": "2026-11-19T20:43:36.204+00:00",
+  "finished_at": "2026-11-19T20:43:38.896+00:00",
+  "uv_version": "0.13.7",
+  "image": null
+}
