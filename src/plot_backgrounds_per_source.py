@@ -29,7 +29,8 @@ baseline for LL-dominated S1c > 40 events, not new NEST productions:
 dlog10(S2c) = log10(q/0.65). Every other modeling choice is held fixed.
 Our value is a figure-matching diagnostic, not a likelihood fit to data.
 
-Probe: writes PNGs to the given --outdir; not a declared output.
+Declared outputs bkg_source_<source> (one per Table I source) use
+--source <key> --output <png>; --outdir still writes all 12 at once.
 """
 import argparse
 import csv
@@ -153,8 +154,17 @@ def main():
     ap.add_argument("--response", required=True)
     ap.add_argument("--reference", required=True)
     ap.add_argument("--table1", required=True)
-    ap.add_argument("--outdir", required=True)
+    ap.add_argument("--outdir",
+                    help="write all 12 figures as <outdir>/bkg_<slug>.png")
+    ap.add_argument("--source", choices=sorted(SOURCE_PLOTS),
+                    help="draw only this source (with --output)")
+    ap.add_argument("--output",
+                    help="PNG path for the single --source figure")
     args = ap.parse_args()
+    if args.source is None and args.outdir is None:
+        ap.error("give --outdir, or --source with --output")
+    if (args.source is None) != (args.output is None):
+        ap.error("--source and --output go together")
 
     ref = load_reference(args.reference)
     band = load_band(args.response)
@@ -188,6 +198,8 @@ def main():
         lz[(panel, series)] = lv
 
     for src, (title, series, extras) in SOURCE_PLOTS.items():
+        if args.source is not None and src != args.source:
+            continue
         fig, axes = plt.subplots(2, 1, figsize=(8, 7), sharex=True,
                                  gridspec_kw={"hspace": 0.12})
         for ax, panel in zip(axes, PANEL_S1C):
@@ -276,7 +288,8 @@ def main():
                          transform=axes[1].transAxes, ha="center",
                          fontsize=9, color="0.35", style="italic")
         slug = src.replace("_", "-")
-        out = f"{args.outdir}/bkg_{slug}.png"
+        out = (args.output if args.source is not None
+               else f"{args.outdir}/bkg_{slug}.png")
         fig.savefig(out, dpi=150, bbox_inches="tight")
         plt.close(fig)
         print("wrote", out)

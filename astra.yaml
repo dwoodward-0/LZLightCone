@@ -3592,6 +3592,114 @@ outputs:
     decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment, er_efficiency_treatment]
     recipe:
       command: "python src/validate_backgrounds.py --models {inputs.background_models} --response {inputs.response_model_calibration} --table1 {inputs.lz_table1_counts_reference} --reference {inputs.lz_ws2024_fig4_projection} --output {output} --efficiency-treatment {decisions.efficiency_treatment} --er-efficiency-treatment {decisions.er_efficiency_treatment} --background-components {decisions.background_components} --exposure-structure {decisions.exposure_structure} --nest-parameter-set {decisions.nest_parameter_set} --detector-effects {decisions.detector_effects} && python src/plot_validation4.py --models {inputs.background_models} --response {inputs.response_model_calibration} --paper {inputs.lz_ws2024_paper} --output {output}"
+  - id: bkg_source_pb214_betas
+    type: figure
+    format: png
+    label: "Background review vs Fig. 4: 214Pb betas"
+    description: "Per-source background review figure (Validation 4 companion): 214Pb betas. Band-projected u = (log10 S2c - mu_ER(S1c))/sigma_ER(S1c) distribution in both Fig. 4 S1c panels (top 3-40, bottom 40-80 phd), -6..4 horizontal range, red dashed = this work with +/-1 sigma finite-MC band. Solid black = LZ WS2024 Fig. 4 digitized outline; gray band = Table I pre-fit normalization uncertainty (one correlated rate scaling, not per-bin errors). Normalized to Table I for the WS2024 3.3 t-y exposure. Review figure, no acceptance gate; Validation 4's gates live in background_projection_validation."
+    inputs: [background_models, response_model_calibration, lz_ws2024_fig4_projection, lz_table1_counts_reference, plot_backgrounds_per_source_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment, er_efficiency_treatment]
+    recipe:
+      command: "python src/plot_backgrounds_per_source.py --models {inputs.background_models} --response {inputs.response_model_calibration} --reference {inputs.lz_ws2024_fig4_projection} --table1 {inputs.lz_table1_counts_reference} --source 214Pb_betas --output {output}"
+  - id: bkg_source_kr85_ar39_det_gammas
+    type: figure
+    format: png
+    label: "Background review vs Fig. 4: 85Kr + 39Ar + detector gammas (Other ERs)"
+    description: "Per-source background review figure (Validation 4 companion): 85Kr + 39Ar + detector gammas (Other ERs). Band-projected u = (log10 S2c - mu_ER(S1c))/sigma_ER(S1c) distribution in both Fig. 4 S1c panels (top 3-40, bottom 40-80 phd), -6..4 horizontal range, red dashed = this work with +/-1 sigma finite-MC band. Solid black = LZ WS2024 Fig. 4 digitized outline; gray band = Table I pre-fit normalization uncertainty (one correlated rate scaling, not per-bin errors). The red curve is the 85Kr/39Ar/det-gamma + 136Xe sum, because digitization shows LZ's drawn 'Other ER betas' outline holds exactly that sum. Normalized to Table I for the WS2024 3.3 t-y exposure. Review figure, no acceptance gate; Validation 4's gates live in background_projection_validation."
+    inputs: [background_models, response_model_calibration, lz_ws2024_fig4_projection, lz_table1_counts_reference, plot_backgrounds_per_source_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment, er_efficiency_treatment]
+    recipe:
+      command: "python src/plot_backgrounds_per_source.py --models {inputs.background_models} --response {inputs.response_model_calibration} --reference {inputs.lz_ws2024_fig4_projection} --table1 {inputs.lz_table1_counts_reference} --source kr85_ar39_det_gammas --output {output}"
+  - id: bkg_source_xe136_2nubb
+    type: figure
+    format: png
+    label: "Background review vs Fig. 4: 136Xe 2nu-beta-beta"
+    description: "Per-source background review figure (Validation 4 companion): 136Xe 2nu-beta-beta. Band-projected u = (log10 S2c - mu_ER(S1c))/sigma_ER(S1c) distribution in both Fig. 4 S1c panels (top 3-40, bottom 40-80 phd), -6..4 horizontal range, red dashed = this work with +/-1 sigma finite-MC band. Solid black = LZ WS2024 Fig. 4 digitized outline; gray band = Table I pre-fit normalization uncertainty (one correlated rate scaling, not per-bin errors). Also overlays the 85Kr + 136Xe sum that LZ's 'Other ER betas' outline corresponds to. Normalized to Table I for the WS2024 3.3 t-y exposure. Review figure, no acceptance gate; Validation 4's gates live in background_projection_validation."
+    inputs: [background_models, response_model_calibration, lz_ws2024_fig4_projection, lz_table1_counts_reference, plot_backgrounds_per_source_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment, er_efficiency_treatment]
+    recipe:
+      command: "python src/plot_backgrounds_per_source.py --models {inputs.background_models} --response {inputs.response_model_calibration} --reference {inputs.lz_ws2024_fig4_projection} --table1 {inputs.lz_table1_counts_reference} --source xe136_2nubb --output {output}"
+  - id: bkg_source_pb212_po218_betas
+    type: figure
+    format: png
+    label: "Background review vs Fig. 4: 212Pb + 218Po betas"
+    description: "Per-source background review figure (Validation 4 companion): 212Pb + 218Po betas. Band-projected u = (log10 S2c - mu_ER(S1c))/sigma_ER(S1c) distribution in both Fig. 4 S1c panels (top 3-40, bottom 40-80 phd), -6..4 horizontal range, red dashed = this work with +/-1 sigma finite-MC band. LZ does not draw this source individually in Fig. 4, so the figure shows this work alone (shape inspection, no reference). Normalized to Table I for the WS2024 3.3 t-y exposure. Review figure, no acceptance gate; Validation 4's gates live in background_projection_validation."
+    inputs: [background_models, response_model_calibration, lz_ws2024_fig4_projection, lz_table1_counts_reference, plot_backgrounds_per_source_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment, er_efficiency_treatment]
+    recipe:
+      command: "python src/plot_backgrounds_per_source.py --models {inputs.background_models} --response {inputs.response_model_calibration} --reference {inputs.lz_ws2024_fig4_projection} --table1 {inputs.lz_table1_counts_reference} --source pb212_po218_betas --output {output}"
+  - id: bkg_source_solar_nu_er
+    type: figure
+    format: png
+    label: "Background review vs Fig. 4: solar-neutrino ER (RRPA)"
+    description: "Per-source background review figure (Validation 4 companion): solar-neutrino ER (RRPA). Band-projected u = (log10 S2c - mu_ER(S1c))/sigma_ER(S1c) distribution in both Fig. 4 S1c panels (top 3-40, bottom 40-80 phd), -6..4 horizontal range, red dashed = this work with +/-1 sigma finite-MC band. LZ does not draw this source individually in Fig. 4, so the figure shows this work alone (shape inspection, no reference). Normalized to Table I for the WS2024 3.3 t-y exposure. Review figure, no acceptance gate; Validation 4's gates live in background_projection_validation."
+    inputs: [background_models, response_model_calibration, lz_ws2024_fig4_projection, lz_table1_counts_reference, plot_backgrounds_per_source_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment, er_efficiency_treatment]
+    recipe:
+      command: "python src/plot_backgrounds_per_source.py --models {inputs.background_models} --response {inputs.response_model_calibration} --reference {inputs.lz_ws2024_fig4_projection} --table1 {inputs.lz_table1_counts_reference} --source solar_nu_er --output {output}"
+  - id: bkg_source_tritium_c14_betas
+    type: figure
+    format: png
+    label: "Background review vs Fig. 4: tritium + 14C calibration-source betas"
+    description: "Per-source background review figure (Validation 4 companion): tritium + 14C calibration-source betas. Band-projected u = (log10 S2c - mu_ER(S1c))/sigma_ER(S1c) distribution in both Fig. 4 S1c panels (top 3-40, bottom 40-80 phd), -6..4 horizontal range, red dashed = this work with +/-1 sigma finite-MC band. LZ does not draw this source individually in Fig. 4, so the figure shows this work alone (shape inspection, no reference). Normalized to Table I for the WS2024 3.3 t-y exposure. Review figure, no acceptance gate; Validation 4's gates live in background_projection_validation."
+    inputs: [background_models, response_model_calibration, lz_ws2024_fig4_projection, lz_table1_counts_reference, plot_backgrounds_per_source_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment, er_efficiency_treatment]
+    recipe:
+      command: "python src/plot_backgrounds_per_source.py --models {inputs.background_models} --response {inputs.response_model_calibration} --reference {inputs.lz_ws2024_fig4_projection} --table1 {inputs.lz_table1_counts_reference} --source tritium_c14_betas --output {output}"
+  - id: bkg_source_xe124_dec
+    type: figure
+    format: png
+    label: "Background review vs Fig. 4: 124Xe double electron capture"
+    description: "Per-source background review figure (Validation 4 companion): 124Xe double electron capture. Band-projected u = (log10 S2c - mu_ER(S1c))/sigma_ER(S1c) distribution in both Fig. 4 S1c panels (top 3-40, bottom 40-80 phd), -6..4 horizontal range, red dashed = this work with +/-1 sigma finite-MC band. Solid black = LZ WS2024 Fig. 4 digitized outline; gray band = Table I pre-fit normalization uncertainty (one correlated rate scaling, not per-bin errors). Presentation convention (user decision 2026-11-11): red = LL charge yield q = 0.78 (Fig.-4 shape-optimal), green (bottom panel) = LZ's fitted q = 0.70 +/- 0.04; both analytic S2 rescalings of the stored q = 0.65 production model, not new NEST runs or a likelihood fit. Normalized to Table I for the WS2024 3.3 t-y exposure. Review figure, no acceptance gate; Validation 4's gates live in background_projection_validation."
+    inputs: [background_models, response_model_calibration, lz_ws2024_fig4_projection, lz_table1_counts_reference, plot_backgrounds_per_source_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment, er_efficiency_treatment]
+    recipe:
+      command: "python src/plot_backgrounds_per_source.py --models {inputs.background_models} --response {inputs.response_model_calibration} --reference {inputs.lz_ws2024_fig4_projection} --table1 {inputs.lz_table1_counts_reference} --source xe124_dec --output {output}"
+  - id: bkg_source_xe127_xe125_ec
+    type: figure
+    format: png
+    label: "Background review vs Fig. 4: 127Xe/125Xe electron capture"
+    description: "Per-source background review figure (Validation 4 companion): 127Xe/125Xe electron capture. Band-projected u = (log10 S2c - mu_ER(S1c))/sigma_ER(S1c) distribution in both Fig. 4 S1c panels (top 3-40, bottom 40-80 phd), -6..4 horizontal range, red dashed = this work with +/-1 sigma finite-MC band. Solid black = LZ WS2024 Fig. 4 digitized outline; gray band = Table I pre-fit normalization uncertainty (one correlated rate scaling, not per-bin errors). Normalized to Table I for the WS2024 3.3 t-y exposure. Review figure, no acceptance gate; Validation 4's gates live in background_projection_validation."
+    inputs: [background_models, response_model_calibration, lz_ws2024_fig4_projection, lz_table1_counts_reference, plot_backgrounds_per_source_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment, er_efficiency_treatment]
+    recipe:
+      command: "python src/plot_backgrounds_per_source.py --models {inputs.background_models} --response {inputs.response_model_calibration} --reference {inputs.lz_ws2024_fig4_projection} --table1 {inputs.lz_table1_counts_reference} --source xe127_xe125_ec --output {output}"
+  - id: bkg_source_accidental_coincidences
+    type: figure
+    format: png
+    label: "Background review vs Fig. 4: accidental coincidences"
+    description: "Per-source background review figure (Validation 4 companion): accidental coincidences. Band-projected u = (log10 S2c - mu_ER(S1c))/sigma_ER(S1c) distribution in both Fig. 4 S1c panels (top 3-40, bottom 40-80 phd), -6..4 horizontal range, red dashed = this work with +/-1 sigma finite-MC band. Solid black = LZ WS2024 Fig. 4 digitized outline; gray band = Table I pre-fit normalization uncertainty (one correlated rate scaling, not per-bin errors). LZ's bottom-panel accidentals outline lies entirely below the 10^-2 figure floor and is absent from the digitized reference. Normalized to Table I for the WS2024 3.3 t-y exposure. Review figure, no acceptance gate; Validation 4's gates live in background_projection_validation."
+    inputs: [background_models, response_model_calibration, lz_ws2024_fig4_projection, lz_table1_counts_reference, plot_backgrounds_per_source_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment, er_efficiency_treatment]
+    recipe:
+      command: "python src/plot_backgrounds_per_source.py --models {inputs.background_models} --response {inputs.response_model_calibration} --reference {inputs.lz_ws2024_fig4_projection} --table1 {inputs.lz_table1_counts_reference} --source accidental_coincidences --output {output}"
+  - id: bkg_source_b8_hep_nu_nr
+    type: figure
+    format: png
+    label: "Background review vs Fig. 4: 8B + hep neutrino NR (CEvNS)"
+    description: "Per-source background review figure (Validation 4 companion): 8B + hep neutrino NR (CEvNS). Band-projected u = (log10 S2c - mu_ER(S1c))/sigma_ER(S1c) distribution in both Fig. 4 S1c panels (top 3-40, bottom 40-80 phd), -6..4 horizontal range, red dashed = this work with +/-1 sigma finite-MC band. Solid black = LZ WS2024 Fig. 4 digitized outline; gray band = Table I pre-fit normalization uncertainty (one correlated rate scaling, not per-bin errors). Normalized to Table I for the WS2024 3.3 t-y exposure. Review figure, no acceptance gate; Validation 4's gates live in background_projection_validation."
+    inputs: [background_models, response_model_calibration, lz_ws2024_fig4_projection, lz_table1_counts_reference, plot_backgrounds_per_source_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment, er_efficiency_treatment]
+    recipe:
+      command: "python src/plot_backgrounds_per_source.py --models {inputs.background_models} --response {inputs.response_model_calibration} --reference {inputs.lz_ws2024_fig4_projection} --table1 {inputs.lz_table1_counts_reference} --source b8_hep_nu_nr --output {output}"
+  - id: bkg_source_atm_nu_nr
+    type: figure
+    format: png
+    label: "Background review vs Fig. 4: atmospheric-neutrino NR"
+    description: "Per-source background review figure (Validation 4 companion): atmospheric-neutrino NR. Band-projected u = (log10 S2c - mu_ER(S1c))/sigma_ER(S1c) distribution in both Fig. 4 S1c panels (top 3-40, bottom 40-80 phd), -6..4 horizontal range, red dashed = this work with +/-1 sigma finite-MC band. LZ does not draw this source individually in Fig. 4, so the figure shows this work alone (shape inspection, no reference). Normalized to Table I for the WS2024 3.3 t-y exposure. Review figure, no acceptance gate; Validation 4's gates live in background_projection_validation."
+    inputs: [background_models, response_model_calibration, lz_ws2024_fig4_projection, lz_table1_counts_reference, plot_backgrounds_per_source_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment, er_efficiency_treatment]
+    recipe:
+      command: "python src/plot_backgrounds_per_source.py --models {inputs.background_models} --response {inputs.response_model_calibration} --reference {inputs.lz_ws2024_fig4_projection} --table1 {inputs.lz_table1_counts_reference} --source atm_nu_nr --output {output}"
+  - id: bkg_source_detector_neutrons
+    type: figure
+    format: png
+    label: "Background review vs Fig. 4: detector neutrons"
+    description: "Per-source background review figure (Validation 4 companion): detector neutrons. Band-projected u = (log10 S2c - mu_ER(S1c))/sigma_ER(S1c) distribution in both Fig. 4 S1c panels (top 3-40, bottom 40-80 phd), -6..4 horizontal range, red dashed = this work with +/-1 sigma finite-MC band. LZ does not draw this source individually in Fig. 4, so the figure shows this work alone (shape inspection, no reference). Table I mean is 0.0 +/- 0.2, so the drawn model is zero-weight. Normalized to Table I for the WS2024 3.3 t-y exposure. Review figure, no acceptance gate; Validation 4's gates live in background_projection_validation."
+    inputs: [background_models, response_model_calibration, lz_ws2024_fig4_projection, lz_table1_counts_reference, plot_backgrounds_per_source_script]
+    decisions: [background_components, exposure_structure, nest_parameter_set, detector_effects, accidentals_model, efficiency_treatment, er_efficiency_treatment]
+    recipe:
+      command: "python src/plot_backgrounds_per_source.py --models {inputs.background_models} --response {inputs.response_model_calibration} --reference {inputs.lz_ws2024_fig4_projection} --table1 {inputs.lz_table1_counts_reference} --source detector_neutrons --output {output}"
   - id: nr_efficiency_comparison
     type: data
     format: hdf5
