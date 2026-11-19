@@ -887,3 +887,18 @@ see the lightcone skill; never write into `results/` by hand.
   are byte-identical to the old review PNGs, and carry no gate. All 34
   outputs are current. `bkg_review/bkg_total.png` is now the V4 figure;
   `results/bkg_review/` itself stays untracked.
+
+- **WIMP Fig. 3 region comparison declared (2026-11-19, user request)**:
+  new outputs `wimp_fig3_validation` (png) and
+  `wimp_fig3_validation_metrics` (json), from
+  `src/plot_wimp_fig3_comparison.py` (inputs `plot_wimp_fig3_script`,
+  `digitize_accidentals_ws2024_script`). It is a validation beyond the
+  original six and complements `wimp_fig4_validation` (already declared).
+  LZ's purple 68%/95% 40 GeV/c2 regions are extracted exactly from the
+  pinned paper's vector paths. Containment of our ROI sample: **65.92% ±
+  0.21% / 94.41% ± 0.10%**. It is descriptive, with no gate. The
+  2026-11-13 scratch probe read a /tmp event-level archive that no longer
+  exists (66.00% / 94.37%). The rebuild uses the declared archive's uniform
+  50,000-of-59,852 display subsample for containment and the full histogram
+  (1 phd × 0.02 dex) for the density panel and contours. The polygons are
+  identical. The root `wimp_fig3_*` files are the old viewing copies.
