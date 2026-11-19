@@ -4,7 +4,7 @@
   "universe_id": "baseline",
   "recipe": "python src/validate_bands.py --band er --er-spectrum tritium_beta --reference data/lz_ws2022_band_reference.csv --header data/lz_ws2022_nest_header.hh --output results/baseline/er_band_validation.png",
   "definition_version": "sha256:1213e4995f26c15436ae8f1b4576b4fcaaeb4713518c722ce31887bcf2585e8b",
-  "env_version": "sha256:7c0beb4a6c9729006f13b818e2a5e8b79be88f5d4c846bda140894a4c315a3a4",
+  "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
   "data_version": "sha256:2be15f5ace6888042a8871827e977f7b842105994b42067e015d1cb706083c00",
   "decisions": {
     "response_model": "nest_library",
@@ -17,7 +17,7 @@
     "lz_ws2022_nest_header": "sha256:34a1b5cc8533ea0f3cf226bb42a7600f4e5c7691bf1e2cf338448bac28d2cf36",
     "band_validation_script": "sha256:1ffd22bd08a55206f4c703c2bba8046b244bb0512a038f351c7ea00cd496e2bd"
   },
-  "git_sha": "8a6d9e2c60f0a278d5a2d466240f9b921087f9fe",
+  "git_sha": "0c722a46860011cdfcaf2d87256d4831c9a32611",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -27,8 +27,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-10T20:33:13.279+00:00",
-  "finished_at": "2026-11-10T20:33:25.826+00:00",
+  "started_at": "2026-11-19T02:20:04.489+00:00",
+  "finished_at": "2026-11-19T02:20:39.435+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
