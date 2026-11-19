@@ -17,9 +17,14 @@ src/digitize_accidentals_ws2024.py) and compare them with our declared
 
 No refit, renormalization, new threshold or new NEST production. The ROI is
 the model's corrected-space ROI (3 < S1c < 80 phd, S2c >= 493 phd,
-log10 S2c < 4.5). Descriptive checkpoint: no acceptance gate. Published
-regions are not a 2D PDF, and LZ's contour/MC uncertainty is unavailable, so
-containment is not a goodness-of-fit test.
+log10 S2c < 4.5).
+
+Acceptance gate (user decision 2026-11-19): the containment inside LZ's 68%
+region must lie within 0.68 +/- 0.05, and inside the 95% region within
+0.95 +/- 0.03 (absolute fractions). It is a tolerance, not a significance
+test: published regions are not a 2D PDF, and LZ's contour/MC/construction
+uncertainty is unavailable, so a test against our MC sigma alone would be
+meaningless. The pull against our MC sigma is still reported.
 
 One file per invocation, chosen by the --output suffix: .png draws the
 figure (wimp_fig3_validation), .json writes the metrics
@@ -55,6 +60,8 @@ PURPLE = (0.517647, 0.0, 0.803922)
 SURFACE, FG, MUTED, GRID = "#fcfcfb", "#20201e", "#62625c", "#e4e3e0"
 OUR, LZ = "#D55E00", "#7B61A8"
 SMOOTH_PHD, SMOOTH_DEX = 1.1, 0.040
+# Acceptance gate: region -> (nominal fraction, absolute tolerance).
+GATE = {"q68": (0.68, 0.05), "q95": (0.95, 0.03)}
 CAPTION = ("Dark and light gray and purple shading show the regions containing "
            "68% and 95% of the ER portion of the background model and a "
            "40 GeV/c2 WIMP, respectively.")
@@ -139,6 +146,19 @@ def containment(s1, y, regions):
     return out
 
 
+def acceptance(stats):
+    out = {}
+    for name, (nominal, tol) in GATE.items():
+        f = stats[name]["fraction_inside"]
+        out[name] = {"nominal": nominal, "tolerance_abs": tol,
+                     "measured": f, "deviation_abs": f - nominal,
+                     "pull_vs_mc_sigma": (f - nominal)
+                     / stats[name]["mc_sigma_fraction"],
+                     "pass": bool(abs(f - nominal) <= tol)}
+    out["pass"] = all(v["pass"] for v in out.values())
+    return out
+
+
 def smooth2d(hist, sigmas):
     """Display-only separable Gaussian blur (sigmas in bins)."""
     out = hist.astype(float)
@@ -164,7 +184,7 @@ def smoothing_bins(edges):
     return (SMOOTH_PHD / dx, SMOOTH_DEX / dy), dx, dy
 
 
-def make_figure(s1, regions, stats, hist, edges, out):
+def make_figure(s1, regions, stats, acc, hist, edges, out):
     sig_bins, dx, dy = smoothing_bins(edges)
     smooth = smooth2d(hist, sig_bins)
     lev = hdr_levels(smooth)
@@ -216,13 +236,18 @@ def make_figure(s1, regions, stats, hist, edges, out):
         ax.text(77, thr + .008, "our S2c = 493 cut", color=MUTED,
                 fontsize=8.5, ha="right", va="bottom")
     n = len(s1)
-    text = ("Our ROI sample within LZ's published region\n"
+    verdict = lambda k: "PASS" if acc[k]["pass"] else "FAIL"
+    text = (f"Gate: {'PASS' if acc['pass'] else 'FAIL'}  (68% region: 0.68 ± 0.05, "
+            "95% region: 0.95 ± 0.03)\n"
+            "Our ROI sample within LZ's published region\n"
             f"68% region: {100 * stats['q68']['fraction_inside']:.2f}% "
             f"± {100 * stats['q68']['mc_sigma_fraction']:.2f}% "
-            f"({stats['q68']['n_inside']:,} / {n:,})\n"
+            f"({stats['q68']['n_inside']:,} / {n:,})  "
+            f"[{verdict('q68')}]\n"
             f"95% region: {100 * stats['q95']['fraction_inside']:.2f}% "
             f"± {100 * stats['q95']['mc_sigma_fraction']:.2f}% "
-            f"({stats['q95']['n_inside']:,} / {n:,})")
+            f"({stats['q95']['n_inside']:,} / {n:,})  "
+            f"[{verdict('q95')}]")
     axes[1].text(.975, .955, text, transform=axes[1].transAxes, color=FG,
                  fontsize=9, ha="right", va="top",
                  bbox=dict(facecolor=SURFACE, alpha=.94, edgecolor=GRID,
@@ -265,15 +290,19 @@ def main():
     regions = regions_from_pdf(args.paper)
     s1, y, hist, edges = load_model(args.models)
     stats = containment(s1, y, regions)
+    acc = acceptance(stats)
     if suffix == ".png":
-        make_figure(s1, regions, stats, hist, edges, args.output)
+        make_figure(s1, regions, stats, acc, hist, edges, args.output)
         print(f"68%: {stats['q68']['fraction_inside']:.4f}  "
               f"95%: {stats['q95']['fraction_inside']:.4f}")
         return
     sig_bins, dx, dy = smoothing_bins(edges)
     report = {
-        "scope": ("40 GeV/c2 WIMP vs WS2024 Fig. 3 purple regions; "
-                  "descriptive checkpoint, no acceptance gate"),
+        "scope": "40 GeV/c2 WIMP vs WS2024 Fig. 3 purple regions",
+        "acceptance": acc,
+        "acceptance_rule": ("|f68 - 0.68| <= 0.05 and |f95 - 0.95| <= 0.03 "
+                            "(absolute fractions; tolerance, not a "
+                            "significance test; user decision 2026-11-19)"),
         "reference": {
             "paper": "arXiv:2410.17036v3", "figure": "Fig. 3 top, All Data",
             "sha256": SHA256, "quote": CAPTION,
@@ -308,7 +337,7 @@ def main():
             "The low-S2 bound is the model's corrected-space S2c >= 493 phd, "
             "applied once; no raw-S2 alternative."]}
     Path(args.output).write_text(json.dumps(report, indent=2) + "\n")
-    print(json.dumps(report["containment"], indent=2))
+    print(json.dumps(report["acceptance"], indent=2))
 
 
 if __name__ == "__main__":
