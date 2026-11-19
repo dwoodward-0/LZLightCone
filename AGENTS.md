@@ -876,3 +876,14 @@ see the lightcone skill; never write into `results/` by hand.
     are now committed and declared (they were local-only in
     `.git/info/exclude`). The other `bkg_review` per-source figures are
     still undeclared.
+
+- **Per-source review figures declared (2026-11-19, user request)**: the
+  12 `results/bkg_review/bkg_*.png` figures are now declared outputs
+  `bkg_source_<source>` (pb214_betas, kr85_ar39_det_gammas, xe136_2nubb,
+  pb212_po218_betas, solar_nu_er, tritium_c14_betas, xe124_dec,
+  xe127_xe125_ec, accidental_coincidences, b8_hep_nu_nr, atm_nu_nr,
+  detector_neutrons), one PNG each (lc outputs must be single files). They
+  come from `src/plot_backgrounds_per_source.py --source <key> --output`,
+  are byte-identical to the old review PNGs, and carry no gate. All 34
+  outputs are current. `bkg_review/bkg_total.png` is now the V4 figure;
+  `results/bkg_review/` itself stays untracked.
