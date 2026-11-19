@@ -6,8 +6,11 @@ WS2024-only median and +-1 sigma edges, and (optionally) the FC counting median.
 Bottom: ratio of medians to LZ's, with our bootstrap median uncertainty.
 
 Acceptance (sensitivity_vs_lz_validation, like-for-like WS2024-only target):
-  A1  at 40 GeV/c2 our PC median matches LZ's WS2024-only median within the toy
-      ensemble's statistical resolution, |ours - LZ| <= 2 x bootstrap sigma;
+  A1  at 40 GeV/c2 our PC median is within 25% of LZ's WS2024-only median,
+      |ours/LZ - 1| <= 0.25 (user decision 2026-11-19; replaces the original
+      |ours - LZ| <= 2 x bootstrap sigma gate, which ignored the uncertainty of
+      LZ's curve, its digitization and our binned single-sample likelihood).
+      The bootstrap pull is still reported, informationally;
   A2  at every mass where LZ's +-1 sigma band is published (finite), our PC median
       lies inside it.
 Both are evaluated, printed and written onto the figure; the script does not fail
@@ -29,7 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from stat_decisions import add_decision_args
 
 A1_MASS_GEV = 40.0
-A1_NSIGMA = 2.0
+A1_MAX_REL_DEV = 0.25
 BANDS = ("minus2sigma", "minus1sigma", "plus1sigma", "plus2sigma")
 
 
@@ -57,7 +60,7 @@ def acceptance(m, ours, ref):
     pull = (med - lz) / boot
     a1 = {"mass_gev": A1_MASS_GEV, "ours_cm2": float(med), "bootstrap_sigma_cm2": float(boot),
           "lz_ws2024_only_cm2": float(lz), "ratio": float(med / lz), "pull": float(pull),
-          "pass": bool(abs(pull) <= A1_NSIGMA)}
+          "max_rel_dev": A1_MAX_REL_DEV, "pass": bool(abs(med / lz - 1.0) <= A1_MAX_REL_DEV)}
     have = np.isfinite(ref["minus1sigma"]) & np.isfinite(ref["plus1sigma"])
     inside = (ours["median_pc_cm2"] >= ref["minus1sigma"]) & (ours["median_pc_cm2"] <= ref["plus1sigma"])
     a2 = {"masses_with_band": int(have.sum()), "inside": int((inside & have).sum()),
@@ -105,7 +108,7 @@ def main():
     ax.grid(which="major", color="#e4e4e4", lw=0.6)
     ax.legend(fontsize=8, loc="upper left", frameon=False)
     ax.set_title("Median sensitivity: binned 2D PLR vs LZ WS2024-only", fontsize=11)
-    verdict = (f"A1 (40 GeV, |pull| $\\leq$ {A1_NSIGMA:g}): {'PASS' if a1['pass'] else 'FAIL'}, "
+    verdict = (f"A1 (40 GeV, within {A1_MAX_REL_DEV:.0%} of LZ): {'PASS' if a1['pass'] else 'FAIL'}, "
                f"ratio {a1['ratio']:.3f}, pull {a1['pull']:+.1f}\n"
                f"A2 (median inside LZ $\\pm1\\sigma$): {'PASS' if a2['pass'] else 'FAIL'}, "
                f"{a2['inside']}/{a2['masses_with_band']} masses")

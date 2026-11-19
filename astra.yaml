@@ -2,7 +2,7 @@
 
 version: "0.0.14"
 name: "xenon-wimp-sensitivity"
-description: "A from-scratch model of a dual-phase xenon direct-detection experiment, modeled on LUX-ZEPLIN (LZ), that computes the instrument's sensitivity to spin-independent WIMP-nucleon scattering. NEST-style recoil microphysics (yields, recombination, fluctuations) maps a WIMP signal and each LZ background source into corrected observables (S1c, log10 S2c); LZ's published detector parameters, analysis efficiency curve, and background expectations (Table I of the WS2024 result) are declared inputs. Statistical machinery — a 2D binned profile likelihood with nuisance parameters plus a Feldman-Cousins cut-and-count cross-check — turns the expected spectra into a median sensitivity curve, validated against LZ's published median expected limit (5.1e-48 cm2 at 40 GeV/c2). Once validated, background rates become knobs for sensitivity-variation studies under alternative assumptions."
+description: "A from-scratch model of a dual-phase xenon direct-detection experiment, modeled on LUX-ZEPLIN (LZ), that computes the instrument's sensitivity to spin-independent WIMP-nucleon scattering. NEST-style recoil microphysics (yields, recombination, fluctuations) maps a WIMP signal and each LZ background source into corrected observables (S1c, log10 S2c); LZ's published detector parameters, analysis efficiency curve, and background expectations (Table I of the WS2024 result) are declared inputs. Statistical machinery — a 2D binned profile likelihood with nuisance parameters plus a Feldman-Cousins cut-and-count cross-check — turns the expected spectra into a median sensitivity curve for the WS2024 3.3 tonne-year exposure, validated like-for-like against LZ's WS2024-only median expected limit (5.76e-48 cm2 at 40 GeV/c2, slide 24 of the collaboration's TeVPA talk); LZ's combined 4.2 tonne-year median (5.1e-48 cm2) adds the separately configured WS2022 sample and is not the target. A 1000-live-day extension compares the PLR and FC methods at higher exposure. Once validated, background rates become knobs for sensitivity-variation studies under alternative assumptions."
 
 prior_insights:
   lz_plr_unbinned_2d:
@@ -3127,12 +3127,12 @@ decisions:
   exposure_structure:
     id: exposure_structure
     label: "Exposure / likelihood sample structure"
-    rationale: "LZ splits the data into six likelihood samples (four WS2024 flow-state/radon-tag categories plus a veto-tagged sample plus the full WS2022 sample) with some nuisance parameters independent between flow states. For a forward model with no observed data, pooling the combined 4.2 tonne-year exposure into a single sample reproduces the expected total counts exactly and only neglects the nuisance-decoupling benefit of the split."
+    rationale: "LZ splits the data into six likelihood samples (four WS2024 flow-state/radon-tag categories plus a veto-tagged sample plus the full WS2022 sample) with some nuisance parameters independent between flow states. For a forward model with no observed data, pooling into a single sample reproduces the expected total counts exactly and only neglects the nuisance-decoupling benefit of the split. As realized, the pooled sample is the WS2024 exposure alone (3.3 tonne-years, Table I scope); adding WS2022's 0.9 tonne-years to reach LZ's combined 4.2 needs a separately validated WS2022 response, efficiency, ROI and background set and is not implemented."
     default: combined_single
     options:
       combined_single:
         label: "Single combined exposure (simplified)"
-        description: "Pool the combined 4.2 tonne-year exposure into one likelihood sample using the total expected counts of each background source."
+        description: "Pool the WS2024 3.3 tonne-year exposure (Table I scope) into one likelihood sample using the total expected counts of each background source. The WS2022 0.9 tonne-year sample of LZ's combined 4.2 tonne-year analysis is not included."
         insights: [lz_exposure_4p2ty, lz_bkg_total, lz_table1_scope]
       six_samples_full:
         label: "Six-sample structure (LZ-faithful)"
@@ -3620,7 +3620,7 @@ outputs:
     type: figure
     format: png
     label: "Validation 5: median sensitivity vs LZ WS2024-only"
-    description: "The headline validation, like-for-like: our PLR median sensitivity curve (unconstrained +/-1 and +/-2 sigma toy bands, PC median) overlaid on LZ's WS2024-only (3.3 t-y) curves from slide 24 (lz_ws2024_only_sensitivity_reference), the right target for our WS2024 exposure; the combined 4.2 t-y 5.1e-48 (lz_si_sensitivity_reference) is NOT the target (user decision 2026-11-18). The FC counting median is overlaid for reference. ACCEPTANCE: A1 - at 40 GeV/c2 our PC median matches LZ's WS2024-only median (5.76e-48) within the toy ensemble's statistical resolution, |ours - LZ| <= 2 x bootstrap sigma of the median (this ignores the uncertainty of LZ's curve and of its digitization); A2 - at every mass where LZ's +/-1 sigma band is published (finite; 13-10000 GeV/c2), our PC median lies inside it. Both verdicts are printed and written on the figure."
+    description: "The headline validation, like-for-like: our PLR median sensitivity curve (unconstrained +/-1 and +/-2 sigma toy bands, PC median) overlaid on LZ's WS2024-only (3.3 t-y) curves from slide 24 (lz_ws2024_only_sensitivity_reference), the right target for our WS2024 exposure; the combined 4.2 t-y 5.1e-48 (lz_si_sensitivity_reference) is NOT the target (user decision 2026-11-18). The FC counting median is overlaid for reference. ACCEPTANCE: A1 - at 40 GeV/c2 our PC median is within 25% of LZ's WS2024-only median (5.76e-48), |ours/LZ - 1| <= 0.25 (user decision 2026-11-19, replacing the original |ours - LZ| <= 2 x bootstrap-sigma gate, which ignored the uncertainty of LZ's curve and its digitization and the binned single-sample likelihood approximation; it failed at ratio 0.935, pull -3.5, and the pull is still reported informationally); A2 - at every mass where LZ's +/-1 sigma band is published (finite; 13-10000 GeV/c2), our PC median lies inside it. Both verdicts are printed and written on the figure."
     inputs: [plr_sensitivity_curve, fc_sensitivity_curve, lz_ws2024_only_sensitivity_reference, plot_plr_scan_script, stat_decisions_script]
     decisions: [statistics, median_sensitivity_definition, power_constraint, test_statistic_sidedness]
     recipe:
