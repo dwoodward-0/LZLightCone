@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "output_id": "fc_plr_crosscheck",
+  "universe_id": "baseline",
+  "recipe": "python src/plot_fc_plr_crosscheck.py --plr results/baseline/plr_sensitivity_curve.csv --fc results/baseline/fc_sensitivity_curve.csv --output results/baseline/fc_plr_crosscheck.png --statistics both_with_crosscheck --median-sensitivity-definition median_of_toy_limits --power-constraint applied_1sigma --test-statistic-sidedness two_sided",
+  "definition_version": "sha256:e3eafff9c1a0d133bb6bf1fddd92b76547d9648c32f77f630c34c688a7fa2751",
+  "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
+  "data_version": "sha256:02055a028062e8951dcf0535992cd1baff0c1ecd511fddab2d813eecf7daa755",
+  "decisions": {
+    "statistics": "both_with_crosscheck",
+    "median_sensitivity_definition": "median_of_toy_limits",
+    "power_constraint": "applied_1sigma",
+    "test_statistic_sidedness": "two_sided"
+  },
+  "input_versions": {
+    "plr_sensitivity_curve": "sha256:c5598a9bf10f41d52af198caa89fdd19c1f393bd50298168761c13fb0a54d5fe",
+    "fc_sensitivity_curve": "sha256:4bcb5dee8cec2b6bf2e2bed2e35a0427f5085c631f920792297d790d83922482",
+    "plot_fc_plr_crosscheck_script": "sha256:ec2981e828819327586d4810c4c22549b922f3874925580f2ceae546de4df603",
+    "stat_decisions_script": "sha256:9420b1baad5380213570616c7f455b775e150ba060c653a97cd98117d91feb8b"
+  },
+  "git_sha": "ec146e9435f25699f122ea40e9c9a9bc7ad94f16",
+  "git_remote": "",
+  "lc_version": "0.5.0",
+  "hermeticity": {
+    "mechanism": "seatbelt",
+    "fs": "declared",
+    "network": "allowed",
+    "landlock_abi": null,
+    "exec_allowlist_version": 1
+  },
+  "started_at": "2026-11-19T01:25:10.079+00:00",
+  "finished_at": "2026-11-19T01:25:15.729+00:00",
+  "uv_version": "0.13.7",
+  "image": null
+}
