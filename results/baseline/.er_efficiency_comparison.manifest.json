@@ -4,8 +4,8 @@
   "universe_id": "baseline",
   "recipe": "python src/compare_er_efficiency.py --output results/baseline/er_efficiency_comparison.hdf5 --background-models results/baseline/background_models.hdf5 --response results/baseline/response_model_calibration.hdf5 --validation-script src/validate_backgrounds.py --reference data/lz_ws2024_fig4_projection.csv --er-2d-efficiency data/lz_ws2024_er_2d_efficiency.csv --forward-check-statistics 5000 --spectra data/lz2018_component_spectra.csv --neutron-spectrum data/lz_neutron_spectrum_2018.csv --efficiency data/lz_ws2024_efficiency.csv --fig2-efficiency data/lz_ws2024_fig2_efficiency.csv --efficiency-treatment input_pre_roi_curve --er-staged-efficiency data/lz_ws2024_er_staged_efficiency.csv --er-1d-efficiency data/lz_ws2024_er_1d_efficiency.csv --er-efficiency-treatment staged_conditional --table1 data/lz_ws2024_table1_counts.csv --contours data/lz_ws2024_accidentals_contours.csv --sr1-marginals data/lz_accidentals_marginals_sr1.csv --nest-header data/lz_ws2024_nest_header.hh --background-components all_table1 --exposure-structure combined_single --nest-parameter-set ws2024_nest240 --detector-effects uniform_1d --accidentals-model factorized_contour_constrained",
   "definition_version": "sha256:16a5beae36a0f15961cb1f352cc08cbe387fcf71cf4928ef0398e5a843d74cf9",
-  "env_version": "sha256:7c0beb4a6c9729006f13b818e2a5e8b79be88f5d4c846bda140894a4c315a3a4",
-  "data_version": "sha256:e059460b960d46821590682a2fb20205cf6235d0454defbb1fb00ed944b5e178",
+  "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
+  "data_version": "sha256:5ddcd7cf770dcff34241bba1e43d757818aebb3d61964946567f851601fb0d87",
   "decisions": {
     "background_components": "all_table1",
     "exposure_structure": "combined_single",
@@ -16,7 +16,7 @@
     "er_efficiency_treatment": "staged_conditional"
   },
   "input_versions": {
-    "background_models": "sha256:87bbbcc6a2dfdce2af9a21fd35bca916b0c669f33f9364f00f895ceeceddaf26",
+    "background_models": "sha256:482c981a163bc19616e285dc2d364d1d772714b3acd473f1bb38f6bd965dc2ee",
     "response_model_calibration": "sha256:7a1a9f3d85035a93e45e42b8ea4a242730f8895a24179a2a9decfbae9e89cce8",
     "lz_nest_header_ws2024": "sha256:4c5ded34d69646dfc8842b2c07f796e89f4fb218565ae11b32c1c608f233e9ce",
     "lz_efficiency_curve": "sha256:5f007b20449756e68d2afc4cf3e5c93be1373f7ddd985f50fee873afbd1a2b3e",
@@ -26,7 +26,7 @@
     "lz_neutron_spectrum_2018": "sha256:aff84e2122008ca603d108d1589e959b177b8a4545b1dbb706f8aec79f13ebf1",
     "lz_ws2024_accidentals_contours": "sha256:8d7af8c07c18a6f42fb42e7fe8a971d8a0a48f3c6089df8fa3264ea0597501be",
     "lz_accidentals_marginals_sr1": "sha256:d676f725b34894081a93513473d1823679dd7d84406451b69b71a70e7f6c394d",
-    "background_models_script": "sha256:83d7cdf7c794b48c85f37b850497ee72ec8e9e4c6dd49c55416800f35e1ece29",
+    "background_models_script": "sha256:9e48fa61c889e2c1e8d14212d6f684efb0f6785ac068bdc6e18cf5ad2cc039fd",
     "lz_ws2024_fig4_projection": "sha256:3925d20a10daa24f650eb6215c353a6994188aea5f1590bb36185f32270548a0",
     "background_projection_script": "sha256:65bb4671e15c336a9d6f09c4b41922a0164bf0c980f47368fbe1327949d19866",
     "lz_ws2024_er_staged_efficiency": "sha256:7fbd404dff021df890c39c0b55a425fefb127569740bc2e558c007c13769968a",
@@ -37,7 +37,7 @@
     "nr_efficiency_comparison_script": "sha256:f4cda227f5d3221f1cff9c048af99e254dcf9f4cc5b97b1a3600160e290b6e4c",
     "er_efficiency_comparison_script": "sha256:45789731c8500eb323c8a41e5961552c39fe2b513a5ecf7a1f78062d4ba7f767"
   },
-  "git_sha": "454688e5c0bd04236b8ef58db135c128ca94c035",
+  "git_sha": "ec146e9435f25699f122ea40e9c9a9bc7ad94f16",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -47,8 +47,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-12T19:49:24.917+00:00",
-  "finished_at": "2026-11-12T19:49:54.312+00:00",
+  "started_at": "2026-11-18T23:47:33.544+00:00",
+  "finished_at": "2026-11-19T00:18:14.148+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
