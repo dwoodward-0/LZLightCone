@@ -4,7 +4,7 @@
   "universe_id": "baseline",
   "recipe": "python src/validate_wimp_signal.py --models results/baseline/wimp_signal_models.hdf5 --response results/baseline/response_model_calibration.hdf5 --fig4-reference data/lz_ws2024_fig4_projection.csv --sensitivity data/lz_ws2024_si_sensitivity.csv --output results/baseline/wimp_fig4_validation_metrics.json --require-full-grid --response-model nest_library --time-mode representative_day --support-treatment native_drate_extension --efficiency-treatment input_pre_roi_curve --exposure-structure combined_single --nest-parameter-set ws2024_nest240 --detector-effects uniform_1d --halo-model shm_standard",
   "definition_version": "sha256:86271984719472126c5124eb014e72f99f0bbf4d256009358c5c6f938c349015",
-  "env_version": "sha256:a9da338ac504678126a9754f50151bf8f5967363745f77510189ca425512d000",
+  "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
   "data_version": "sha256:347c037290bb1253b6e84ee0d016aeb13f4bb24ec191fded73a507356ef50fa3",
   "decisions": {
     "response_model": "nest_library",
@@ -24,7 +24,7 @@
     "background_projection_script": "sha256:65bb4671e15c336a9d6f09c4b41922a0164bf0c980f47368fbe1327949d19866",
     "wimp_signal_validation_script": "sha256:063be0b2ed9e742e55151e2ceb9520bacc5bd287de97c09517368da055c83a9b"
   },
-  "git_sha": "f7fafe7ef7ccd1ecea181e141a2168559a6570f2",
+  "git_sha": "0c722a46860011cdfcaf2d87256d4831c9a32611",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -34,8 +34,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-14T01:41:50.678+00:00",
-  "finished_at": "2026-11-14T01:41:53.517+00:00",
+  "started_at": "2026-11-19T03:14:56.618+00:00",
+  "finished_at": "2026-11-19T03:14:59.408+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
