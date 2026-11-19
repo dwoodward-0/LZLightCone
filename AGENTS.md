@@ -859,3 +859,20 @@ see the lightcone skill; never write into `results/` by hand.
   Also: the local cluster can disappear between sessions; `lc materialize`
   then fails with "no current cluster named 'local'", and
   `lc compute launch --wait` (no positional name) restores it.
+
+- **Validation 4 figure replaced (2026-11-19, user decision)**: the
+  declared `background_projection_validation.png` is now the all-source
+  total vs Fig. 4 plot (formerly `results/bkg_review/bkg_total.png`), with
+  the six gate verdicts as a footer. The recipe chains the unchanged
+  `src/validate_backgrounds.py` (gates + JSON) `&&` the new
+  `src/plot_validation4.py` (redraws the PNG). Recipes run through a
+  shell, so `&&` works. The old per-category overlay plotted LZ's log10
+  levels as counts (display bug only; the gates always converted).
+  - **Do not edit `src/validate_backgrounds.py` casually**: it is a
+    declared input of about 12 outputs (efficiency comparisons, WIMP
+    signal, PLR and FC curves import its helpers). Any edit forces about
+    2 h of identical reruns.
+  - `src/plot_background_total.py` and `src/plot_backgrounds_per_source.py`
+    are now committed and declared (they were local-only in
+    `.git/info/exclude`). The other `bkg_review` per-source figures are
+    still undeclared.
