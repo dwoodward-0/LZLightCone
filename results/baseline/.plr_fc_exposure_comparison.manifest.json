@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "output_id": "plr_fc_exposure_comparison",
+  "universe_id": "baseline",
+  "recipe": "python src/plot_plr_exposure.py --run '220 live days,results/baseline/plr_sensitivity_curve.csv,results/baseline/fc_sensitivity_curve.csv' --run '1000 live days,results/baseline/plr_sensitivity_curve_1000d.csv,results/baseline/fc_sensitivity_curve_1000d.csv' --output results/baseline/plr_fc_exposure_comparison.png --statistics both_with_crosscheck --median-sensitivity-definition median_of_toy_limits --power-constraint applied_1sigma --test-statistic-sidedness two_sided",
+  "definition_version": "sha256:8167817d650b22fb739bf31ccf9f180e3ffe68e6eb555758c3ceac6b08d83d7d",
+  "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
+  "data_version": "sha256:4dac4144016c8f2561eb2a6b25a58ae4e22c0b483acc5174152eb59e9b198326",
+  "decisions": {
+    "statistics": "both_with_crosscheck",
+    "median_sensitivity_definition": "median_of_toy_limits",
+    "power_constraint": "applied_1sigma",
+    "test_statistic_sidedness": "two_sided"
+  },
+  "input_versions": {
+    "plr_sensitivity_curve": "sha256:c5598a9bf10f41d52af198caa89fdd19c1f393bd50298168761c13fb0a54d5fe",
+    "fc_sensitivity_curve": "sha256:4bcb5dee8cec2b6bf2e2bed2e35a0427f5085c631f920792297d790d83922482",
+    "plr_sensitivity_curve_1000d": "sha256:7bbb23a99f8f3d5c33052f14378d4c15190ccca8fb050b1ab99378ee13d9d9fb",
+    "fc_sensitivity_curve_1000d": "sha256:b3a458d09e26ca85880611ee3dcfc13239ce9bc8d809d8ad1c797517f167671d",
+    "plot_plr_exposure_script": "sha256:4cf644cd74bed3a82bc31f510030863d7a2e68fee688f24c679a9ca5aea11e46",
+    "stat_decisions_script": "sha256:9420b1baad5380213570616c7f455b775e150ba060c653a97cd98117d91feb8b"
+  },
+  "git_sha": "0c722a46860011cdfcaf2d87256d4831c9a32611",
+  "git_remote": "",
+  "lc_version": "0.5.0",
+  "hermeticity": {
+    "mechanism": "seatbelt",
+    "fs": "declared",
+    "network": "allowed",
+    "landlock_abi": null,
+    "exec_allowlist_version": 1
+  },
+  "started_at": "2026-11-19T03:14:56.618+00:00",
+  "finished_at": "2026-11-19T03:14:58.222+00:00",
+  "uv_version": "0.13.7",
+  "image": null
+}
