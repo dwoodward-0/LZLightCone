@@ -2930,6 +2930,45 @@ findings:
       - id: ev2
         artifact: background_projection_validation
 
+  plr_sensitivity_vs_lz_ws2024_only:
+    id: plr_sensitivity_vs_lz_ws2024_only
+    label: "2D-PLR median sensitivity agrees with LZ WS2024-only within 25%"
+    claim: "The binned 2D profile-likelihood median sensitivity (power-constrained, toy Neyman construction, 3.3 tonne-years) is 5.39e-48 +/- 0.11e-48 cm2 at 40 GeV/c2 vs LZ's WS2024-only median 5.76e-48 (ratio 0.935), passing the 25% acceptance (A1). At all 22 masses where LZ's +/-1 sigma band is published our median lies inside it (A2); ratios to LZ span 0.85-1.18: about 1.18 at 13-17 GeV/c2, 1.02-1.08 at 19-32, 0.94-0.96 at 36-46 and 0.85-0.94 from 65 GeV/c2 up."
+    created_at: "2026-11-19T00:00:00Z"
+    scope: "WS2024 exposure only, baseline universe (uniform_1d, combined_single as one pooled WS2024 sample, two-sided q, power constraint at -1 sigma); 25 mu points 0.5-40 events, 2000 toys per mu, 1000 background-only toys, seed 20261118."
+    notes: "The original A1 gate (|ours - LZ| <= 2 bootstrap sigma) failed with pull -3.5 because it ignored the uncertainty of LZ's curve and its digitization and our binned single-sample approximation of LZ's unbinned six-sample likelihood; the user set the 25% criterion on 2026-11-19. The low-mass excess and high-mass deficit are not investigated. Band comparisons use our unconstrained toy quantiles (LZ's convention). Nothing was tuned."
+    evidence:
+      - id: ev1
+        artifact: plr_sensitivity_curve
+      - id: ev2
+        artifact: sensitivity_vs_lz_validation
+  fc_plr_crosscheck_agreement:
+    id: fc_plr_crosscheck_agreement
+    label: "FC counting and 2D PLR agree at 3.3 tonne-years"
+    claim: "At every one of the 26 masses the PLR and FC cut-and-count medians agree within their combined band widths (Validation 6 PASS, 26/26); the PLR/FC ratio spans 0.91-1.12, using at most 0.12 of the allowed envelope. At 40 GeV/c2 the FC median is 5.70e-48 cm2 vs PLR 5.39e-48."
+    created_at: "2026-11-18T00:00:00Z"
+    scope: "WS2024 exposure, baseline universe; FC regions from the progressive-voxel scan with the unguarded ranking (user decision 2026-11-17), exact Poisson-median FC limits with fixed background."
+    notes: "The FC optimum sits at n_med = 0 (B about 0.68) above 20 GeV/c2, a near-background-free regime where the 2D shape adds little; this explains the closeness. FC retained signal fraction 0.44-0.92. The counting regions sit in regions of sparse background MC (documented limitation) and the FC calculation has no background uncertainty."
+    evidence:
+      - id: ev1
+        artifact: fc_sensitivity_curve
+      - id: ev2
+        artifact: fc_plr_crosscheck
+  plr_gain_over_fc_at_1000d:
+    id: plr_gain_over_fc_at_1000d
+    label: "At 1000 live days the 2D PLR beats FC counting by 7-19%"
+    claim: "Scaling signal and all Table-I means by 1000/220 (fixed fractional constraint uncertainties), the PLR/FC median ratio is 0.81-0.93 from 19 GeV/c2 to 10 TeV/c2 (40 GeV/c2: 1.975e-48 vs 2.339e-48 cm2, ratio 0.84) and 0.96-1.09 below 18 GeV/c2, whereas at 220 days the two agree within about 5% at nearly every mass."
+    created_at: "2026-11-18T00:00:00Z"
+    scope: "Exposure scale 4.545454545454546 applied to the WS2024 model (no new detector or background modeling); PLR 28 mu points 0.5-60 events, 2000 toys per mu, 1000 background-only toys."
+    notes: "FC still optimizes to n_med = 0 above 20 GeV/c2 and gives up signal (26% retained at 40 GeV/c2), while the PLR uses the whole plane. Point-to-point scatter (about 5%) exceeds the plotted bootstrap bars because critical-value order-statistic noise and FC's integer count steps are not included. The declared curves are bit-identical to the scratch runs."
+    evidence:
+      - id: ev1
+        artifact: plr_sensitivity_curve_1000d
+      - id: ev2
+        artifact: fc_sensitivity_curve_1000d
+      - id: ev3
+        artifact: plr_fc_exposure_comparison
+
 decisions:
   statistics:
     id: statistics

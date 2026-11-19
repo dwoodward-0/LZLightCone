@@ -4,8 +4,11 @@ A from-scratch model of a dual-phase xenon dark-matter experiment, modeled on
 LUX-ZEPLIN (LZ), that computes sensitivity to spin-independent WIMP-nucleon
 scattering. The spec is `astra.yaml` — the source of truth for structure,
 decisions, and evidence. The analysis is a forward model: no observed data is
-used; the validation target is LZ's published **median sensitivity** (expected
-limit) from the WS2024 result (arXiv 2410.17036): **5.1e-48 cm2 at 40 GeV/c2**.
+used; the validation target is LZ's **WS2024-only median sensitivity**
+(expected limit, slide 24 of the collaboration's TeVPA talk):
+**5.76e-48 cm2 at 40 GeV/c2**, like-for-like with our WS2024 3.3 t-y
+exposure. LZ's combined 4.2 t-y median (5.1e-48, arXiv 2410.17036) adds the
+WS2022 sample, which we do not model (retargeted 2026-11-18).
 
 The user's working mode, agreed during scoping: build and validate each
 component (microphysics → backgrounds → statistics) *before* running
@@ -68,8 +71,9 @@ see the lightcone skill; never write into `results/` by hand.
   - `median_sensitivity_definition: median_of_toy_limits` — median of
     background-only toy-MC limits (LZ's Fig. 5 construction); toy MC, not
     asymptotic, per the conventions paper (XENON1T saw ~50% bias).
-  - `exposure_structure: combined_single` — pool 4.2 tonne-years into one
-    sample; the six-sample split only buys nuisance decoupling.
+  - `exposure_structure: combined_single` — pool into one sample (planned
+    as 4.2 tonne-years; realized as WS2024's 3.3 t-y only, see the
+    2026-11-19 note); the six-sample split only buys nuisance decoupling.
   - `test_statistic_sidedness: two_sided`, `power_constraint: applied_1sigma`
     (both = LZ), `halo_model: shm_standard` with parameters **fixed, not
     profiled** (conventions paper).
@@ -85,7 +89,8 @@ see the lightcone skill; never write into `results/` by hand.
      a **1D projection along the ER-band median**, not a stacked 2D spectrum;
      compare projections + total counts vs Table I pre-fit values.
   5. Median sensitivity curve vs LZ Fig. 5 dashed line — minimum ≈
-     5.1e-48 cm2 at 40 GeV/c2, shape agreement.
+     5.1e-48 cm2 at 40 GeV/c2, shape agreement. (Later retargeted to the
+     WS2024-only 5.76e-48 with a 25% gate — see 2026-11-18/19 notes.)
   6. Statistical cross-check — FC cut-and-count curve vs 2D-PLR curve
      consistency.
 
@@ -827,11 +832,10 @@ see the lightcone skill; never write into `results/` by hand.
     the implemented options.
   - V5 now targets the like-for-like WS2024-only slide-24 curve
     (`lz_ws2024_only_sensitivity_reference`), not the combined 5.1e-48.
-    **A1 FAILS**: 40 GeV 5.39e-48 vs 5.76e-48, ratio 0.935, pull -3.5
-    against our bootstrap error alone, because the reference uncertainty is
-    not in the gate. **A2 PASSES** 22/22 masses, ratio 0.85-1.18. Open:
-    widen the gate to include the reference uncertainty, or accept A1 as a
-    documented residual.
+    A1 originally FAILED: 40 GeV 5.39e-48 vs 5.76e-48, ratio 0.935, pull
+    -3.5 against our bootstrap error alone. **User decision 2026-11-19: A1
+    is now "within 25% of LZ at 40 GeV"; V5 PASSES both A1 and A2** (A2
+    22/22 masses, ratio 0.85-1.18; the pull is still printed).
   - V6 PASSES 26/26: PLR/FC 0.91-1.12.
   - The 1000-day extension is now part of the spec:
     `plr_sensitivity_curve_1000d`, `fc_sensitivity_curve_1000d` and
@@ -845,3 +849,13 @@ see the lightcone skill; never write into `results/` by hand.
       orphaned and nothing commits. Recover with
       `lc compute down <clu_ id>`, relaunch, and rerun.
     - Launch long runs with `nohup caffeinate -i lc materialize ... &`.
+
+- **Spec cleanup (2026-11-19)**: the spec description and the
+  `exposure_structure` text now state the realized exposure (WS2024
+  3.3 t-y; WS2022's 0.9 t-y not modeled) and the WS2024-only target.
+  Three statistics-stage findings were added:
+  `plr_sensitivity_vs_lz_ws2024_only`, `fc_plr_crosscheck_agreement` and
+  `plr_gain_over_fc_at_1000d`. All six agreed validations now PASS.
+  Also: the local cluster can disappear between sessions; `lc materialize`
+  then fails with "no current cluster named 'local'", and
+  `lc compute launch --wait` (no positional name) restores it.
