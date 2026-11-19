@@ -23,11 +23,11 @@
     "background_projection_script": "sha256:65bb4671e15c336a9d6f09c4b41922a0164bf0c980f47368fbe1327949d19866",
     "plot_validation4_script": "sha256:d93cd87fa5441a00f34413bf22fa5a4d1d6652d4fda6f2fe485a44427a57f08d",
     "plot_background_total_script": "sha256:88a2c9c465c3d38fe12444a1f8eb53473080027bb711d1466d9f0cabc7bf2918",
-    "plot_backgrounds_per_source_script": "sha256:cced1dbac8cbbc0b674f171e4f4eebb0e8190852187a4c049be5ef8571ede31c",
+    "plot_backgrounds_per_source_script": "sha256:25fdcae7e51d3ab67fca5bd5345c808e36dea66b7d0b4a246dedf172ea3c8308",
     "digitize_fig4_projection_script": "sha256:d0b8c95e7619ad79517edc797219c1513a4deabe977695d950528f672b1b1b99",
     "lz_ws2024_paper": "sha256:d358bffbaed7eaddd431f9b540790673d650f00d0964282a089a15c84b2f9544"
   },
-  "git_sha": "d93d51ccc3b1f1f2ffa3e556f573f949aef5e08c",
+  "git_sha": "c555f031ceab2246bb073239c2066f032f357463",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -37,8 +37,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-19T20:28:43.002+00:00",
-  "finished_at": "2026-11-19T20:28:47.518+00:00",
+  "started_at": "2026-11-19T20:43:32.573+00:00",
+  "finished_at": "2026-11-19T20:43:40.841+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
