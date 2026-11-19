@@ -5,7 +5,7 @@
   "recipe": "python src/plot_plr_scan.py --scan results/baseline/plr_sensitivity_curve.csv --fc results/baseline/fc_sensitivity_curve.csv --reference data/lz_ws2024_only_sensitivity_slide24.csv --output results/baseline/sensitivity_vs_lz_validation.png --statistics both_with_crosscheck --median-sensitivity-definition median_of_toy_limits --power-constraint applied_1sigma --test-statistic-sidedness two_sided",
   "definition_version": "sha256:9922d22d31614f0e1bd675a70311162c385b4e7238600af33ede841b13872da3",
   "env_version": "sha256:be66c0f4145ed592908e044d87181153f41ce8583695b187169b19f5a4368ae4",
-  "data_version": "sha256:44bdeb78697c6771271bcbb4a2c0c9234860c76583c368c745ad872195e6f75e",
+  "data_version": "sha256:ed0edfa770a392a286712e9529e8a8f6f3c39bd144e20300660bb500dff8bf40",
   "decisions": {
     "statistics": "both_with_crosscheck",
     "median_sensitivity_definition": "median_of_toy_limits",
@@ -16,10 +16,10 @@
     "plr_sensitivity_curve": "sha256:c5598a9bf10f41d52af198caa89fdd19c1f393bd50298168761c13fb0a54d5fe",
     "fc_sensitivity_curve": "sha256:4bcb5dee8cec2b6bf2e2bed2e35a0427f5085c631f920792297d790d83922482",
     "lz_ws2024_only_sensitivity_reference": "sha256:ddba355a7373b2ca417e28b1c23ac16c0157b274e15fbf65ebf55d52d272c7fd",
-    "plot_plr_scan_script": "sha256:9be821679800538cecb44802a56f81746133ffba4e0acad040c06125c80c65d5",
+    "plot_plr_scan_script": "sha256:3e6f01083a6ff6a2058e50303dca6099da9f60d2d401f63ed82dcf4416a2c898",
     "stat_decisions_script": "sha256:9420b1baad5380213570616c7f455b775e150ba060c653a97cd98117d91feb8b"
   },
-  "git_sha": "ec146e9435f25699f122ea40e9c9a9bc7ad94f16",
+  "git_sha": "d61f457c3c932c97d6c696efe56991ad46427e91",
   "git_remote": "",
   "lc_version": "0.5.0",
   "hermeticity": {
@@ -29,8 +29,8 @@
     "landlock_abi": null,
     "exec_allowlist_version": 1
   },
-  "started_at": "2026-11-19T01:25:10.080+00:00",
-  "finished_at": "2026-11-19T01:25:15.710+00:00",
+  "started_at": "2026-11-19T19:59:28.852+00:00",
+  "finished_at": "2026-11-19T19:59:30.593+00:00",
   "uv_version": "0.13.7",
   "image": null
 }
