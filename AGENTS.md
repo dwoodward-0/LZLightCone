@@ -896,7 +896,7 @@ see the lightcone skill; never write into `results/` by hand.
   original six and complements `wimp_fig4_validation` (already declared).
   LZ's purple 68%/95% 40 GeV/c2 regions are extracted exactly from the
   pinned paper's vector paths. Containment of our ROI sample: **65.92% ±
-  0.21% / 94.41% ± 0.10%**. It is descriptive, with no gate. The
+  0.21% / 94.41% ± 0.10%**. **Gate (user decision, same day): |f68 − 0.68| ≤ 0.05 and |f95 − 0.95| ≤ 0.03, absolute; PASS** (−2.1 / −0.6 points). It is a tolerance because LZ's contour uncertainty is unpublished; the pull vs our MC sigma alone (−9.8 / −5.7) is reported, not gated. Our signal is slightly broader than LZ's, mostly at low S2c. The validation list is now seven. The
   2026-11-13 scratch probe read a /tmp event-level archive that no longer
   exists (66.00% / 94.37%). The rebuild uses the declared archive's uniform
   50,000-of-59,852 display subsample for containment and the full histogram
