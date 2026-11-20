@@ -26,7 +26,7 @@ site=_build/html
 find "$site" -type f -name '*.hdf5' -delete
 grep -rlE "${BASE_URL}/build/[A-Za-z0-9_]+-[0-9a-f]{32}\.hdf5" "$site" \
   | while read -r f; do
-      sed -i '' -E "s#${BASE_URL}/build/[A-Za-z0-9_]+-[0-9a-f]{32}\.hdf5#${DATA_URL}#g" "$f"
+      sed -i '' -E "s|${BASE_URL}/build/[A-Za-z0-9_]+-[0-9a-f]{32}\.hdf5|${DATA_URL}|g" "$f"
     done
 touch "$site/.nojekyll"
 # Stable paths for the README's embedded headline figures.
