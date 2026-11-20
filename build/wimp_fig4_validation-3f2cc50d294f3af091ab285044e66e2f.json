@@ -1,0 +1,475 @@
+{
+  "model_path": "results/baseline/wimp_signal_models.hdf5",
+  "mass_gev": 40.0,
+  "campaign": "WS2024 only",
+  "exposure_tonne_years": 3.3,
+  "native_reference_sigma_cm2": 1e-36,
+  "displayed_sigma_cm2": 2.1816833824484827e-48,
+  "published_median_not_used_cm2": 5.0587223537493065e-48,
+  "native_rate_events_per_kg_day_at_native_reference_sigma": 1091198.2563265532,
+  "absolute_roi_events_at_native_reference_sigma": 656002129289.4882,
+  "absolute_roi_events_at_displayed_sigma": 1.4311889443216974,
+  "full_roi_mc_events": 59852,
+  "mc_relative_sigma_at_native_reference": 0.004085304237759805,
+  "normalization_outputs": {
+    "direct_accepted_closure": 656002129289.4896,
+    "mean_rate_acceptance_closure": 656002129289.4895
+  },
+  "reference_bin_counts": {
+    "top": 8,
+    "bottom": 3
+  },
+  "reference_missing_bins_are_missing_not_zero": true,
+  "reference_uncertainty": "No LZ background band is treated as WIMP uncertainty",
+  "display_semantics": "Fixed LZ observed-power-constrained limit input at WS2024 exposure; no fit/tuning",
+  "comparison_acceptance": "Descriptive go/no-go checkpoint, no agreement-improvement target",
+  "panels": {
+    "top": {
+      "reference_present_bins": 8,
+      "reference_present_centers": [
+        -4.611000000000001,
+        -4.055,
+        -3.499,
+        -2.943,
+        -2.387,
+        -1.831,
+        -1.275,
+        -0.7189999999999999
+      ],
+      "model_at_reference_bins": [
+        0.14426189435765244,
+        0.21389402370798458,
+        0.2614074306512786,
+        0.24674929353188294,
+        0.16807837815997614,
+        0.08369246316084708,
+        0.03010537460557328,
+        0.007269288228827862
+      ],
+      "lz_at_reference_bins": [
+        0.12618275345906707,
+        0.17571142465950945,
+        0.21473359748208543,
+        0.22824433121735035,
+        0.18958326569471123,
+        0.11819524358201662,
+        0.0494424519333682,
+        0.016025072388814194
+      ],
+      "model_sigma_at_reference_bins": [
+        0.0018100222071233212,
+        0.002175639389940752,
+        0.00238356043925494,
+        0.0023222672063212104,
+        0.0019451716918151576,
+        0.0013938776910847122,
+        0.0008439969914851199,
+        0.00041639383700047125
+      ],
+      "signed_model_minus_lz_at_reference_bins": [
+        0.018079140898585366,
+        0.038182599048475124,
+        0.04667383316919316,
+        0.01850496231453258,
+        -0.02150488753473509,
+        -0.03450278042116954,
+        -0.01933707732779492,
+        -0.008755784159986332
+      ],
+      "model_sum_at_reference_bins": 1.155458146404023,
+      "lz_sum_at_reference_bins": 1.1181181404169225,
+      "signed_sum_model_minus_lz_at_reference_bins": 0.03734000598710034,
+      "model_all_grid_sum": 1.1569167864762548,
+      "model_reference_absent_sum": 0.0014586400722319062,
+      "model_reference_absent_mc_sigma": 0.00018671939515848808,
+      "reference_absent_bin_centers": [
+        -0.1629999999999998,
+        0.39300000000000024,
+        0.9490000000000003,
+        1.5050000000000003,
+        2.0610000000000004,
+        2.6170000000000004,
+        3.173,
+        3.729
+      ],
+      "reference_absent_model_counts": [
+        0.0013390794105735532,
+        0.00011956066165835296,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_peak_u": -3.499,
+      "lZ_peak_u": -2.943,
+      "peak_model_minus_lz_u": -0.556,
+      "max_absolute_residual_at_reference_bins": 0.04667383316919316,
+      "reference_level_min_max": [
+        0.016025072388814194,
+        0.22824433121735035
+      ],
+      "model_level_min_max_at_reference_bins": [
+        0.007269288228827862,
+        0.2614074306512786
+      ],
+      "bins": [
+        {
+          "u": -4.611000000000001,
+          "model": 0.14426189435765244,
+          "model_mc_sigma": 0.0018100222071233212,
+          "reference": 0.12618275345906707,
+          "model_minus_reference": 0.018079140898585366
+        },
+        {
+          "u": -4.055,
+          "model": 0.21389402370798458,
+          "model_mc_sigma": 0.002175639389940752,
+          "reference": 0.17571142465950945,
+          "model_minus_reference": 0.038182599048475124
+        },
+        {
+          "u": -3.499,
+          "model": 0.2614074306512786,
+          "model_mc_sigma": 0.00238356043925494,
+          "reference": 0.21473359748208543,
+          "model_minus_reference": 0.04667383316919316
+        },
+        {
+          "u": -2.943,
+          "model": 0.24674929353188294,
+          "model_mc_sigma": 0.0023222672063212104,
+          "reference": 0.22824433121735035,
+          "model_minus_reference": 0.01850496231453258
+        },
+        {
+          "u": -2.387,
+          "model": 0.16807837815997614,
+          "model_mc_sigma": 0.0019451716918151576,
+          "reference": 0.18958326569471123,
+          "model_minus_reference": -0.02150488753473509
+        },
+        {
+          "u": -1.831,
+          "model": 0.08369246316084708,
+          "model_mc_sigma": 0.0013938776910847122,
+          "reference": 0.11819524358201662,
+          "model_minus_reference": -0.03450278042116954
+        },
+        {
+          "u": -1.275,
+          "model": 0.03010537460557328,
+          "model_mc_sigma": 0.0008439969914851199,
+          "reference": 0.0494424519333682,
+          "model_minus_reference": -0.01933707732779492
+        },
+        {
+          "u": -0.7189999999999999,
+          "model": 0.007269288228827862,
+          "model_mc_sigma": 0.00041639383700047125,
+          "reference": 0.016025072388814194,
+          "model_minus_reference": -0.008755784159986332
+        },
+        {
+          "u": -0.1629999999999998,
+          "model": 0.0013390794105735532,
+          "model_mc_sigma": 0.000178900255136814,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 0.39300000000000024,
+          "model": 0.00011956066165835296,
+          "model_mc_sigma": 5.346803942856404e-05,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 0.9490000000000003,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 1.5050000000000003,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 2.0610000000000004,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 2.6170000000000004,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 3.173,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 3.729,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        }
+      ]
+    },
+    "bottom": {
+      "reference_present_bins": 3,
+      "reference_present_centers": [
+        -4.055,
+        -3.499,
+        -2.943
+      ],
+      "model_at_reference_bins": [
+        0.0144668400607266,
+        0.01659501983825448,
+        0.01044960182898733
+      ],
+      "lz_at_reference_bins": [
+        0.009482001070195064,
+        0.013489628825916533,
+        0.013292295883156831
+      ],
+      "model_sigma_at_reference_bins": [
+        0.0005866761586346278,
+        0.0006281141255580592,
+        0.0004989612312220295
+      ],
+      "signed_model_minus_lz_at_reference_bins": [
+        0.004984838990531537,
+        0.0031053910123379456,
+        -0.002842694054169502
+      ],
+      "model_sum_at_reference_bins": 0.04151146172796841,
+      "lz_sum_at_reference_bins": 0.03626392577926843,
+      "signed_sum_model_minus_lz_at_reference_bins": 0.005247535948699981,
+      "model_all_grid_sum": 0.05545223487739602,
+      "model_reference_absent_sum": 0.013940773149427607,
+      "model_reference_absent_mc_sigma": 0.0005766873103569609,
+      "reference_absent_bin_centers": [
+        -4.611000000000001,
+        -2.387,
+        -1.831,
+        -1.275,
+        -0.7189999999999999,
+        -0.1629999999999998,
+        0.39300000000000024,
+        0.9490000000000003,
+        1.5050000000000003,
+        2.0610000000000004,
+        2.6170000000000004,
+        3.173,
+        3.729
+      ],
+      "reference_absent_model_counts": [
+        0.008847488962758727,
+        0.003825941173084606,
+        0.0011477823519253818,
+        9.564852932711516e-05,
+        2.391213233177879e-05,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "model_peak_u": -3.499,
+      "lZ_peak_u": -3.499,
+      "peak_model_minus_lz_u": 0.0,
+      "max_absolute_residual_at_reference_bins": 0.004984838990531537,
+      "reference_level_min_max": [
+        0.009482001070195064,
+        0.013489628825916533
+      ],
+      "model_level_min_max_at_reference_bins": [
+        0.01044960182898733,
+        0.01659501983825448
+      ],
+      "bins": [
+        {
+          "u": -4.611000000000001,
+          "model": 0.008847488962758727,
+          "model_mc_sigma": 0.00045924939815627407,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": -4.055,
+          "model": 0.0144668400607266,
+          "model_mc_sigma": 0.0005866761586346278,
+          "reference": 0.009482001070195064,
+          "model_minus_reference": 0.004984838990531537
+        },
+        {
+          "u": -3.499,
+          "model": 0.01659501983825448,
+          "model_mc_sigma": 0.0006281141255580592,
+          "reference": 0.013489628825916533,
+          "model_minus_reference": 0.0031053910123379456
+        },
+        {
+          "u": -2.943,
+          "model": 0.01044960182898733,
+          "model_mc_sigma": 0.0004989612312220295,
+          "reference": 0.013292295883156831,
+          "model_minus_reference": -0.002842694054169502
+        },
+        {
+          "u": -2.387,
+          "model": 0.003825941173084606,
+          "model_mc_sigma": 0.0003022654954543175,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": -1.831,
+          "model": 0.0011477823519253818,
+          "model_mc_sigma": 0.00016563497552730857,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": -1.275,
+          "model": 9.564852932711516e-05,
+          "model_mc_sigma": 4.78234675858436e-05,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": -0.7189999999999999,
+          "model": 2.391213233177879e-05,
+          "model_mc_sigma": 2.3912032697689558e-05,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": -0.1629999999999998,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 0.39300000000000024,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 0.9490000000000003,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 1.5050000000000003,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 2.0610000000000004,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 2.6170000000000004,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 3.173,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        },
+        {
+          "u": 3.729,
+          "model": 0.0,
+          "model_mc_sigma": 0.0,
+          "reference": null,
+          "model_minus_reference": null
+        }
+      ]
+    }
+  },
+  "annual_response_check": {
+    "relative_absolute_yield_difference_representative_minus_annual": 0.000197130056113215,
+    "relative_yield_difference_mc_sigma": 0.005777545469048901,
+    "representative_within_3_mc_sigma_of_annual": true,
+    "shape_differences": {
+      "top": {
+        "bins": 10.0,
+        "max_abs_unit_shape_difference": 0.005122822981139377,
+        "max_abs_difference_mc_sigma": 2.830446381884682
+      },
+      "bottom": {
+        "bins": 8.0,
+        "max_abs_unit_shape_difference": 0.0005017146404007761,
+        "max_abs_difference_mc_sigma": 1.0006087355309394
+      }
+    },
+    "note": "Independent native/response realizations; no common-RNG cancellation or LZ tuning"
+  },
+  "decision_checks_pass": {
+    "time_mode": "representative_day",
+    "support_treatment": "native_drate_extension",
+    "efficiency_treatment": "input_pre_roi_curve",
+    "nest_parameter_set": "ws2024_nest240",
+    "detector_effects": "uniform_1d",
+    "halo_model": "shm_standard",
+    "exposure_structure": "combined_single",
+    "response_model": "nest_library"
+  },
+  "validated_response_calibration_dependency": "results/baseline/response_model_calibration.hdf5",
+  "response_band_dependency_check": {
+    "s1c_phd": [
+      3.5,
+      10.0,
+      40.0,
+      79.5
+    ],
+    "er_median_log10_s2c": [
+      3.4456252006909507,
+      3.58374729419101,
+      3.8543054307135716,
+      4.029055063228789
+    ],
+    "er_sigma_log10_s2c": [
+      0.09160087014961305,
+      0.08728027213973,
+      0.07839474439665561,
+      0.0689238996637247
+    ],
+    "meaning": "Finite-response input check; model counts remain full stored projections"
+  },
+  "storage_and_closure_checks_pass": true,
+  "no_LZ_agreement_fit_or_stated_improvement_gate": true
+}
