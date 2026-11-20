@@ -24,7 +24,7 @@ At 40 GeV/c², our median power-constrained limit is
 (bootstrap uncertainty
 {astra:value col=median_bootstrap_sigma_cm2 where="mass_gev=40" sig=2}`outputs.plr_sensitivity_curve` cm²).
 That is within the agreed 25% of LZ's value, and the curve tracks LZ's across
-the published mass range ({astra:ref}`outputs.sensitivity_vs_lz_validation`).
+the published mass range ({astra}`outputs.sensitivity_vs_lz_validation`).
 An independent Feldman–Cousins cut-and-count analysis gives
 {astra:value col=median_pc_cm2 where="mass_gev=40" sig=3}`outputs.fc_sensitivity_curve` cm²
 at the same mass. All seven validations along the chain pass (see the table
@@ -204,6 +204,7 @@ limit exactly from the Poisson median count, so no toys are needed.
 - **Fixed inputs:** background constraints use Table I pre-fit uncertainties.
   Halo parameters are fixed.
 
+(efficiency-methodology)=
 # Efficiency methodology
 
 These sections document how the public efficiency curves are applied, and the
@@ -225,9 +226,6 @@ ROI follow once, before Table I normalization. Consequently this correction
 changes NR generation efficiencies and shapes, but not the imposed central
 physical Table I counts. It is also the chain used for the absolute WIMP
 signal yields.
-
-:::{astra} decisions.efficiency_treatment
-:::
 
 {astra}`outputs.nr_efficiency_comparison` reruns complete, matched-budget
 background models under the legacy and corrected selections. It retains full
@@ -280,15 +278,13 @@ the six unchanged Validation 4 gates. Cumulative-Y and the independent
 HEPData total-2D curve are forward diagnostics only: neither is multiplied
 into the production selection. Both modes pass the same six gates.
 
-:::{astra} decisions.er_efficiency_treatment
-:::
-
 :::{astra} outputs.er_efficiency_validation
 :caption: Complete staged ER selection comparison. The conditional G/Y stage uses retained sampled true energy. Unit-shape differences and Monte Carlo multiplicities are distinct from the unchanged Table-I physical means; the independent total-2D curve is never another selection factor.
 :::
 
 # Appendix
 
+(per-source-background-figures)=
 ## Per-source background figures
 
 Each figure shows one Table I source in both Fig. 4 S1c panels. The red dashed
@@ -342,6 +338,7 @@ normalization uncertainty. LZ's "Other ER betas" outline holds exactly
 :::{astra} findings.er_staged_conditional_chain
 :::
 
+(decision-registry)=
 ## Decision registry
 
 :::{astra} decisions
