@@ -29,6 +29,13 @@ grep -rlE "${BASE_URL}/build/[A-Za-z0-9_]+-[0-9a-f]{32}\.hdf5" "$site" \
       sed -i '' -E "s|${BASE_URL}/build/[A-Za-z0-9_]+-[0-9a-f]{32}\.hdf5|${DATA_URL}|g" "$f"
     done
 touch "$site/.nojekyll"
+# Hydration fix: myst 1.13 bakes the page's route as "/index" without the base
+# path. The Remix client compares it with window.location.pathname
+# ("/LZLightCone/") and reloads on any mismatch, which loops forever. Bake in
+# the served path instead (single-page site: index.html only).
+sed -i '' "s|__remixContext = {\"url\":\"/index\"|__remixContext = {\"url\":\"${BASE_URL}/\"|" "$site/index.html"
+grep -q "__remixContext = {\"url\":\"${BASE_URL}/\"" "$site/index.html" \
+  || { echo "refusing to publish: hydration URL patch did not apply" >&2; exit 1; }
 # Stable paths for the README's embedded headline figures.
 mkdir -p "$site/figures"
 cp results/baseline/sensitivity_vs_lz_validation.png \
